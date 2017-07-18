@@ -1,7 +1,8 @@
 module Selectize.Selectize
     exposing
         ( Entry
-        , Msg
+        , Movement(..)
+        , Msg(..)
         , State
         , UpdateConfig
         , ViewConfig
@@ -12,11 +13,11 @@ module Selectize.Selectize
         , first
         , next
         , previous
+        , topAndHeight
         , update
         , updateConfig
         , view
         , viewConfig
-        , topAndHeight
         )
 
 import DOM
@@ -338,7 +339,7 @@ update config model msg =
                     )
 
         SelectKeyboardFocusAndBlur ->
-            ( state
+            ( state |> reset
             , blur config.id
             , Just (config.select state.keyboardFocus)
             )
