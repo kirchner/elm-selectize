@@ -15,7 +15,7 @@ import Test exposing (..)
 testUpdate : Test
 testUpdate =
     concat
-        [ msgTestWithPrecondition "bluring textfield resets model"
+        [ msgTestWithPrecondition "reset model if textfield blured and preventBlur is False"
             app
             textfieldBlured
             (\model -> not model.menu.preventBlur)
@@ -23,6 +23,14 @@ testUpdate =
             \_ _ _ _ finalModel ->
                 finalModel.menu
                     |> expectReset
+        , msgTestWithPrecondition "do not change model if textfield blured and preventBlur is True"
+            app
+            textfieldBlured
+            (\model -> model.menu.preventBlur)
+          <|
+            \_ _ beforeMsgModel _ finalModel ->
+                beforeMsgModel
+                    |> Expect.equal finalModel
         , msgTest "model is reseted after sth is selected"
             app
             (Fuzz.oneOf
@@ -54,6 +62,13 @@ testUpdate =
                             |> S.filter identity finalModel.menu.query
                             |> S.first
                         )
+        , msgTest "model is unchanged after clear selection"
+            app
+            clearSelection
+          <|
+            \_ _ beforeMsgModel _ finalModel ->
+                beforeMsgModel
+                    |> Expect.equal finalModel
         ]
 
 
