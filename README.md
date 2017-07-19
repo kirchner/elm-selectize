@@ -8,7 +8,7 @@ This is a customizable dropdown menu with the following features:
   scroll`
 * you can insert non-selectable dividers between entries
 
-Check out the [demo](https://kirchner.github.io/elm-pat)
+Check out the [demo](https://kirchner.github.io/elm-selectize)
 
 The list of menu entries and the actual selection live in your model.  The
 styling and rendering of the entries can be fully customized.
