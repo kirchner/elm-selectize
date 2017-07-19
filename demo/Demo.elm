@@ -168,7 +168,10 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    Html.div []
+    Html.div
+        [ Attributes.style
+            [ ( "width", "30rem" ) ]
+        ]
         [ Selectize.view viewConfig model |> Html.map MenuMsg ]
 
 
@@ -188,6 +191,8 @@ trees =
         , treesPart1 |> List.map Selectize.entry
         , [ Selectize.divider "Second Part" ]
         , treesPart2 |> List.map Selectize.entry
+        , [ Selectize.divider "Third Part" ]
+        , treesPart3 |> List.map Selectize.entry
         ]
 
 
