@@ -2,11 +2,86 @@ module ArchitectureTests exposing (..)
 
 import ArchitectureTest exposing (..)
 import ArchitectureTest.Types exposing (..)
-import Expect
+import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
 import Random
 import Selectize.Selectize as S
 import Test exposing (..)
+
+
+{- actual tests -}
+
+
+testUpdate : Test
+testUpdate =
+    concat
+        [ msgTestWithPrecondition "bluring textfield resets model"
+            app
+            textfieldBlured
+            (\model -> not model.menu.preventBlur)
+          <|
+            \_ _ _ _ finalModel ->
+                finalModel.menu
+                    |> expectReset
+        , msgTest "model is reseted after sth is selected"
+            app
+            (Fuzz.oneOf
+                [ select
+                , selectKeyboardFocusAndBlur
+                ]
+            )
+          <|
+            \_ _ _ _ finalModel ->
+                finalModel.menu
+                    |> expectReset
+        , invariantTest "mouseFocus and keyboardFocus are always from the list"
+            app
+          <|
+            \_ _ finalModel ->
+                finalModel.menu
+                    |> Expect.all
+                        [ .mouseFocus >> expectMember
+                        , .keyboardFocus >> expectMember
+                        ]
+        , msgTest "First possible entry is keyboardFocused after query change"
+            app
+            setQuery
+          <|
+            \_ _ _ _ finalModel ->
+                finalModel.menu.keyboardFocus
+                    |> Expect.equal
+                        (trees
+                            |> S.filter identity finalModel.menu.query
+                            |> S.first
+                        )
+        ]
+
+
+
+{- expectations -}
+
+
+expectReset : S.State String -> Expectation
+expectReset menu =
+    menu
+        |> Expect.all
+            [ .query >> Expect.equal ""
+            , .keyboardFocus >> Expect.equal Nothing
+            , .mouseFocus >> Expect.equal Nothing
+            , .open >> Expect.false "Expected the menu to be closed"
+            ]
+
+
+expectMember : Maybe String -> Expectation
+expectMember maybeFocus =
+    case maybeFocus of
+        Just focus ->
+            List.member (S.entry focus) trees
+                |> Expect.true "Expected the focus to be in the list of possible entries"
+
+        Nothing ->
+            Expect.pass
+
 
 
 {- setup -}
@@ -54,21 +129,30 @@ updateConfig =
         }
 
 
+
+{- msg fuzzer -}
+
+
 msg : Fuzzer (S.Msg String)
 msg =
     Fuzz.oneOf
         -- TODO: add setPreventBlur
-        [ Fuzz.constant S.NoOp
+        [ noOp
         , textfieldFocused
-        , Fuzz.constant S.TextfieldBlured
-        , Fuzz.constant S.BlurTextfield
-        , Fuzz.string |> Fuzz.map S.SetQuery
+        , textfieldBlured
+        , blurTextfield
+        , setQuery
         , setMouseFocus
         , select
         , setKeyboardFocus
         , selectKeyboardFocusAndBlur
-        , Fuzz.constant S.ClearSelection
+        , clearSelection
         ]
+
+
+noOp : Fuzzer (S.Msg String)
+noOp =
+    Fuzz.constant S.NoOp
 
 
 textfieldFocused : Fuzzer (S.Msg String)
@@ -77,6 +161,21 @@ textfieldFocused =
         (listCount (Fuzz.intRange 0 42) (List.length trees))
         (Fuzz.intRange 0 100)
         (Fuzz.intRange 0 1000)
+
+
+textfieldBlured : Fuzzer (S.Msg String)
+textfieldBlured =
+    Fuzz.constant S.TextfieldBlured
+
+
+blurTextfield : Fuzzer (S.Msg String)
+blurTextfield =
+    Fuzz.constant S.BlurTextfield
+
+
+setQuery : Fuzzer (S.Msg String)
+setQuery =
+    Fuzz.string |> Fuzz.map S.SetQuery
 
 
 setMouseFocus : Fuzzer (S.Msg String)
@@ -118,27 +217,9 @@ movement =
         ]
 
 
-testUpdate : Test
-testUpdate =
-    concat
-        [ msgTest "bluring textfield resets model"
-            app
-            (Fuzz.constant S.TextfieldBlured)
-          <|
-            \_ _ _ _ finalModel ->
-                finalModel.menu.query
-                    |> Expect.equal ""
-        , msgTest "model is reseted after sth is selected"
-            app
-            (Fuzz.oneOf
-                [ select, selectKeyboardFocusAndBlur ]
-            )
-          <|
-            \_ _ _ _ finalModel ->
-                finalModel.menu.query
-                    |> Expect.equal ""
-        , todo "add more tests"
-        ]
+clearSelection : Fuzzer (S.Msg String)
+clearSelection =
+    Fuzz.constant S.ClearSelection
 
 
 
