@@ -51,27 +51,32 @@ update msg model =
     case msg of
         MenuMsg selectizeMsg ->
             let
-                ( newMenu, cmd, maybeMsg ) =
+                ( newMenu, menuCmd, maybeMsg ) =
                     Selectize.update updateConfig model selectizeMsg
 
                 newModel =
                     { model | menu = newMenu }
+
+                cmd =
+                    menuCmd |> Cmd.map MenuMsg
             in
             case maybeMsg of
                 Just nextMsg ->
                     update nextMsg newModel
-                        |> (\( nextModel, nextCmd ) ->
-                                ( nextModel
-                                , Cmd.batch
-                                    [ nextCmd, cmd |> Cmd.map MenuMsg ]
-                                )
-                           )
+                        |> andDo cmd
 
                 Nothing ->
-                    ( newModel, cmd |> Cmd.map MenuMsg )
+                    ( newModel, cmd )
 
         SelectTree newSelection ->
             ( { model | selection = newSelection }, Cmd.none )
+
+
+andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
+andDo cmd ( model, cmds ) =
+    ( model
+    , Cmd.batch [ cmd, cmds ]
+    )
 
 
 updateConfig : Selectize.UpdateConfig String Msg Model
