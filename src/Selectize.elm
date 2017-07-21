@@ -231,7 +231,18 @@ type UpdateConfig a msg model
     = UpdateConfig (Internal.UpdateConfig a msg model)
 
 
-{-| Create the update configuration.
+{-| Create the update configuration, for example
+
+    updateConfig : Selectize.UpdateConfig String Msg Model
+    updateConfig =
+        Selectize.updateConfig
+            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
+            , state = \model -> model.menu
+            , entries = \model -> entries
+            , selection = \model -> selection
+            , id = "tree-menu"
+            , select = SelectTree
+            }
 
   - `toLabel` should return a unique string representation of `a`.
   - tell the dropdown with `state`, `entries` and `selection` how to
@@ -273,7 +284,37 @@ type ViewConfig a model
     = ViewConfig (Internal.ViewConfig a model)
 
 
-{-| Create the view configuration.
+{-| Create the view configuration, for example
+
+    viewConfig : Selectize.ViewConfig String Model
+    viewConfig =
+        Selectize.viewConfig
+            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
+            , state = \model -> model.menu
+            , entries = \model -> model.entries
+            , selection = \model -> selection
+            , id = "tree-menu"
+            , placeholder = "Select a Tree"
+            , container = [ ... ]
+            , input =
+                \sthSelected open -> [ ... ]
+            , toggle =
+                \open ->
+                    Html.div
+                        ...
+            , menu = [ ... ]
+            , ul = [ ... ]
+            , entry =
+                \tree mouseFocused keyboardFocused ->
+                    { attributes = ...
+                    , children = ...
+                    }
+            , divider =
+                \title ->
+                    { attributes = ...
+                    , children = ...
+                    }
+            }
 
   - `toLabel`, `state`, `entries`, `selection` and `id` have to be the
     same as in the `updateConfig`
