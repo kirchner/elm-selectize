@@ -103,7 +103,7 @@ testPrevious =
                         treeB
                 in
                 currentEntry
-                    |> previous entries Nothing
+                    |> previous entries
                     |> Expect.equal previousEntry
         ]
 
@@ -111,12 +111,10 @@ testPrevious =
 testTopAndHeight : Test
 testTopAndHeight =
     describe "topAndHeight"
-        [ fuzz3 (listCount (Fuzz.intRange 0 42) (List.length trees1))
-            (Fuzz.intRange 0 200)
-            (Fuzz.intRange 0 1000)
+        [ fuzz (listCount (Fuzz.intRange 0 42) (List.length trees1))
             "satisfies a priori bounds"
           <|
-            \entryHeights menuHeight scrollTop ->
+            \entryHeights ->
                 let
                     entries =
                         trees1 |> List.map entry
@@ -133,7 +131,7 @@ testTopAndHeight =
                             |> Maybe.withDefault 0
                 in
                 List.head trees1
-                    |> topAndHeight entryHeights menuHeight scrollTop entries
+                    |> topAndHeight entryHeights entries
                     |> Expect.all
                         [ Tuple.first >> Expect.atLeast 0
                         , Tuple.first >> Expect.atMost sum

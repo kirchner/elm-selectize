@@ -172,15 +172,18 @@ noOp =
 
 textfieldFocused : Fuzzer (S.Msg String)
 textfieldFocused =
-    Fuzz.map3 S.TextfieldFocused
-        (listCount (Fuzz.intRange 0 42) (List.length trees))
-        (Fuzz.intRange 0 100)
+    Fuzz.map2 S.OpenMenu
+        (Fuzz.map2
+            S.Heights
+            (listCount (Fuzz.intRange 0 42) (List.length trees))
+            (Fuzz.intRange 0 100)
+        )
         (Fuzz.intRange 0 1000)
 
 
 textfieldBlured : Fuzzer (S.Msg String)
 textfieldBlured =
-    Fuzz.constant S.TextfieldBlured
+    Fuzz.constant S.CloseMenu
 
 
 blurTextfield : Fuzzer (S.Msg String)
@@ -212,10 +215,14 @@ select =
 
 setKeyboardFocus : Fuzzer (S.Msg String)
 setKeyboardFocus =
-    Fuzz.map4 S.SetKeyboardFocus
+    Fuzz.map3 S.SetKeyboardFocus
         movement
-        (listCount (Fuzz.intRange 0 42) (List.length trees))
-        (Fuzz.intRange 0 100)
+        (Fuzz.map2
+            S.Heights
+            (listCount (Fuzz.intRange 0 42) (List.length trees))
+            (Fuzz.intRange 0 100)
+            |> Fuzz.maybe
+        )
         (Fuzz.intRange 0 1000)
 
 

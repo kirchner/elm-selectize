@@ -6,6 +6,7 @@ module Selectize.Selectize
         , State
         , UpdateConfig
         , ViewConfig
+        , Heights
         , divider
         , empty
         , entry
