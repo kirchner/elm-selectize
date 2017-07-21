@@ -81,8 +81,8 @@ where the update configuration is given by
         Selectize.updateConfig
             { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
             , state = \model -> model.menu
-            , entries = \model -> entries
-            , selection = \model -> selection
+            , entries = \model -> model.entries
+            , selection = \model -> model.selection
             , id = "tree-menu"
             , select = SelectTree
             }
@@ -102,7 +102,7 @@ with the view configuration given by
             { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
             , state = \model -> model.menu
             , entries = \model -> model.entries
-            , selection = \model -> selection
+            , selection = \model -> model.selection
             , id = "tree-menu"
             , placeholder = "Select a Tree"
             , container =
@@ -199,7 +199,7 @@ empty =
     State Internal.empty
 
 
-{-| Each entry of the menu has to wrapped in this type. C.f. `entry`
+{-| Each entry of the menu has to be wrapped in this type. C.f. `entry`
 and `divider`.
 -}
 type Entry a
@@ -237,9 +237,9 @@ type UpdateConfig a msg model
     updateConfig =
         Selectize.updateConfig
             { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
-            , state = \model -> model.menu
-            , entries = \model -> entries
-            , selection = \model -> selection
+            , state = .menu
+            , entries = .entries
+            , selection = .selection
             , id = "tree-menu"
             , select = SelectTree
             }
@@ -290,9 +290,9 @@ type ViewConfig a model
     viewConfig =
         Selectize.viewConfig
             { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
-            , state = \model -> model.menu
-            , entries = \model -> model.entries
-            , selection = \model -> selection
+            , state = .menu
+            , entries = .entries
+            , selection = .selection
             , id = "tree-menu"
             , placeholder = "Select a Tree"
             , container = [ ... ]
