@@ -367,8 +367,7 @@ updateKeyboardFocus select filteredEntries movement state =
             case movement of
                 Up ->
                     state.keyboardFocus
-                        |> Maybe.map
-                            (previous filteredEntries Nothing)
+                        |> Maybe.map (previous filteredEntries)
 
                 Down ->
                     state.keyboardFocus
@@ -685,54 +684,39 @@ first entries =
 Returns the provided entry if there is no next.
 -}
 next : List (Entry a) -> a -> a
-next entries currentFocus =
-    case entries of
-        [] ->
-            currentFocus
-
-        entry :: rest ->
-            case entry of
-                Entry a ->
-                    if a == currentFocus then
-                        case rest of
-                            entry :: rest ->
-                                case entry of
-                                    Entry newFocus ->
-                                        newFocus
-
-                                    Divider _ ->
-                                        next (Entry currentFocus :: rest)
-                                            currentFocus
-
-                            [] ->
-                                currentFocus
-                    else
-                        next rest currentFocus
-
-                Divider _ ->
-                    next rest currentFocus
+next entries current =
+    -- this is an adaption of the implementation in
+    -- thebritican/elm-autocomplete
+    entries
+        |> List.foldl (getPrevious current) Nothing
+        |> Maybe.withDefault current
 
 
 {-| Return the entry before (i.e. above) the given one, which is not
 a `Divider`. Returns the provided entry if there is no previous.
 -}
-previous : List (Entry a) -> Maybe a -> a -> a
-previous entries former currentFocus =
-    case entries of
-        [] ->
-            currentFocus
+previous : List (Entry a) -> a -> a
+previous entries current =
+    -- this is an adaption of the implementation in
+    -- thebritican/elm-autocomplete
+    entries
+        |> List.foldr (getPrevious current) Nothing
+        |> Maybe.withDefault current
 
-        entry :: rest ->
-            case entry of
-                Entry a ->
-                    if a == currentFocus then
-                        former
-                            |> Maybe.withDefault currentFocus
-                    else
-                        previous rest (Just a) currentFocus
 
-                Divider _ ->
-                    previous rest former currentFocus
+getPrevious : a -> Entry a -> Maybe a -> Maybe a
+getPrevious current next result =
+    case next of
+        Entry nextA ->
+            if nextA == current then
+                Just nextA
+            else if result == Just current then
+                Just nextA
+            else
+                result
+
+        Divider _ ->
+            result
 
 
 
