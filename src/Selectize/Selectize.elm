@@ -322,6 +322,14 @@ update config model msg =
             )
 
 
+type alias WithKeyboardFocus a r =
+    { r | keyboardFocus : Maybe a }
+
+
+type alias WithHeights r =
+    { r | heights : Maybe Heights }
+
+
 reset : State a -> State a
 reset state =
     { state
@@ -332,12 +340,12 @@ reset state =
     }
 
 
-resetHeights : State a -> State a
+resetHeights : WithHeights r -> WithHeights r
 resetHeights state =
     { state | heights = Nothing }
 
 
-updateHeights : Maybe Heights -> State a -> State a
+updateHeights : Maybe Heights -> WithHeights r -> WithHeights r
 updateHeights maybeHeights state =
     case maybeHeights of
         Just newHeights ->
@@ -351,8 +359,8 @@ updateKeyboardFocus :
     (Maybe a -> msg)
     -> List (Entry a)
     -> Movement
-    -> State a
-    -> ( State a, Cmd (Msg a), Maybe msg )
+    -> WithKeyboardFocus a r
+    -> ( WithKeyboardFocus a r, Cmd (Msg a), Maybe msg )
 updateKeyboardFocus select filteredEntries movement state =
     let
         nextKeyboardFocus =
@@ -387,8 +395,8 @@ scrollToKeyboardFocus :
     String
     -> List (Entry a)
     -> Int
-    -> ( State a, Cmd (Msg a), Maybe msg )
-    -> ( State a, Cmd (Msg a), Maybe msg )
+    -> ( WithKeyboardFocus a (WithHeights r), Cmd (Msg a), Maybe msg )
+    -> ( WithKeyboardFocus a (WithHeights r), Cmd (Msg a), Maybe msg )
 scrollToKeyboardFocus id filteredEntries scrollTop ( state, cmd, maybeMsg ) =
     case state.keyboardFocus of
         Just focus ->
