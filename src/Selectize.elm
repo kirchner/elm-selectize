@@ -48,27 +48,31 @@ And you have to hook it up in your update function like so
         case msg of
             MenuMsg selectizeMsg ->
                 let
-                    ( newMenu, cmd, maybeMsg ) =
+                    ( newMenu, menuCmd, maybeMsg ) =
                         Selectize.update updateConfig model selectizeMsg
 
                     newModel =
                         { model | menu = newMenu }
+
+                    cmd =
+                        menuCmd |> Cmd.map MenuMsg
                 in
                 case maybeMsg of
                     Just nextMsg ->
                         update nextMsg newModel
-                            |> (\( nextModel, nextCmd ) ->
-                                    ( nextModel
-                                    , Cmd.batch
-                                        [ nextCmd, cmd |> Cmd.map MenuMsg ]
-                                    )
-                               )
+                            |> andDo cmd
 
                     Nothing ->
-                        ( newModel, cmd |> Cmd.map MenuMsg )
+                        ( newModel, cmd )
 
             SelectTree newSelection ->
                 ( { model | selection = newSelection }, Cmd.none )
+
+    andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
+    andDo cmd ( model, cmds ) =
+        ( model
+        , Cmd.batch [ cmd, cmds ]
+        )
 
 where the update configuration is given by
 
@@ -102,26 +106,26 @@ with the view configuration given by
             , id = "tree-menu"
             , placeholder = "Select a Tree"
             , container =
-                [ Attributes.class "pa-selectize__container" ]
+                [ Attributes.class "selectize__container" ]
             , input =
                 \sthSelected open ->
-                    [ Attributes.class "pa-selectize__textfield"
+                    [ Attributes.class "selectize__textfield"
                     , Attributes.classList
-                        [ ( "pa-selectize__textfield--selection", sthSelected )
-                        , ( "pa-selectize__textfield--no-selection", not sthSelected )
-                        , ( "pa-selectize__textfield--menu-open", open )
+                        [ ( "selectize__textfield--selection", sthSelected )
+                        , ( "selectize__textfield--no-selection", not sthSelected )
+                        , ( "selectize__textfield--menu-open", open )
                         ]
                     ]
             , toggle =
                 \open ->
                     Html.div
-                        [ Attributes.class "pa-selectize__menu-toggle"
+                        [ Attributes.class "selectize__menu-toggle"
                         , Attributes.classList
-                            [ ( "pa-selectize__menu-toggle--menu-open", open ) ]
+                            [ ( "selectize__menu-toggle--menu-open", open ) ]
                         ]
                         [ Html.i
                             [ Attributes.class "material-icons"
-                            , Attributes.class "pa-selectize__icon"
+                            , Attributes.class "selectize__icon"
                             ]
                             [ if open then
                                 Html.text "arrow_drop_up"
@@ -130,18 +134,18 @@ with the view configuration given by
                             ]
                         ]
             , menu =
-                [ Attributes.class "pa-selectize__menu" ]
+                [ Attributes.class "selectize__menu" ]
             , ul =
-                [ Attributes.class "pa-selectize__list" ]
+                [ Attributes.class "selectize__list" ]
             , entry =
                 \tree mouseFocused keyboardFocused ->
                     { attributes =
-                        [ Attributes.class "pa-selectize__item"
+                        [ Attributes.class "selectize__item"
                         , Attributes.classList
-                            [ ( "pa-selectize__item--mouse-selected"
+                            [ ( "selectize__item--mouse-selected"
                               , mouseFocused
                               )
-                            , ( "pa-selectize__item--key-selected"
+                            , ( "selectize__item--key-selected"
                               , keyboardFocused
                               )
                             ]
@@ -152,7 +156,7 @@ with the view configuration given by
             , divider =
                 \title ->
                     { attributes =
-                        [ Attributes.class "pa-selectize__divider" ]
+                        [ Attributes.class "selectize__divider" ]
                     , children =
                         [ Html.text title ]
                     }
