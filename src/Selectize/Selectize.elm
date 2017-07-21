@@ -52,6 +52,16 @@ type alias State a =
     , mouseFocus : Maybe a
     , preventBlur : Bool
     , open : Bool
+
+    -- dom measurements
+    , heights : Maybe Heights
+    , scrollTop : Int
+    }
+
+
+type alias Heights =
+    { entries : List Int
+    , menu : Int
     }
 
 
@@ -62,6 +72,8 @@ empty =
     , mouseFocus = Nothing
     , preventBlur = False
     , open = False
+    , heights = Nothing
+    , scrollTop = 0
     }
 
 
@@ -177,16 +189,16 @@ viewConfig config =
 type Msg a
     = NoOp
       -- open/close menu
-    | TextfieldFocused (List Int) Int Int
-    | TextfieldBlured
+    | OpenMenu Heights Int
+    | CloseMenu
     | BlurTextfield
-    | SetPreventBlur Bool
+    | PreventClosing Bool
       -- query
     | SetQuery String
       -- handle focus and selection
     | SetMouseFocus (Maybe a)
     | Select a
-    | SetKeyboardFocus Movement (List Int) Int Int
+    | SetKeyboardFocus Movement (Maybe Heights) Int
     | SelectKeyboardFocusAndBlur
     | ClearSelection
 
@@ -215,7 +227,7 @@ update config model msg =
         NoOp ->
             ( state, Cmd.none, Nothing )
 
-        TextfieldFocused entryHeights menuHeight scrollTop ->
+        OpenMenu heights scrollTop ->
             let
                 keyboardFocus =
                     case config.selection model of
@@ -226,24 +238,21 @@ update config model msg =
                             config.selection model
 
                 ( top, height ) =
-                    topAndHeight
-                        entryHeights
-                        menuHeight
-                        scrollTop
-                        entries
-                        keyboardFocus
+                    topAndHeight heights.entries entries keyboardFocus
             in
             ( { state
                 | keyboardFocus = keyboardFocus
                 , mouseFocus = Nothing
                 , query = ""
                 , open = True
+                , heights = Just heights
+                , scrollTop = scrollTop
               }
-            , scroll config.id (top - (menuHeight - height) // 2)
+            , scroll config.id (top - (heights.menu - height) // 2)
             , Nothing
             )
 
-        TextfieldBlured ->
+        CloseMenu ->
             if state.preventBlur then
                 ( state, Cmd.none, Nothing )
             else
@@ -258,7 +267,7 @@ update config model msg =
             , Nothing
             )
 
-        SetPreventBlur preventBlur ->
+        PreventClosing preventBlur ->
             ( { state | preventBlur = preventBlur }
             , Cmd.none
             , Nothing
@@ -273,6 +282,7 @@ update config model msg =
                         |> first
                 , mouseFocus = Nothing
               }
+                |> resetHeights
             , scroll config.id 0
             , Just (config.select Nothing)
             )
@@ -289,54 +299,15 @@ update config model msg =
             , Just (config.select (Just a))
             )
 
-        SetKeyboardFocus movement entryHeights menuHeight scrollTop ->
+        SetKeyboardFocus movement maybeHeights scrollTop ->
             let
                 filteredEntries =
-                    entries
-                        |> filter config.toLabel state.query
-
-                nextKeyboardFocus =
-                    case movement of
-                        Up ->
-                            state.keyboardFocus
-                                |> Maybe.map
-                                    (previous filteredEntries Nothing)
-
-                        Down ->
-                            state.keyboardFocus
-                                |> Maybe.map (next filteredEntries)
-
-                        _ ->
-                            Nothing
-
-                ( top, height ) =
-                    topAndHeight
-                        entryHeights
-                        menuHeight
-                        scrollTop
-                        filteredEntries
-                        nextKeyboardFocus
-
-                y =
-                    if (top - 2 * height // 3) < scrollTop then
-                        top - 2 * height // 3
-                    else if top + 5 * height // 3 > (scrollTop + menuHeight) then
-                        top + 5 * height // 3 - menuHeight
-                    else
-                        scrollTop
+                    entries |> filter config.toLabel state.query
             in
-            case nextKeyboardFocus of
-                Nothing ->
-                    ( { state | keyboardFocus = first filteredEntries }
-                    , scroll config.id 0
-                    , Just (config.select Nothing)
-                    )
-
-                Just nextFocus ->
-                    ( { state | keyboardFocus = Just nextFocus }
-                    , scroll config.id y
-                    , Just (config.select Nothing)
-                    )
+            state
+                |> updateHeights maybeHeights
+                |> updateKeyboardFocus config.select filteredEntries movement
+                |> scrollToKeyboardFocus config.id filteredEntries scrollTop
 
         SelectKeyboardFocusAndBlur ->
             ( state |> reset
@@ -359,6 +330,93 @@ reset state =
         , mouseFocus = Nothing
         , keyboardFocus = Nothing
     }
+
+
+resetHeights : State a -> State a
+resetHeights state =
+    { state | heights = Nothing }
+
+
+updateHeights : Maybe Heights -> State a -> State a
+updateHeights maybeHeights state =
+    case maybeHeights of
+        Just newHeights ->
+            { state | heights = Just newHeights }
+
+        Nothing ->
+            state
+
+
+updateKeyboardFocus :
+    (Maybe a -> msg)
+    -> List (Entry a)
+    -> Movement
+    -> State a
+    -> ( State a, Cmd (Msg a), Maybe msg )
+updateKeyboardFocus select filteredEntries movement state =
+    let
+        nextKeyboardFocus =
+            case movement of
+                Up ->
+                    state.keyboardFocus
+                        |> Maybe.map
+                            (previous filteredEntries Nothing)
+
+                Down ->
+                    state.keyboardFocus
+                        |> Maybe.map (next filteredEntries)
+
+                _ ->
+                    Nothing
+    in
+    ( { state
+        | keyboardFocus =
+            case nextKeyboardFocus of
+                Nothing ->
+                    first filteredEntries
+
+                Just nextFocus ->
+                    Just nextFocus
+      }
+    , Cmd.none
+    , Just (select Nothing)
+    )
+
+
+scrollToKeyboardFocus :
+    String
+    -> List (Entry a)
+    -> Int
+    -> ( State a, Cmd (Msg a), Maybe msg )
+    -> ( State a, Cmd (Msg a), Maybe msg )
+scrollToKeyboardFocus id filteredEntries scrollTop ( state, cmd, maybeMsg ) =
+    case state.keyboardFocus of
+        Just focus ->
+            let
+                heights =
+                    state.heights |> Maybe.withDefault { entries = [], menu = 0 }
+
+                ( top, entryHeight ) =
+                    topAndHeight heights.entries filteredEntries (Just focus)
+
+                y =
+                    if (top - 2 * entryHeight // 3) < scrollTop then
+                        top - 2 * entryHeight // 3
+                    else if top + 5 * entryHeight // 3 > (scrollTop + heights.menu) then
+                        top + 5 * entryHeight // 3 - heights.menu
+                    else
+                        scrollTop
+            in
+            ( state
+            , Cmd.batch [ scroll id y, cmd ]
+            , maybeMsg
+            )
+
+        Nothing ->
+            ( state
+            , cmd
+            , maybeMsg
+            )
 
 
 
@@ -407,9 +465,14 @@ view config model =
         [ Html.input
             (inputAttrs <|
                 if state.open then
-                    [ Events.onBlur TextfieldBlured
+                    [ Events.onBlur CloseMenu
                     , Events.on "keyup" keyupDecoder
-                    , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                    , case state.heights of
+                        Nothing ->
+                            Events.onWithOptions "keydown" keydownOptions keydownDecoder
+
+                        Just _ ->
+                            Events.onWithOptions "keydown" keydownOptions keydownWithoutHeightsDecoder
                     , Events.onInput SetQuery
                     ]
                 else
@@ -418,8 +481,8 @@ view config model =
             []
         , Html.div
             ([ Attributes.id (menuId config.id)
-             , Events.onMouseDown (SetPreventBlur True)
-             , Events.onMouseUp (SetPreventBlur False)
+             , Events.onMouseDown (PreventClosing True)
+             , Events.onMouseUp (PreventClosing False)
              ]
                 ++ noOp config.menu
             )
@@ -446,7 +509,7 @@ focusDecoder : Decoder (Msg a)
 focusDecoder =
     Decode.map3
         (\entryHeights menuHeight scrollTop ->
-            TextfieldFocused entryHeights menuHeight scrollTop
+            OpenMenu { entries = entryHeights, menu = menuHeight } scrollTop
         )
         entryHeightsDecoder
         menuHeightDecoder
@@ -466,10 +529,10 @@ keydownDecoder =
         (\code entryHeights menuHeight scrollTop ->
             case code |> fromCode of
                 ArrowUp ->
-                    Ok (SetKeyboardFocus Up entryHeights menuHeight scrollTop)
+                    Ok (SetKeyboardFocus Up (Just { entries = entryHeights, menu = menuHeight }) scrollTop)
 
                 ArrowDown ->
-                    Ok (SetKeyboardFocus Down entryHeights menuHeight scrollTop)
+                    Ok (SetKeyboardFocus Down (Just { entries = entryHeights, menu = menuHeight }) scrollTop)
 
                 Enter ->
                     Ok SelectKeyboardFocusAndBlur
@@ -483,6 +546,31 @@ keydownDecoder =
         Events.keyCode
         entryHeightsDecoder
         menuHeightDecoder
+        scrollTopDecoder
+        |> Decode.andThen fromResult
+
+
+keydownWithoutHeightsDecoder : Decoder (Msg a)
+keydownWithoutHeightsDecoder =
+    Decode.map2
+        (\code scrollTop ->
+            case code |> fromCode of
+                ArrowUp ->
+                    Ok (SetKeyboardFocus Up Nothing scrollTop)
+
+                ArrowDown ->
+                    Ok (SetKeyboardFocus Down Nothing scrollTop)
+
+                Enter ->
+                    Ok SelectKeyboardFocusAndBlur
+
+                Escape ->
+                    Ok BlurTextfield
+
+                _ ->
+                    Err "not handling that key here"
+        )
+        Events.keyCode
         scrollTopDecoder
         |> Decode.andThen fromResult
 
@@ -646,8 +734,8 @@ previous entries former currentFocus =
 {-| Compute the distance of the entry to the beginning of the list and
 its height, as it is rendered in the DOM.
 -}
-topAndHeight : List Int -> Int -> Int -> List (Entry a) -> Maybe a -> ( Int, Int )
-topAndHeight entryHeights menuHeight scrollTop filteredEntries focus =
+topAndHeight : List Int -> List (Entry a) -> Maybe a -> ( Int, Int )
+topAndHeight entryHeights filteredEntries focus =
     let
         lists =
             List.zip filteredEntries entryHeights
