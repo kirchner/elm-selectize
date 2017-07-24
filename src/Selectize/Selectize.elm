@@ -1,12 +1,12 @@
 module Selectize.Selectize
     exposing
         ( Entry
+        , Heights
         , Movement(..)
         , Msg(..)
         , State
         , UpdateConfig
         , ViewConfig
-        , Heights
         , divider
         , empty
         , entry
@@ -27,6 +27,7 @@ import Dom.Scroll
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
+import Html.Lazy as Lazy
 import Json.Decode as Decode exposing (Decoder)
 import Keyboard.Extra
     exposing
@@ -40,7 +41,6 @@ import Keyboard.Extra
             )
         , fromCode
         )
-import List.Extra as List
 import Task
 
 
@@ -623,7 +623,8 @@ viewEntry open renderEntry renderDivider state entry =
         liAttrs attrs =
             attrs ++ noOp attributes
     in
-    Html.li
+    Lazy.lazy2
+        Html.li
         (liAttrs <|
             case entry of
                 Entry entry ->
@@ -729,27 +730,33 @@ its height, as it is rendered in the DOM.
 -}
 topAndHeight : List Int -> List (Entry a) -> Maybe a -> ( Int, Int )
 topAndHeight entryHeights filteredEntries focus =
-    let
-        lists =
-            List.zip filteredEntries entryHeights
-                |> List.splitWhen
-                    (\( entry, _ ) ->
-                        Just entry == (focus |> Maybe.map Entry)
-                    )
-    in
-    case lists of
-        Just ( start, end ) ->
-            ( start
-                |> List.foldl
-                    (\( _, height ) sum -> sum + height)
-                    0
-            , end
-                |> List.head
-                |> Maybe.map Tuple.second
-                |> Maybe.withDefault 0
-            )
+    case focus of
+        Just a ->
+            topAndHeightHelper entryHeights filteredEntries a ( 0, 0 )
 
         Nothing ->
+            ( 0, 0 )
+
+
+topAndHeightHelper :
+    List Int
+    -> List (Entry a)
+    -> a
+    -> ( Int, Int )
+    -> ( Int, Int )
+topAndHeightHelper entryHeights filteredEntries focus ( distance, height ) =
+    case ( entryHeights, filteredEntries ) of
+        ( height :: otherHeights, entry :: otherEntries ) ->
+            if entry == Entry focus then
+                ( distance, height )
+            else
+                topAndHeightHelper
+                    otherHeights
+                    otherEntries
+                    focus
+                    ( distance + height, 0 )
+
+        _ ->
             ( 0, 0 )
 
 
