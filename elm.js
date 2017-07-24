@@ -5886,1345 +5886,6 @@ var _debois$elm_dom$DOM$Rectangle = F4(
 		return {top: a, left: b, width: c, height: d};
 	});
 
-var _elm_lang$core$Set$foldr = F3(
-	function (f, b, _p0) {
-		var _p1 = _p0;
-		return A3(
-			_elm_lang$core$Dict$foldr,
-			F3(
-				function (k, _p2, b) {
-					return A2(f, k, b);
-				}),
-			b,
-			_p1._0);
-	});
-var _elm_lang$core$Set$foldl = F3(
-	function (f, b, _p3) {
-		var _p4 = _p3;
-		return A3(
-			_elm_lang$core$Dict$foldl,
-			F3(
-				function (k, _p5, b) {
-					return A2(f, k, b);
-				}),
-			b,
-			_p4._0);
-	});
-var _elm_lang$core$Set$toList = function (_p6) {
-	var _p7 = _p6;
-	return _elm_lang$core$Dict$keys(_p7._0);
-};
-var _elm_lang$core$Set$size = function (_p8) {
-	var _p9 = _p8;
-	return _elm_lang$core$Dict$size(_p9._0);
-};
-var _elm_lang$core$Set$member = F2(
-	function (k, _p10) {
-		var _p11 = _p10;
-		return A2(_elm_lang$core$Dict$member, k, _p11._0);
-	});
-var _elm_lang$core$Set$isEmpty = function (_p12) {
-	var _p13 = _p12;
-	return _elm_lang$core$Dict$isEmpty(_p13._0);
-};
-var _elm_lang$core$Set$Set_elm_builtin = function (a) {
-	return {ctor: 'Set_elm_builtin', _0: a};
-};
-var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
-var _elm_lang$core$Set$singleton = function (k) {
-	return _elm_lang$core$Set$Set_elm_builtin(
-		A2(
-			_elm_lang$core$Dict$singleton,
-			k,
-			{ctor: '_Tuple0'}));
-};
-var _elm_lang$core$Set$insert = F2(
-	function (k, _p14) {
-		var _p15 = _p14;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A3(
-				_elm_lang$core$Dict$insert,
-				k,
-				{ctor: '_Tuple0'},
-				_p15._0));
-	});
-var _elm_lang$core$Set$fromList = function (xs) {
-	return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
-};
-var _elm_lang$core$Set$map = F2(
-	function (f, s) {
-		return _elm_lang$core$Set$fromList(
-			A2(
-				_elm_lang$core$List$map,
-				f,
-				_elm_lang$core$Set$toList(s)));
-	});
-var _elm_lang$core$Set$remove = F2(
-	function (k, _p16) {
-		var _p17 = _p16;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$remove, k, _p17._0));
-	});
-var _elm_lang$core$Set$union = F2(
-	function (_p19, _p18) {
-		var _p20 = _p19;
-		var _p21 = _p18;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
-	});
-var _elm_lang$core$Set$intersect = F2(
-	function (_p23, _p22) {
-		var _p24 = _p23;
-		var _p25 = _p22;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
-	});
-var _elm_lang$core$Set$diff = F2(
-	function (_p27, _p26) {
-		var _p28 = _p27;
-		var _p29 = _p26;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
-	});
-var _elm_lang$core$Set$filter = F2(
-	function (p, _p30) {
-		var _p31 = _p30;
-		return _elm_lang$core$Set$Set_elm_builtin(
-			A2(
-				_elm_lang$core$Dict$filter,
-				F2(
-					function (k, _p32) {
-						return p(k);
-					}),
-				_p31._0));
-	});
-var _elm_lang$core$Set$partition = F2(
-	function (p, _p33) {
-		var _p34 = _p33;
-		var _p35 = A2(
-			_elm_lang$core$Dict$partition,
-			F2(
-				function (k, _p36) {
-					return p(k);
-				}),
-			_p34._0);
-		var p1 = _p35._0;
-		var p2 = _p35._1;
-		return {
-			ctor: '_Tuple2',
-			_0: _elm_lang$core$Set$Set_elm_builtin(p1),
-			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
-		};
-	});
-
-var _elm_community$list_extra$List_Extra$greedyGroupsOfWithStep = F3(
-	function (size, step, xs) {
-		var okayXs = _elm_lang$core$Native_Utils.cmp(
-			_elm_lang$core$List$length(xs),
-			0) > 0;
-		var okayArgs = (_elm_lang$core$Native_Utils.cmp(size, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(step, 0) > 0);
-		var xs_ = A2(_elm_lang$core$List$drop, step, xs);
-		var group = A2(_elm_lang$core$List$take, size, xs);
-		return (okayArgs && okayXs) ? {
-			ctor: '::',
-			_0: group,
-			_1: A3(_elm_community$list_extra$List_Extra$greedyGroupsOfWithStep, size, step, xs_)
-		} : {ctor: '[]'};
-	});
-var _elm_community$list_extra$List_Extra$greedyGroupsOf = F2(
-	function (size, xs) {
-		return A3(_elm_community$list_extra$List_Extra$greedyGroupsOfWithStep, size, size, xs);
-	});
-var _elm_community$list_extra$List_Extra$groupsOfWithStep = F3(
-	function (size, step, xs) {
-		var okayArgs = (_elm_lang$core$Native_Utils.cmp(size, 0) > 0) && (_elm_lang$core$Native_Utils.cmp(step, 0) > 0);
-		var xs_ = A2(_elm_lang$core$List$drop, step, xs);
-		var group = A2(_elm_lang$core$List$take, size, xs);
-		var okayLength = _elm_lang$core$Native_Utils.eq(
-			size,
-			_elm_lang$core$List$length(group));
-		return (okayArgs && okayLength) ? {
-			ctor: '::',
-			_0: group,
-			_1: A3(_elm_community$list_extra$List_Extra$groupsOfWithStep, size, step, xs_)
-		} : {ctor: '[]'};
-	});
-var _elm_community$list_extra$List_Extra$groupsOf = F2(
-	function (size, xs) {
-		return A3(_elm_community$list_extra$List_Extra$groupsOfWithStep, size, size, xs);
-	});
-var _elm_community$list_extra$List_Extra$zip5 = _elm_lang$core$List$map5(
-	F5(
-		function (v0, v1, v2, v3, v4) {
-			return {ctor: '_Tuple5', _0: v0, _1: v1, _2: v2, _3: v3, _4: v4};
-		}));
-var _elm_community$list_extra$List_Extra$zip4 = _elm_lang$core$List$map4(
-	F4(
-		function (v0, v1, v2, v3) {
-			return {ctor: '_Tuple4', _0: v0, _1: v1, _2: v2, _3: v3};
-		}));
-var _elm_community$list_extra$List_Extra$zip3 = _elm_lang$core$List$map3(
-	F3(
-		function (v0, v1, v2) {
-			return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
-		}));
-var _elm_community$list_extra$List_Extra$zip = _elm_lang$core$List$map2(
-	F2(
-		function (v0, v1) {
-			return {ctor: '_Tuple2', _0: v0, _1: v1};
-		}));
-var _elm_community$list_extra$List_Extra$isPrefixOf = F2(
-	function (prefix, xs) {
-		var _p0 = {ctor: '_Tuple2', _0: prefix, _1: xs};
-		if (_p0._0.ctor === '[]') {
-			return true;
-		} else {
-			if (_p0._1.ctor === '[]') {
-				return false;
-			} else {
-				return _elm_lang$core$Native_Utils.eq(_p0._0._0, _p0._1._0) && A2(_elm_community$list_extra$List_Extra$isPrefixOf, _p0._0._1, _p0._1._1);
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$isSuffixOf = F2(
-	function (suffix, xs) {
-		return A2(
-			_elm_community$list_extra$List_Extra$isPrefixOf,
-			_elm_lang$core$List$reverse(suffix),
-			_elm_lang$core$List$reverse(xs));
-	});
-var _elm_community$list_extra$List_Extra$selectSplit = function (xs) {
-	var _p1 = xs;
-	if (_p1.ctor === '[]') {
-		return {ctor: '[]'};
-	} else {
-		var _p5 = _p1._1;
-		var _p4 = _p1._0;
-		return {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple3',
-				_0: {ctor: '[]'},
-				_1: _p4,
-				_2: _p5
-			},
-			_1: A2(
-				_elm_lang$core$List$map,
-				function (_p2) {
-					var _p3 = _p2;
-					return {
-						ctor: '_Tuple3',
-						_0: {ctor: '::', _0: _p4, _1: _p3._0},
-						_1: _p3._1,
-						_2: _p3._2
-					};
-				},
-				_elm_community$list_extra$List_Extra$selectSplit(_p5))
-		};
-	}
-};
-var _elm_community$list_extra$List_Extra$select = function (xs) {
-	var _p6 = xs;
-	if (_p6.ctor === '[]') {
-		return {ctor: '[]'};
-	} else {
-		var _p10 = _p6._1;
-		var _p9 = _p6._0;
-		return {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: _p9, _1: _p10},
-			_1: A2(
-				_elm_lang$core$List$map,
-				function (_p7) {
-					var _p8 = _p7;
-					return {
-						ctor: '_Tuple2',
-						_0: _p8._0,
-						_1: {ctor: '::', _0: _p9, _1: _p8._1}
-					};
-				},
-				_elm_community$list_extra$List_Extra$select(_p10))
-		};
-	}
-};
-var _elm_community$list_extra$List_Extra$tailsHelp = F2(
-	function (e, list) {
-		var _p11 = list;
-		if (_p11.ctor === '::') {
-			var _p12 = _p11._0;
-			return {
-				ctor: '::',
-				_0: {ctor: '::', _0: e, _1: _p12},
-				_1: {ctor: '::', _0: _p12, _1: _p11._1}
-			};
-		} else {
-			return {ctor: '[]'};
-		}
-	});
-var _elm_community$list_extra$List_Extra$tails = A2(
-	_elm_lang$core$List$foldr,
-	_elm_community$list_extra$List_Extra$tailsHelp,
-	{
-		ctor: '::',
-		_0: {ctor: '[]'},
-		_1: {ctor: '[]'}
-	});
-var _elm_community$list_extra$List_Extra$isInfixOf = F2(
-	function (infix, xs) {
-		return A2(
-			_elm_lang$core$List$any,
-			_elm_community$list_extra$List_Extra$isPrefixOf(infix),
-			_elm_community$list_extra$List_Extra$tails(xs));
-	});
-var _elm_community$list_extra$List_Extra$inits = A2(
-	_elm_lang$core$List$foldr,
-	F2(
-		function (e, acc) {
-			return {
-				ctor: '::',
-				_0: {ctor: '[]'},
-				_1: A2(
-					_elm_lang$core$List$map,
-					F2(
-						function (x, y) {
-							return {ctor: '::', _0: x, _1: y};
-						})(e),
-					acc)
-			};
-		}),
-	{
-		ctor: '::',
-		_0: {ctor: '[]'},
-		_1: {ctor: '[]'}
-	});
-var _elm_community$list_extra$List_Extra$groupWhileTransitively = F2(
-	function (cmp, xs_) {
-		var _p13 = xs_;
-		if (_p13.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			if (_p13._1.ctor === '[]') {
-				return {
-					ctor: '::',
-					_0: {
-						ctor: '::',
-						_0: _p13._0,
-						_1: {ctor: '[]'}
-					},
-					_1: {ctor: '[]'}
-				};
-			} else {
-				var _p15 = _p13._0;
-				var _p14 = A2(_elm_community$list_extra$List_Extra$groupWhileTransitively, cmp, _p13._1);
-				if (_p14.ctor === '::') {
-					return A2(cmp, _p15, _p13._1._0) ? {
-						ctor: '::',
-						_0: {ctor: '::', _0: _p15, _1: _p14._0},
-						_1: _p14._1
-					} : {
-						ctor: '::',
-						_0: {
-							ctor: '::',
-							_0: _p15,
-							_1: {ctor: '[]'}
-						},
-						_1: _p14
-					};
-				} else {
-					return {ctor: '[]'};
-				}
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$stripPrefix = F2(
-	function (prefix, xs) {
-		var step = F2(
-			function (e, m) {
-				var _p16 = m;
-				if (_p16.ctor === 'Nothing') {
-					return _elm_lang$core$Maybe$Nothing;
-				} else {
-					if (_p16._0.ctor === '[]') {
-						return _elm_lang$core$Maybe$Nothing;
-					} else {
-						return _elm_lang$core$Native_Utils.eq(e, _p16._0._0) ? _elm_lang$core$Maybe$Just(_p16._0._1) : _elm_lang$core$Maybe$Nothing;
-					}
-				}
-			});
-		return A3(
-			_elm_lang$core$List$foldl,
-			step,
-			_elm_lang$core$Maybe$Just(xs),
-			prefix);
-	});
-var _elm_community$list_extra$List_Extra$dropWhileRight = function (p) {
-	return A2(
-		_elm_lang$core$List$foldr,
-		F2(
-			function (x, xs) {
-				return (p(x) && _elm_lang$core$List$isEmpty(xs)) ? {ctor: '[]'} : {ctor: '::', _0: x, _1: xs};
-			}),
-		{ctor: '[]'});
-};
-var _elm_community$list_extra$List_Extra$takeWhileRight = function (p) {
-	var step = F2(
-		function (x, _p17) {
-			var _p18 = _p17;
-			var _p19 = _p18._0;
-			return (p(x) && _p18._1) ? {
-				ctor: '_Tuple2',
-				_0: {ctor: '::', _0: x, _1: _p19},
-				_1: true
-			} : {ctor: '_Tuple2', _0: _p19, _1: false};
-		});
-	return function (_p20) {
-		return _elm_lang$core$Tuple$first(
-			A3(
-				_elm_lang$core$List$foldr,
-				step,
-				{
-					ctor: '_Tuple2',
-					_0: {ctor: '[]'},
-					_1: true
-				},
-				_p20));
-	};
-};
-var _elm_community$list_extra$List_Extra$splitAt = F2(
-	function (n, xs) {
-		return {
-			ctor: '_Tuple2',
-			_0: A2(_elm_lang$core$List$take, n, xs),
-			_1: A2(_elm_lang$core$List$drop, n, xs)
-		};
-	});
-var _elm_community$list_extra$List_Extra$groupsOfVarying_ = F3(
-	function (listOflengths, list, accu) {
-		groupsOfVarying_:
-		while (true) {
-			var _p21 = {ctor: '_Tuple2', _0: listOflengths, _1: list};
-			if (((_p21.ctor === '_Tuple2') && (_p21._0.ctor === '::')) && (_p21._1.ctor === '::')) {
-				var _p22 = A2(_elm_community$list_extra$List_Extra$splitAt, _p21._0._0, list);
-				var head = _p22._0;
-				var tail = _p22._1;
-				var _v11 = _p21._0._1,
-					_v12 = tail,
-					_v13 = {ctor: '::', _0: head, _1: accu};
-				listOflengths = _v11;
-				list = _v12;
-				accu = _v13;
-				continue groupsOfVarying_;
-			} else {
-				return _elm_lang$core$List$reverse(accu);
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$groupsOfVarying = F2(
-	function (listOflengths, list) {
-		return A3(
-			_elm_community$list_extra$List_Extra$groupsOfVarying_,
-			listOflengths,
-			list,
-			{ctor: '[]'});
-	});
-var _elm_community$list_extra$List_Extra$unfoldr = F2(
-	function (f, seed) {
-		var _p23 = f(seed);
-		if (_p23.ctor === 'Nothing') {
-			return {ctor: '[]'};
-		} else {
-			return {
-				ctor: '::',
-				_0: _p23._0._0,
-				_1: A2(_elm_community$list_extra$List_Extra$unfoldr, f, _p23._0._1)
-			};
-		}
-	});
-var _elm_community$list_extra$List_Extra$scanr1 = F2(
-	function (f, xs_) {
-		var _p24 = xs_;
-		if (_p24.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			if (_p24._1.ctor === '[]') {
-				return {
-					ctor: '::',
-					_0: _p24._0,
-					_1: {ctor: '[]'}
-				};
-			} else {
-				var _p25 = A2(_elm_community$list_extra$List_Extra$scanr1, f, _p24._1);
-				if (_p25.ctor === '::') {
-					return {
-						ctor: '::',
-						_0: A2(f, _p24._0, _p25._0),
-						_1: _p25
-					};
-				} else {
-					return {ctor: '[]'};
-				}
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$scanr = F3(
-	function (f, acc, xs_) {
-		var _p26 = xs_;
-		if (_p26.ctor === '[]') {
-			return {
-				ctor: '::',
-				_0: acc,
-				_1: {ctor: '[]'}
-			};
-		} else {
-			var _p27 = A3(_elm_community$list_extra$List_Extra$scanr, f, acc, _p26._1);
-			if (_p27.ctor === '::') {
-				return {
-					ctor: '::',
-					_0: A2(f, _p26._0, _p27._0),
-					_1: _p27
-				};
-			} else {
-				return {ctor: '[]'};
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$scanl1 = F2(
-	function (f, xs_) {
-		var _p28 = xs_;
-		if (_p28.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			return A3(_elm_lang$core$List$scanl, f, _p28._0, _p28._1);
-		}
-	});
-var _elm_community$list_extra$List_Extra$indexedFoldr = F3(
-	function (func, acc, list) {
-		var step = F2(
-			function (x, _p29) {
-				var _p30 = _p29;
-				var _p31 = _p30._0;
-				return {
-					ctor: '_Tuple2',
-					_0: _p31 - 1,
-					_1: A3(func, _p31, x, _p30._1)
-				};
-			});
-		return _elm_lang$core$Tuple$second(
-			A3(
-				_elm_lang$core$List$foldr,
-				step,
-				{
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$List$length(list) - 1,
-					_1: acc
-				},
-				list));
-	});
-var _elm_community$list_extra$List_Extra$indexedFoldl = F3(
-	function (func, acc, list) {
-		var step = F2(
-			function (x, _p32) {
-				var _p33 = _p32;
-				var _p34 = _p33._0;
-				return {
-					ctor: '_Tuple2',
-					_0: _p34 + 1,
-					_1: A3(func, _p34, x, _p33._1)
-				};
-			});
-		return _elm_lang$core$Tuple$second(
-			A3(
-				_elm_lang$core$List$foldl,
-				step,
-				{ctor: '_Tuple2', _0: 0, _1: acc},
-				list));
-	});
-var _elm_community$list_extra$List_Extra$foldr1 = F2(
-	function (f, xs) {
-		var mf = F2(
-			function (x, m) {
-				return _elm_lang$core$Maybe$Just(
-					function () {
-						var _p35 = m;
-						if (_p35.ctor === 'Nothing') {
-							return x;
-						} else {
-							return A2(f, x, _p35._0);
-						}
-					}());
-			});
-		return A3(_elm_lang$core$List$foldr, mf, _elm_lang$core$Maybe$Nothing, xs);
-	});
-var _elm_community$list_extra$List_Extra$foldl1 = F2(
-	function (f, xs) {
-		var mf = F2(
-			function (x, m) {
-				return _elm_lang$core$Maybe$Just(
-					function () {
-						var _p36 = m;
-						if (_p36.ctor === 'Nothing') {
-							return x;
-						} else {
-							return A2(f, _p36._0, x);
-						}
-					}());
-			});
-		return A3(_elm_lang$core$List$foldl, mf, _elm_lang$core$Maybe$Nothing, xs);
-	});
-var _elm_community$list_extra$List_Extra$interweaveHelp = F3(
-	function (l1, l2, acc) {
-		interweaveHelp:
-		while (true) {
-			var _p37 = {ctor: '_Tuple2', _0: l1, _1: l2};
-			_v24_1:
-			do {
-				if (_p37._0.ctor === '::') {
-					if (_p37._1.ctor === '::') {
-						var _v25 = _p37._0._1,
-							_v26 = _p37._1._1,
-							_v27 = A2(
-							_elm_lang$core$Basics_ops['++'],
-							acc,
-							{
-								ctor: '::',
-								_0: _p37._0._0,
-								_1: {
-									ctor: '::',
-									_0: _p37._1._0,
-									_1: {ctor: '[]'}
-								}
-							});
-						l1 = _v25;
-						l2 = _v26;
-						acc = _v27;
-						continue interweaveHelp;
-					} else {
-						break _v24_1;
-					}
-				} else {
-					if (_p37._1.ctor === '[]') {
-						break _v24_1;
-					} else {
-						return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._1);
-					}
-				}
-			} while(false);
-			return A2(_elm_lang$core$Basics_ops['++'], acc, _p37._0);
-		}
-	});
-var _elm_community$list_extra$List_Extra$interweave = F2(
-	function (l1, l2) {
-		return A3(
-			_elm_community$list_extra$List_Extra$interweaveHelp,
-			l1,
-			l2,
-			{ctor: '[]'});
-	});
-var _elm_community$list_extra$List_Extra$permutations = function (xs_) {
-	var _p38 = xs_;
-	if (_p38.ctor === '[]') {
-		return {
-			ctor: '::',
-			_0: {ctor: '[]'},
-			_1: {ctor: '[]'}
-		};
-	} else {
-		var f = function (_p39) {
-			var _p40 = _p39;
-			return A2(
-				_elm_lang$core$List$map,
-				F2(
-					function (x, y) {
-						return {ctor: '::', _0: x, _1: y};
-					})(_p40._0),
-				_elm_community$list_extra$List_Extra$permutations(_p40._1));
-		};
-		return A2(
-			_elm_lang$core$List$concatMap,
-			f,
-			_elm_community$list_extra$List_Extra$select(_p38));
-	}
-};
-var _elm_community$list_extra$List_Extra$isPermutationOf = F2(
-	function (permut, xs) {
-		return A2(
-			_elm_lang$core$List$member,
-			permut,
-			_elm_community$list_extra$List_Extra$permutations(xs));
-	});
-var _elm_community$list_extra$List_Extra$subsequencesNonEmpty = function (xs) {
-	var _p41 = xs;
-	if (_p41.ctor === '[]') {
-		return {ctor: '[]'};
-	} else {
-		var _p42 = _p41._0;
-		var f = F2(
-			function (ys, r) {
-				return {
-					ctor: '::',
-					_0: ys,
-					_1: {
-						ctor: '::',
-						_0: {ctor: '::', _0: _p42, _1: ys},
-						_1: r
-					}
-				};
-			});
-		return {
-			ctor: '::',
-			_0: {
-				ctor: '::',
-				_0: _p42,
-				_1: {ctor: '[]'}
-			},
-			_1: A3(
-				_elm_lang$core$List$foldr,
-				f,
-				{ctor: '[]'},
-				_elm_community$list_extra$List_Extra$subsequencesNonEmpty(_p41._1))
-		};
-	}
-};
-var _elm_community$list_extra$List_Extra$subsequences = function (xs) {
-	return {
-		ctor: '::',
-		_0: {ctor: '[]'},
-		_1: _elm_community$list_extra$List_Extra$subsequencesNonEmpty(xs)
-	};
-};
-var _elm_community$list_extra$List_Extra$isSubsequenceOf = F2(
-	function (subseq, xs) {
-		return A2(
-			_elm_lang$core$List$member,
-			subseq,
-			_elm_community$list_extra$List_Extra$subsequences(xs));
-	});
-var _elm_community$list_extra$List_Extra$transpose = function (ll) {
-	transpose:
-	while (true) {
-		var _p43 = ll;
-		if (_p43.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			if (_p43._0.ctor === '[]') {
-				var _v32 = _p43._1;
-				ll = _v32;
-				continue transpose;
-			} else {
-				var _p44 = _p43._1;
-				var tails = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$tail, _p44);
-				var heads = A2(_elm_lang$core$List$filterMap, _elm_lang$core$List$head, _p44);
-				return {
-					ctor: '::',
-					_0: {ctor: '::', _0: _p43._0._0, _1: heads},
-					_1: _elm_community$list_extra$List_Extra$transpose(
-						{ctor: '::', _0: _p43._0._1, _1: tails})
-				};
-			}
-		}
-	}
-};
-var _elm_community$list_extra$List_Extra$intercalate = function (xs) {
-	return function (_p45) {
-		return _elm_lang$core$List$concat(
-			A2(_elm_lang$core$List$intersperse, xs, _p45));
-	};
-};
-var _elm_community$list_extra$List_Extra$filterNot = F2(
-	function (pred, list) {
-		return A2(
-			_elm_lang$core$List$filter,
-			function (_p46) {
-				return !pred(_p46);
-			},
-			list);
-	});
-var _elm_community$list_extra$List_Extra$removeAt = F2(
-	function (index, l) {
-		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
-			return l;
-		} else {
-			var tail = _elm_lang$core$List$tail(
-				A2(_elm_lang$core$List$drop, index, l));
-			var head = A2(_elm_lang$core$List$take, index, l);
-			var _p47 = tail;
-			if (_p47.ctor === 'Nothing') {
-				return l;
-			} else {
-				return A2(_elm_lang$core$List$append, head, _p47._0);
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$stableSortWith = F2(
-	function (pred, list) {
-		var predWithIndex = F2(
-			function (_p49, _p48) {
-				var _p50 = _p49;
-				var _p51 = _p48;
-				var result = A2(pred, _p50._0, _p51._0);
-				var _p52 = result;
-				if (_p52.ctor === 'EQ') {
-					return A2(_elm_lang$core$Basics$compare, _p50._1, _p51._1);
-				} else {
-					return result;
-				}
-			});
-		var listWithIndex = A2(
-			_elm_lang$core$List$indexedMap,
-			F2(
-				function (i, a) {
-					return {ctor: '_Tuple2', _0: a, _1: i};
-				}),
-			list);
-		return A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$first,
-			A2(_elm_lang$core$List$sortWith, predWithIndex, listWithIndex));
-	});
-var _elm_community$list_extra$List_Extra$setAt = F3(
-	function (index, value, l) {
-		if (_elm_lang$core$Native_Utils.cmp(index, 0) < 0) {
-			return _elm_lang$core$Maybe$Nothing;
-		} else {
-			var tail = _elm_lang$core$List$tail(
-				A2(_elm_lang$core$List$drop, index, l));
-			var head = A2(_elm_lang$core$List$take, index, l);
-			var _p53 = tail;
-			if (_p53.ctor === 'Nothing') {
-				return _elm_lang$core$Maybe$Nothing;
-			} else {
-				return _elm_lang$core$Maybe$Just(
-					A2(
-						_elm_lang$core$List$append,
-						head,
-						{ctor: '::', _0: value, _1: _p53._0}));
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$remove = F2(
-	function (x, xs) {
-		var _p54 = xs;
-		if (_p54.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			var _p56 = _p54._1;
-			var _p55 = _p54._0;
-			return _elm_lang$core$Native_Utils.eq(x, _p55) ? _p56 : {
-				ctor: '::',
-				_0: _p55,
-				_1: A2(_elm_community$list_extra$List_Extra$remove, x, _p56)
-			};
-		}
-	});
-var _elm_community$list_extra$List_Extra$updateIfIndex = F3(
-	function (predicate, update, list) {
-		return A2(
-			_elm_lang$core$List$indexedMap,
-			F2(
-				function (i, x) {
-					return predicate(i) ? update(x) : x;
-				}),
-			list);
-	});
-var _elm_community$list_extra$List_Extra$updateAt = F3(
-	function (index, update, list) {
-		return ((_elm_lang$core$Native_Utils.cmp(index, 0) < 0) || (_elm_lang$core$Native_Utils.cmp(
-			index,
-			_elm_lang$core$List$length(list)) > -1)) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$Maybe$Just(
-			A3(
-				_elm_community$list_extra$List_Extra$updateIfIndex,
-				F2(
-					function (x, y) {
-						return _elm_lang$core$Native_Utils.eq(x, y);
-					})(index),
-				update,
-				list));
-	});
-var _elm_community$list_extra$List_Extra$updateIf = F3(
-	function (predicate, update, list) {
-		return A2(
-			_elm_lang$core$List$map,
-			function (item) {
-				return predicate(item) ? update(item) : item;
-			},
-			list);
-	});
-var _elm_community$list_extra$List_Extra$replaceIf = F3(
-	function (predicate, replacement, list) {
-		return A3(
-			_elm_community$list_extra$List_Extra$updateIf,
-			predicate,
-			_elm_lang$core$Basics$always(replacement),
-			list);
-	});
-var _elm_community$list_extra$List_Extra$findIndices = function (p) {
-	return function (_p57) {
-		return A2(
-			_elm_lang$core$List$map,
-			_elm_lang$core$Tuple$first,
-			A2(
-				_elm_lang$core$List$filter,
-				function (_p58) {
-					var _p59 = _p58;
-					return p(_p59._1);
-				},
-				A2(
-					_elm_lang$core$List$indexedMap,
-					F2(
-						function (v0, v1) {
-							return {ctor: '_Tuple2', _0: v0, _1: v1};
-						}),
-					_p57)));
-	};
-};
-var _elm_community$list_extra$List_Extra$findIndex = function (p) {
-	return function (_p60) {
-		return _elm_lang$core$List$head(
-			A2(_elm_community$list_extra$List_Extra$findIndices, p, _p60));
-	};
-};
-var _elm_community$list_extra$List_Extra$splitWhen = F2(
-	function (predicate, list) {
-		return A2(
-			_elm_lang$core$Maybe$map,
-			function (i) {
-				return A2(_elm_community$list_extra$List_Extra$splitAt, i, list);
-			},
-			A2(_elm_community$list_extra$List_Extra$findIndex, predicate, list));
-	});
-var _elm_community$list_extra$List_Extra$elemIndices = function (x) {
-	return _elm_community$list_extra$List_Extra$findIndices(
-		F2(
-			function (x, y) {
-				return _elm_lang$core$Native_Utils.eq(x, y);
-			})(x));
-};
-var _elm_community$list_extra$List_Extra$elemIndex = function (x) {
-	return _elm_community$list_extra$List_Extra$findIndex(
-		F2(
-			function (x, y) {
-				return _elm_lang$core$Native_Utils.eq(x, y);
-			})(x));
-};
-var _elm_community$list_extra$List_Extra$find = F2(
-	function (predicate, list) {
-		find:
-		while (true) {
-			var _p61 = list;
-			if (_p61.ctor === '[]') {
-				return _elm_lang$core$Maybe$Nothing;
-			} else {
-				var _p62 = _p61._0;
-				if (predicate(_p62)) {
-					return _elm_lang$core$Maybe$Just(_p62);
-				} else {
-					var _v41 = predicate,
-						_v42 = _p61._1;
-					predicate = _v41;
-					list = _v42;
-					continue find;
-				}
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$notMember = function (x) {
-	return function (_p63) {
-		return !A2(_elm_lang$core$List$member, x, _p63);
-	};
-};
-var _elm_community$list_extra$List_Extra$andThen = _elm_lang$core$List$concatMap;
-var _elm_community$list_extra$List_Extra$lift2 = F3(
-	function (f, la, lb) {
-		return A2(
-			_elm_community$list_extra$List_Extra$andThen,
-			function (a) {
-				return A2(
-					_elm_community$list_extra$List_Extra$andThen,
-					function (b) {
-						return {
-							ctor: '::',
-							_0: A2(f, a, b),
-							_1: {ctor: '[]'}
-						};
-					},
-					lb);
-			},
-			la);
-	});
-var _elm_community$list_extra$List_Extra$lift3 = F4(
-	function (f, la, lb, lc) {
-		return A2(
-			_elm_community$list_extra$List_Extra$andThen,
-			function (a) {
-				return A2(
-					_elm_community$list_extra$List_Extra$andThen,
-					function (b) {
-						return A2(
-							_elm_community$list_extra$List_Extra$andThen,
-							function (c) {
-								return {
-									ctor: '::',
-									_0: A3(f, a, b, c),
-									_1: {ctor: '[]'}
-								};
-							},
-							lc);
-					},
-					lb);
-			},
-			la);
-	});
-var _elm_community$list_extra$List_Extra$lift4 = F5(
-	function (f, la, lb, lc, ld) {
-		return A2(
-			_elm_community$list_extra$List_Extra$andThen,
-			function (a) {
-				return A2(
-					_elm_community$list_extra$List_Extra$andThen,
-					function (b) {
-						return A2(
-							_elm_community$list_extra$List_Extra$andThen,
-							function (c) {
-								return A2(
-									_elm_community$list_extra$List_Extra$andThen,
-									function (d) {
-										return {
-											ctor: '::',
-											_0: A4(f, a, b, c, d),
-											_1: {ctor: '[]'}
-										};
-									},
-									ld);
-							},
-							lc);
-					},
-					lb);
-			},
-			la);
-	});
-var _elm_community$list_extra$List_Extra$andMap = F2(
-	function (l, fl) {
-		return A3(
-			_elm_lang$core$List$map2,
-			F2(
-				function (x, y) {
-					return x(y);
-				}),
-			fl,
-			l);
-	});
-var _elm_community$list_extra$List_Extra$uniqueHelp = F3(
-	function (f, existing, remaining) {
-		uniqueHelp:
-		while (true) {
-			var _p64 = remaining;
-			if (_p64.ctor === '[]') {
-				return {ctor: '[]'};
-			} else {
-				var _p66 = _p64._1;
-				var _p65 = _p64._0;
-				var computedFirst = f(_p65);
-				if (A2(_elm_lang$core$Set$member, computedFirst, existing)) {
-					var _v44 = f,
-						_v45 = existing,
-						_v46 = _p66;
-					f = _v44;
-					existing = _v45;
-					remaining = _v46;
-					continue uniqueHelp;
-				} else {
-					return {
-						ctor: '::',
-						_0: _p65,
-						_1: A3(
-							_elm_community$list_extra$List_Extra$uniqueHelp,
-							f,
-							A2(_elm_lang$core$Set$insert, computedFirst, existing),
-							_p66)
-					};
-				}
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$uniqueBy = F2(
-	function (f, list) {
-		return A3(_elm_community$list_extra$List_Extra$uniqueHelp, f, _elm_lang$core$Set$empty, list);
-	});
-var _elm_community$list_extra$List_Extra$allDifferentBy = F2(
-	function (f, list) {
-		return _elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$List$length(list),
-			_elm_lang$core$List$length(
-				A2(_elm_community$list_extra$List_Extra$uniqueBy, f, list)));
-	});
-var _elm_community$list_extra$List_Extra$allDifferent = function (list) {
-	return A2(_elm_community$list_extra$List_Extra$allDifferentBy, _elm_lang$core$Basics$identity, list);
-};
-var _elm_community$list_extra$List_Extra$unique = function (list) {
-	return A3(_elm_community$list_extra$List_Extra$uniqueHelp, _elm_lang$core$Basics$identity, _elm_lang$core$Set$empty, list);
-};
-var _elm_community$list_extra$List_Extra$dropWhile = F2(
-	function (predicate, list) {
-		dropWhile:
-		while (true) {
-			var _p67 = list;
-			if (_p67.ctor === '[]') {
-				return {ctor: '[]'};
-			} else {
-				if (predicate(_p67._0)) {
-					var _v48 = predicate,
-						_v49 = _p67._1;
-					predicate = _v48;
-					list = _v49;
-					continue dropWhile;
-				} else {
-					return list;
-				}
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$takeWhile = function (predicate) {
-	var takeWhileMemo = F2(
-		function (memo, list) {
-			takeWhileMemo:
-			while (true) {
-				var _p68 = list;
-				if (_p68.ctor === '[]') {
-					return _elm_lang$core$List$reverse(memo);
-				} else {
-					var _p69 = _p68._0;
-					if (predicate(_p69)) {
-						var _v51 = {ctor: '::', _0: _p69, _1: memo},
-							_v52 = _p68._1;
-						memo = _v51;
-						list = _v52;
-						continue takeWhileMemo;
-					} else {
-						return _elm_lang$core$List$reverse(memo);
-					}
-				}
-			}
-		});
-	return takeWhileMemo(
-		{ctor: '[]'});
-};
-var _elm_community$list_extra$List_Extra$span = F2(
-	function (p, xs) {
-		return {
-			ctor: '_Tuple2',
-			_0: A2(_elm_community$list_extra$List_Extra$takeWhile, p, xs),
-			_1: A2(_elm_community$list_extra$List_Extra$dropWhile, p, xs)
-		};
-	});
-var _elm_community$list_extra$List_Extra$break = function (p) {
-	return _elm_community$list_extra$List_Extra$span(
-		function (_p70) {
-			return !p(_p70);
-		});
-};
-var _elm_community$list_extra$List_Extra$groupWhile = F2(
-	function (eq, xs_) {
-		var _p71 = xs_;
-		if (_p71.ctor === '[]') {
-			return {ctor: '[]'};
-		} else {
-			var _p73 = _p71._0;
-			var _p72 = A2(
-				_elm_community$list_extra$List_Extra$span,
-				eq(_p73),
-				_p71._1);
-			var ys = _p72._0;
-			var zs = _p72._1;
-			return {
-				ctor: '::',
-				_0: {ctor: '::', _0: _p73, _1: ys},
-				_1: A2(_elm_community$list_extra$List_Extra$groupWhile, eq, zs)
-			};
-		}
-	});
-var _elm_community$list_extra$List_Extra$group = _elm_community$list_extra$List_Extra$groupWhile(
-	F2(
-		function (x, y) {
-			return _elm_lang$core$Native_Utils.eq(x, y);
-		}));
-var _elm_community$list_extra$List_Extra$minimumBy = F2(
-	function (f, ls) {
-		var minBy = F2(
-			function (x, _p74) {
-				var _p75 = _p74;
-				var _p76 = _p75._1;
-				var fx = f(x);
-				return (_elm_lang$core$Native_Utils.cmp(fx, _p76) < 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p75._0, _1: _p76};
-			});
-		var _p77 = ls;
-		if (_p77.ctor === '::') {
-			if (_p77._1.ctor === '[]') {
-				return _elm_lang$core$Maybe$Just(_p77._0);
-			} else {
-				var _p78 = _p77._0;
-				return _elm_lang$core$Maybe$Just(
-					_elm_lang$core$Tuple$first(
-						A3(
-							_elm_lang$core$List$foldl,
-							minBy,
-							{
-								ctor: '_Tuple2',
-								_0: _p78,
-								_1: f(_p78)
-							},
-							_p77._1)));
-			}
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _elm_community$list_extra$List_Extra$maximumBy = F2(
-	function (f, ls) {
-		var maxBy = F2(
-			function (x, _p79) {
-				var _p80 = _p79;
-				var _p81 = _p80._1;
-				var fx = f(x);
-				return (_elm_lang$core$Native_Utils.cmp(fx, _p81) > 0) ? {ctor: '_Tuple2', _0: x, _1: fx} : {ctor: '_Tuple2', _0: _p80._0, _1: _p81};
-			});
-		var _p82 = ls;
-		if (_p82.ctor === '::') {
-			if (_p82._1.ctor === '[]') {
-				return _elm_lang$core$Maybe$Just(_p82._0);
-			} else {
-				var _p83 = _p82._0;
-				return _elm_lang$core$Maybe$Just(
-					_elm_lang$core$Tuple$first(
-						A3(
-							_elm_lang$core$List$foldl,
-							maxBy,
-							{
-								ctor: '_Tuple2',
-								_0: _p83,
-								_1: f(_p83)
-							},
-							_p82._1)));
-			}
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	});
-var _elm_community$list_extra$List_Extra$uncons = function (xs) {
-	var _p84 = xs;
-	if (_p84.ctor === '[]') {
-		return _elm_lang$core$Maybe$Nothing;
-	} else {
-		return _elm_lang$core$Maybe$Just(
-			{ctor: '_Tuple2', _0: _p84._0, _1: _p84._1});
-	}
-};
-var _elm_community$list_extra$List_Extra$swapAt = F3(
-	function (index1, index2, l) {
-		swapAt:
-		while (true) {
-			if (_elm_lang$core$Native_Utils.eq(index1, index2)) {
-				return _elm_lang$core$Maybe$Just(l);
-			} else {
-				if (_elm_lang$core$Native_Utils.cmp(index1, index2) > 0) {
-					var _v59 = index2,
-						_v60 = index1,
-						_v61 = l;
-					index1 = _v59;
-					index2 = _v60;
-					l = _v61;
-					continue swapAt;
-				} else {
-					if (_elm_lang$core$Native_Utils.cmp(index1, 0) < 0) {
-						return _elm_lang$core$Maybe$Nothing;
-					} else {
-						var _p85 = A2(_elm_community$list_extra$List_Extra$splitAt, index1, l);
-						var part1 = _p85._0;
-						var tail1 = _p85._1;
-						var _p86 = A2(_elm_community$list_extra$List_Extra$splitAt, index2 - index1, tail1);
-						var head2 = _p86._0;
-						var tail2 = _p86._1;
-						return A3(
-							_elm_lang$core$Maybe$map2,
-							F2(
-								function (_p88, _p87) {
-									var _p89 = _p88;
-									var _p90 = _p87;
-									return _elm_lang$core$List$concat(
-										{
-											ctor: '::',
-											_0: part1,
-											_1: {
-												ctor: '::',
-												_0: {ctor: '::', _0: _p90._0, _1: _p89._1},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '::', _0: _p89._0, _1: _p90._1},
-													_1: {ctor: '[]'}
-												}
-											}
-										});
-								}),
-							_elm_community$list_extra$List_Extra$uncons(head2),
-							_elm_community$list_extra$List_Extra$uncons(tail2));
-					}
-				}
-			}
-		}
-	});
-var _elm_community$list_extra$List_Extra$iterate = F2(
-	function (f, x) {
-		var _p91 = f(x);
-		if (_p91.ctor === 'Just') {
-			return {
-				ctor: '::',
-				_0: x,
-				_1: A2(_elm_community$list_extra$List_Extra$iterate, f, _p91._0)
-			};
-		} else {
-			return {
-				ctor: '::',
-				_0: x,
-				_1: {ctor: '[]'}
-			};
-		}
-	});
-var _elm_community$list_extra$List_Extra$getAt = F2(
-	function (idx, xs) {
-		return (_elm_lang$core$Native_Utils.cmp(idx, 0) < 0) ? _elm_lang$core$Maybe$Nothing : _elm_lang$core$List$head(
-			A2(_elm_lang$core$List$drop, idx, xs));
-	});
-var _elm_community$list_extra$List_Extra_ops = _elm_community$list_extra$List_Extra_ops || {};
-_elm_community$list_extra$List_Extra_ops['!!'] = _elm_lang$core$Basics$flip(_elm_community$list_extra$List_Extra$getAt);
-var _elm_community$list_extra$List_Extra$init = function () {
-	var maybe = F2(
-		function (d, f) {
-			return function (_p92) {
-				return A2(
-					_elm_lang$core$Maybe$withDefault,
-					d,
-					A2(_elm_lang$core$Maybe$map, f, _p92));
-			};
-		});
-	return A2(
-		_elm_lang$core$List$foldr,
-		function (x) {
-			return function (_p93) {
-				return _elm_lang$core$Maybe$Just(
-					A3(
-						maybe,
-						{ctor: '[]'},
-						F2(
-							function (x, y) {
-								return {ctor: '::', _0: x, _1: y};
-							})(x),
-						_p93));
-			};
-		},
-		_elm_lang$core$Maybe$Nothing);
-}();
-var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
-	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
-
 var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
 var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
 var _elm_lang$core$Task$spawnCmd = F2(
@@ -10356,6 +9017,10 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$html$Html_Lazy$lazy3 = _elm_lang$virtual_dom$VirtualDom$lazy3;
+var _elm_lang$html$Html_Lazy$lazy2 = _elm_lang$virtual_dom$VirtualDom$lazy2;
+var _elm_lang$html$Html_Lazy$lazy = _elm_lang$virtual_dom$VirtualDom$lazy;
+
 var _elm_lang$keyboard$Keyboard$onSelfMsg = F3(
 	function (router, _p0, state) {
 		var _p1 = _p0;
@@ -11554,54 +10219,53 @@ var _kirchner$elm_selectize$Selectize_Selectize$textfieldId = function (id) {
 var _kirchner$elm_selectize$Selectize_Selectize$menuId = function (id) {
 	return A2(_elm_lang$core$Basics_ops['++'], id, '__menu');
 };
-var _kirchner$elm_selectize$Selectize_Selectize$previous = F3(
-	function (entries, former, currentFocus) {
-		previous:
-		while (true) {
-			var _p1 = entries;
-			if (_p1.ctor === '[]') {
-				return currentFocus;
-			} else {
-				var _p4 = _p1._1;
-				var _p2 = _p1._0;
-				if (_p2.ctor === 'Entry') {
-					var _p3 = _p2._0;
-					if (_elm_lang$core$Native_Utils.eq(_p3, currentFocus)) {
-						return A2(_elm_lang$core$Maybe$withDefault, currentFocus, former);
-					} else {
-						var _v3 = _p4,
-							_v4 = _elm_lang$core$Maybe$Just(_p3),
-							_v5 = currentFocus;
-						entries = _v3;
-						former = _v4;
-						currentFocus = _v5;
-						continue previous;
-					}
-				} else {
-					var _v6 = _p4,
-						_v7 = former,
-						_v8 = currentFocus;
-					entries = _v6;
-					former = _v7;
-					currentFocus = _v8;
-					continue previous;
-				}
-			}
+var _kirchner$elm_selectize$Selectize_Selectize$getPrevious = F3(
+	function (current, next, result) {
+		var _p1 = next;
+		if (_p1.ctor === 'Entry') {
+			var _p2 = _p1._0;
+			return _elm_lang$core$Native_Utils.eq(_p2, current) ? _elm_lang$core$Maybe$Just(_p2) : (_elm_lang$core$Native_Utils.eq(
+				result,
+				_elm_lang$core$Maybe$Just(current)) ? _elm_lang$core$Maybe$Just(_p2) : result);
+		} else {
+			return result;
 		}
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$previous = F2(
+	function (entries, current) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			current,
+			A3(
+				_elm_lang$core$List$foldr,
+				_kirchner$elm_selectize$Selectize_Selectize$getPrevious(current),
+				_elm_lang$core$Maybe$Nothing,
+				entries));
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$next = F2(
+	function (entries, current) {
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			current,
+			A3(
+				_elm_lang$core$List$foldl,
+				_kirchner$elm_selectize$Selectize_Selectize$getPrevious(current),
+				_elm_lang$core$Maybe$Nothing,
+				entries));
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$first = function (entries) {
 	first:
 	while (true) {
-		var _p5 = entries;
-		if (_p5.ctor === '[]') {
+		var _p3 = entries;
+		if (_p3.ctor === '[]') {
 			return _elm_lang$core$Maybe$Nothing;
 		} else {
-			var _p6 = _p5._0;
-			if (_p6.ctor === 'Entry') {
-				return _elm_lang$core$Maybe$Just(_p6._0);
+			var _p4 = _p3._0;
+			if (_p4.ctor === 'Entry') {
+				return _elm_lang$core$Maybe$Just(_p4._0);
 			} else {
-				var _v11 = _p5._1;
-				entries = _v11;
+				var _v4 = _p3._1;
+				entries = _v4;
 				continue first;
 			}
 		}
@@ -11610,13 +10274,13 @@ var _kirchner$elm_selectize$Selectize_Selectize$first = function (entries) {
 var _kirchner$elm_selectize$Selectize_Selectize$filter = F3(
 	function (toLabel, query, entries) {
 		var containsQuery = function (entry) {
-			var _p7 = entry;
-			if (_p7.ctor === 'Entry') {
+			var _p5 = entry;
+			if (_p5.ctor === 'Entry') {
 				return A2(
 					_elm_lang$core$String$contains,
 					_elm_lang$core$String$toLower(query),
 					_elm_lang$core$String$toLower(
-						toLabel(_p7._0)));
+						toLabel(_p5._0)));
 			} else {
 				return true;
 			}
@@ -11624,6 +10288,62 @@ var _kirchner$elm_selectize$Selectize_Selectize$filter = F3(
 		return A2(_elm_lang$core$List$filter, containsQuery, entries);
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$keydownOptions = {preventDefault: true, stopPropagation: false};
+var _kirchner$elm_selectize$Selectize_Selectize$updateKeyboardFocus = F4(
+	function (select, filteredEntries, movement, state) {
+		var nextKeyboardFocus = function () {
+			var _p6 = movement;
+			switch (_p6.ctor) {
+				case 'Up':
+					return A2(
+						_elm_lang$core$Maybe$map,
+						_kirchner$elm_selectize$Selectize_Selectize$previous(filteredEntries),
+						state.keyboardFocus);
+				case 'Down':
+					return A2(
+						_elm_lang$core$Maybe$map,
+						_kirchner$elm_selectize$Selectize_Selectize$next(filteredEntries),
+						state.keyboardFocus);
+				default:
+					return _elm_lang$core$Maybe$Nothing;
+			}
+		}();
+		return {
+			ctor: '_Tuple3',
+			_0: _elm_lang$core$Native_Utils.update(
+				state,
+				{
+					keyboardFocus: function () {
+						var _p7 = nextKeyboardFocus;
+						if (_p7.ctor === 'Nothing') {
+							return _kirchner$elm_selectize$Selectize_Selectize$first(filteredEntries);
+						} else {
+							return _elm_lang$core$Maybe$Just(_p7._0);
+						}
+					}()
+				}),
+			_1: _elm_lang$core$Platform_Cmd$none,
+			_2: _elm_lang$core$Maybe$Just(
+				select(_elm_lang$core$Maybe$Nothing))
+		};
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$updateHeights = F2(
+	function (maybeHeights, state) {
+		var _p8 = maybeHeights;
+		if (_p8.ctor === 'Just') {
+			return _elm_lang$core$Native_Utils.update(
+				state,
+				{
+					heights: _elm_lang$core$Maybe$Just(_p8._0)
+				});
+		} else {
+			return state;
+		}
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$resetHeights = function (state) {
+	return _elm_lang$core$Native_Utils.update(
+		state,
+		{heights: _elm_lang$core$Maybe$Nothing});
+};
 var _kirchner$elm_selectize$Selectize_Selectize$reset = function (state) {
 	return _elm_lang$core$Native_Utils.update(
 		state,
@@ -11635,10 +10355,14 @@ var _kirchner$elm_selectize$Selectize_Selectize$viewConfig = function (config) {
 var _kirchner$elm_selectize$Selectize_Selectize$updateConfig = function (config) {
 	return {toLabel: config.toLabel, state: config.state, entries: config.entries, selection: config.selection, id: config.id, select: config.select};
 };
-var _kirchner$elm_selectize$Selectize_Selectize$empty = {query: '', keyboardFocus: _elm_lang$core$Maybe$Nothing, mouseFocus: _elm_lang$core$Maybe$Nothing, preventBlur: false, open: false};
-var _kirchner$elm_selectize$Selectize_Selectize$State = F5(
-	function (a, b, c, d, e) {
-		return {query: a, keyboardFocus: b, mouseFocus: c, preventBlur: d, open: e};
+var _kirchner$elm_selectize$Selectize_Selectize$empty = {query: '', keyboardFocus: _elm_lang$core$Maybe$Nothing, mouseFocus: _elm_lang$core$Maybe$Nothing, preventBlur: false, open: false, heights: _elm_lang$core$Maybe$Nothing, scrollTop: 0};
+var _kirchner$elm_selectize$Selectize_Selectize$State = F7(
+	function (a, b, c, d, e, f, g) {
+		return {query: a, keyboardFocus: b, mouseFocus: c, preventBlur: d, open: e, heights: f, scrollTop: g};
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$Heights = F2(
+	function (a, b) {
+		return {entries: a, menu: b};
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$HtmlDetails = F2(
 	function (a, b) {
@@ -11656,86 +10380,45 @@ var _kirchner$elm_selectize$Selectize_Selectize$Entry = function (a) {
 var _kirchner$elm_selectize$Selectize_Selectize$entry = function (a) {
 	return _kirchner$elm_selectize$Selectize_Selectize$Entry(a);
 };
-var _kirchner$elm_selectize$Selectize_Selectize$next = F2(
-	function (entries, currentFocus) {
-		next:
+var _kirchner$elm_selectize$Selectize_Selectize$topAndHeightHelper = F4(
+	function (entryHeights, filteredEntries, focus, _p9) {
+		topAndHeightHelper:
 		while (true) {
-			var _p8 = entries;
-			if (_p8.ctor === '[]') {
-				return currentFocus;
-			} else {
-				var _p12 = _p8._1;
-				var _p9 = _p8._0;
-				if (_p9.ctor === 'Entry') {
-					if (_elm_lang$core$Native_Utils.eq(_p9._0, currentFocus)) {
-						var _p10 = _p12;
-						if (_p10.ctor === '::') {
-							var _p11 = _p10._0;
-							if (_p11.ctor === 'Entry') {
-								return _p11._0;
-							} else {
-								var _v17 = {
-									ctor: '::',
-									_0: _kirchner$elm_selectize$Selectize_Selectize$Entry(currentFocus),
-									_1: _p10._1
-								},
-									_v18 = currentFocus;
-								entries = _v17;
-								currentFocus = _v18;
-								continue next;
-							}
-						} else {
-							return currentFocus;
-						}
-					} else {
-						var _v19 = _p12,
-							_v20 = currentFocus;
-						entries = _v19;
-						currentFocus = _v20;
-						continue next;
-					}
+			var _p10 = _p9;
+			var _p13 = _p10._0;
+			var _p11 = {ctor: '_Tuple2', _0: entryHeights, _1: filteredEntries};
+			if (((_p11.ctor === '_Tuple2') && (_p11._0.ctor === '::')) && (_p11._1.ctor === '::')) {
+				var _p12 = _p11._0._0;
+				if (_elm_lang$core$Native_Utils.eq(
+					_p11._1._0,
+					_kirchner$elm_selectize$Selectize_Selectize$Entry(focus))) {
+					return {ctor: '_Tuple2', _0: _p13, _1: _p12};
 				} else {
-					var _v21 = _p12,
-						_v22 = currentFocus;
-					entries = _v21;
-					currentFocus = _v22;
-					continue next;
+					var _v11 = _p11._0._1,
+						_v12 = _p11._1._1,
+						_v13 = focus,
+						_v14 = {ctor: '_Tuple2', _0: _p13 + _p12, _1: 0};
+					entryHeights = _v11;
+					filteredEntries = _v12;
+					focus = _v13;
+					_p9 = _v14;
+					continue topAndHeightHelper;
 				}
+			} else {
+				return {ctor: '_Tuple2', _0: 0, _1: 0};
 			}
 		}
 	});
-var _kirchner$elm_selectize$Selectize_Selectize$topAndHeight = F5(
-	function (entryHeights, menuHeight, scrollTop, filteredEntries, focus) {
-		var lists = A2(
-			_elm_community$list_extra$List_Extra$splitWhen,
-			function (_p13) {
-				var _p14 = _p13;
-				return _elm_lang$core$Native_Utils.eq(
-					_elm_lang$core$Maybe$Just(_p14._0),
-					A2(_elm_lang$core$Maybe$map, _kirchner$elm_selectize$Selectize_Selectize$Entry, focus));
-			},
-			A2(_elm_community$list_extra$List_Extra$zip, filteredEntries, entryHeights));
-		var _p15 = lists;
-		if (_p15.ctor === 'Just') {
-			return {
-				ctor: '_Tuple2',
-				_0: A3(
-					_elm_lang$core$List$foldl,
-					F2(
-						function (_p16, sum) {
-							var _p17 = _p16;
-							return sum + _p17._1;
-						}),
-					0,
-					_p15._0._0),
-				_1: A2(
-					_elm_lang$core$Maybe$withDefault,
-					0,
-					A2(
-						_elm_lang$core$Maybe$map,
-						_elm_lang$core$Tuple$second,
-						_elm_lang$core$List$head(_p15._0._1)))
-			};
+var _kirchner$elm_selectize$Selectize_Selectize$topAndHeight = F3(
+	function (entryHeights, filteredEntries, focus) {
+		var _p14 = focus;
+		if (_p14.ctor === 'Just') {
+			return A4(
+				_kirchner$elm_selectize$Selectize_Selectize$topAndHeightHelper,
+				entryHeights,
+				filteredEntries,
+				_p14._0,
+				{ctor: '_Tuple2', _0: 0, _1: 0});
 		} else {
 			return {ctor: '_Tuple2', _0: 0, _1: 0};
 		}
@@ -11747,8 +10430,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder = A2(
 	A2(
 		_elm_lang$core$Json_Decode$map,
 		function (code) {
-			var _p18 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
-			switch (_p18.ctor) {
+			var _p15 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
+			switch (_p15.ctor) {
 				case 'BackSpace':
 					return _elm_lang$core$Result$Ok(_kirchner$elm_selectize$Selectize_Selectize$ClearSelection);
 				case 'Delete':
@@ -11759,9 +10442,9 @@ var _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder = A2(
 		},
 		_elm_lang$html$Html_Events$keyCode));
 var _kirchner$elm_selectize$Selectize_Selectize$SelectKeyboardFocusAndBlur = {ctor: 'SelectKeyboardFocusAndBlur'};
-var _kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus = F4(
-	function (a, b, c, d) {
-		return {ctor: 'SetKeyboardFocus', _0: a, _1: b, _2: c, _3: d};
+var _kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus = F3(
+	function (a, b, c) {
+		return {ctor: 'SetKeyboardFocus', _0: a, _1: b, _2: c};
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$Select = function (a) {
 	return {ctor: 'Select', _0: a};
@@ -11772,20 +10455,23 @@ var _kirchner$elm_selectize$Selectize_Selectize$SetMouseFocus = function (a) {
 var _kirchner$elm_selectize$Selectize_Selectize$SetQuery = function (a) {
 	return {ctor: 'SetQuery', _0: a};
 };
-var _kirchner$elm_selectize$Selectize_Selectize$SetPreventBlur = function (a) {
-	return {ctor: 'SetPreventBlur', _0: a};
+var _kirchner$elm_selectize$Selectize_Selectize$PreventClosing = function (a) {
+	return {ctor: 'PreventClosing', _0: a};
 };
 var _kirchner$elm_selectize$Selectize_Selectize$BlurTextfield = {ctor: 'BlurTextfield'};
-var _kirchner$elm_selectize$Selectize_Selectize$TextfieldBlured = {ctor: 'TextfieldBlured'};
-var _kirchner$elm_selectize$Selectize_Selectize$TextfieldFocused = F3(
-	function (a, b, c) {
-		return {ctor: 'TextfieldFocused', _0: a, _1: b, _2: c};
+var _kirchner$elm_selectize$Selectize_Selectize$CloseMenu = {ctor: 'CloseMenu'};
+var _kirchner$elm_selectize$Selectize_Selectize$OpenMenu = F2(
+	function (a, b) {
+		return {ctor: 'OpenMenu', _0: a, _1: b};
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$focusDecoder = A4(
 	_elm_lang$core$Json_Decode$map3,
 	F3(
 		function (entryHeights, menuHeight, scrollTop) {
-			return A3(_kirchner$elm_selectize$Selectize_Selectize$TextfieldFocused, entryHeights, menuHeight, scrollTop);
+			return A2(
+				_kirchner$elm_selectize$Selectize_Selectize$OpenMenu,
+				{entries: entryHeights, menu: menuHeight},
+				scrollTop);
 		}),
 	_kirchner$elm_selectize$Selectize_Selectize$entryHeightsDecoder,
 	_kirchner$elm_selectize$Selectize_Selectize$menuHeightDecoder,
@@ -11795,58 +10481,59 @@ var _kirchner$elm_selectize$Selectize_Selectize$noOp = function (attrs) {
 	return A2(
 		_elm_lang$core$List$map,
 		_elm_lang$html$Html_Attributes$map(
-			function (_p19) {
+			function (_p16) {
 				return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 			}),
 		attrs);
 };
 var _kirchner$elm_selectize$Selectize_Selectize$mapToNoOp = _elm_lang$html$Html$map(
-	function (_p20) {
+	function (_p17) {
 		return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$viewEntry = F5(
 	function (open, renderEntry, renderDivider, state, entry) {
-		var _p21 = function () {
-			var _p22 = entry;
-			if (_p22.ctor === 'Entry') {
-				var _p23 = _p22._0;
+		var _p18 = function () {
+			var _p19 = entry;
+			if (_p19.ctor === 'Entry') {
+				var _p20 = _p19._0;
 				return A3(
 					renderEntry,
-					_p23,
+					_p20,
 					_elm_lang$core$Native_Utils.eq(
 						state.mouseFocus,
-						_elm_lang$core$Maybe$Just(_p23)),
+						_elm_lang$core$Maybe$Just(_p20)),
 					_elm_lang$core$Native_Utils.eq(
 						state.keyboardFocus,
-						_elm_lang$core$Maybe$Just(_p23)));
+						_elm_lang$core$Maybe$Just(_p20)));
 			} else {
-				return renderDivider(_p22._0);
+				return renderDivider(_p19._0);
 			}
 		}();
-		var attributes = _p21.attributes;
-		var children = _p21.children;
+		var attributes = _p18.attributes;
+		var children = _p18.children;
 		var liAttrs = function (attrs) {
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
 				attrs,
 				_kirchner$elm_selectize$Selectize_Selectize$noOp(attributes));
 		};
-		return A2(
+		return A3(
+			_elm_lang$html$Html_Lazy$lazy2,
 			_elm_lang$html$Html$li,
 			liAttrs(
 				function () {
-					var _p24 = entry;
-					if (_p24.ctor === 'Entry') {
-						var _p25 = _p24._0;
+					var _p21 = entry;
+					if (_p21.ctor === 'Entry') {
+						var _p22 = _p21._0;
 						return open ? {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onClick(
-								_kirchner$elm_selectize$Selectize_Selectize$Select(_p25)),
+								_kirchner$elm_selectize$Selectize_Selectize$Select(_p22)),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onMouseEnter(
 									_kirchner$elm_selectize$Selectize_Selectize$SetMouseFocus(
-										_elm_lang$core$Maybe$Just(_p25))),
+										_elm_lang$core$Maybe$Just(_p22))),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onMouseLeave(
@@ -11865,7 +10552,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$scroll = F2(
 	function (id, y) {
 		return A2(
 			_elm_lang$core$Task$attempt,
-			function (_p26) {
+			function (_p23) {
 				return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 			},
 			A2(
@@ -11873,10 +10560,52 @@ var _kirchner$elm_selectize$Selectize_Selectize$scroll = F2(
 				_kirchner$elm_selectize$Selectize_Selectize$menuId(id),
 				_elm_lang$core$Basics$toFloat(y)));
 	});
+var _kirchner$elm_selectize$Selectize_Selectize$scrollToKeyboardFocus = F4(
+	function (id, filteredEntries, scrollTop, _p24) {
+		var _p25 = _p24;
+		var _p30 = _p25._0;
+		var _p29 = _p25._2;
+		var _p28 = _p25._1;
+		var _p26 = _p30.keyboardFocus;
+		if (_p26.ctor === 'Just') {
+			var heights = A2(
+				_elm_lang$core$Maybe$withDefault,
+				{
+					entries: {ctor: '[]'},
+					menu: 0
+				},
+				_p30.heights);
+			var _p27 = A3(
+				_kirchner$elm_selectize$Selectize_Selectize$topAndHeight,
+				heights.entries,
+				filteredEntries,
+				_elm_lang$core$Maybe$Just(_p26._0));
+			var top = _p27._0;
+			var entryHeight = _p27._1;
+			var y = (_elm_lang$core$Native_Utils.cmp(top - (((2 * entryHeight) / 3) | 0), scrollTop) < 0) ? (top - (((2 * entryHeight) / 3) | 0)) : ((_elm_lang$core$Native_Utils.cmp(top + (((5 * entryHeight) / 3) | 0), scrollTop + heights.menu) > 0) ? ((top + (((5 * entryHeight) / 3) | 0)) - heights.menu) : scrollTop);
+			return {
+				ctor: '_Tuple3',
+				_0: _p30,
+				_1: _elm_lang$core$Platform_Cmd$batch(
+					{
+						ctor: '::',
+						_0: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, id, y),
+						_1: {
+							ctor: '::',
+							_0: _p28,
+							_1: {ctor: '[]'}
+						}
+					}),
+				_2: _p29
+			};
+		} else {
+			return {ctor: '_Tuple3', _0: _p30, _1: _p28, _2: _p29};
+		}
+	});
 var _kirchner$elm_selectize$Selectize_Selectize$blur = function (id) {
 	return A2(
 		_elm_lang$core$Task$attempt,
-		function (_p27) {
+		function (_p31) {
 			return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 		},
 		_elm_lang$dom$Dom$blur(
@@ -11886,32 +10615,39 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F3(
 	function (config, model, msg) {
 		var entries = config.entries(model);
 		var state = config.state(model);
-		var _p28 = msg;
-		switch (_p28.ctor) {
+		var _p32 = msg;
+		switch (_p32.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple3', _0: state, _1: _elm_lang$core$Platform_Cmd$none, _2: _elm_lang$core$Maybe$Nothing};
-			case 'TextfieldFocused':
-				var _p31 = _p28._1;
+			case 'OpenMenu':
+				var _p35 = _p32._0;
 				var keyboardFocus = function () {
-					var _p29 = config.selection(model);
-					if (_p29.ctor === 'Nothing') {
+					var _p33 = config.selection(model);
+					if (_p33.ctor === 'Nothing') {
 						return _kirchner$elm_selectize$Selectize_Selectize$first(entries);
 					} else {
 						return config.selection(model);
 					}
 				}();
-				var _p30 = A5(_kirchner$elm_selectize$Selectize_Selectize$topAndHeight, _p28._0, _p31, _p28._2, entries, keyboardFocus);
-				var top = _p30._0;
-				var height = _p30._1;
+				var _p34 = A3(_kirchner$elm_selectize$Selectize_Selectize$topAndHeight, _p35.entries, entries, keyboardFocus);
+				var top = _p34._0;
+				var height = _p34._1;
 				return {
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						state,
-						{keyboardFocus: keyboardFocus, mouseFocus: _elm_lang$core$Maybe$Nothing, query: '', open: true}),
-					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, config.id, top - (((_p31 - height) / 2) | 0)),
+						{
+							keyboardFocus: keyboardFocus,
+							mouseFocus: _elm_lang$core$Maybe$Nothing,
+							query: '',
+							open: true,
+							heights: _elm_lang$core$Maybe$Just(_p35),
+							scrollTop: _p32._1
+						}),
+					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, config.id, top - (((_p35.menu - height) / 2) | 0)),
 					_2: _elm_lang$core$Maybe$Nothing
 				};
-			case 'TextfieldBlured':
+			case 'CloseMenu':
 				return state.preventBlur ? {ctor: '_Tuple3', _0: state, _1: _elm_lang$core$Platform_Cmd$none, _2: _elm_lang$core$Maybe$Nothing} : {
 					ctor: '_Tuple3',
 					_0: _kirchner$elm_selectize$Selectize_Selectize$reset(state),
@@ -11925,27 +10661,28 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F3(
 					_1: _kirchner$elm_selectize$Selectize_Selectize$blur(config.id),
 					_2: _elm_lang$core$Maybe$Nothing
 				};
-			case 'SetPreventBlur':
+			case 'PreventClosing':
 				return {
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						state,
-						{preventBlur: _p28._0}),
+						{preventBlur: _p32._0}),
 					_1: _elm_lang$core$Platform_Cmd$none,
 					_2: _elm_lang$core$Maybe$Nothing
 				};
 			case 'SetQuery':
-				var _p32 = _p28._0;
+				var _p36 = _p32._0;
 				return {
 					ctor: '_Tuple3',
-					_0: _elm_lang$core$Native_Utils.update(
-						state,
-						{
-							query: _p32,
-							keyboardFocus: _kirchner$elm_selectize$Selectize_Selectize$first(
-								A3(_kirchner$elm_selectize$Selectize_Selectize$filter, config.toLabel, _p32, entries)),
-							mouseFocus: _elm_lang$core$Maybe$Nothing
-						}),
+					_0: _kirchner$elm_selectize$Selectize_Selectize$resetHeights(
+						_elm_lang$core$Native_Utils.update(
+							state,
+							{
+								query: _p36,
+								keyboardFocus: _kirchner$elm_selectize$Selectize_Selectize$first(
+									A3(_kirchner$elm_selectize$Selectize_Selectize$filter, config.toLabel, _p36, entries)),
+								mouseFocus: _elm_lang$core$Maybe$Nothing
+							})),
 					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, config.id, 0),
 					_2: _elm_lang$core$Maybe$Just(
 						config.select(_elm_lang$core$Maybe$Nothing))
@@ -11955,7 +10692,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F3(
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						state,
-						{mouseFocus: _p28._0}),
+						{mouseFocus: _p32._0}),
 					_1: _elm_lang$core$Platform_Cmd$none,
 					_2: _elm_lang$core$Maybe$Nothing
 				};
@@ -11966,59 +10703,21 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F3(
 					_1: _elm_lang$core$Platform_Cmd$none,
 					_2: _elm_lang$core$Maybe$Just(
 						config.select(
-							_elm_lang$core$Maybe$Just(_p28._0)))
+							_elm_lang$core$Maybe$Just(_p32._0)))
 				};
 			case 'SetKeyboardFocus':
-				var _p37 = _p28._3;
-				var _p36 = _p28._2;
 				var filteredEntries = A3(_kirchner$elm_selectize$Selectize_Selectize$filter, config.toLabel, state.query, entries);
-				var nextKeyboardFocus = function () {
-					var _p33 = _p28._0;
-					switch (_p33.ctor) {
-						case 'Up':
-							return A2(
-								_elm_lang$core$Maybe$map,
-								A2(_kirchner$elm_selectize$Selectize_Selectize$previous, filteredEntries, _elm_lang$core$Maybe$Nothing),
-								state.keyboardFocus);
-						case 'Down':
-							return A2(
-								_elm_lang$core$Maybe$map,
-								_kirchner$elm_selectize$Selectize_Selectize$next(filteredEntries),
-								state.keyboardFocus);
-						default:
-							return _elm_lang$core$Maybe$Nothing;
-					}
-				}();
-				var _p34 = A5(_kirchner$elm_selectize$Selectize_Selectize$topAndHeight, _p28._1, _p36, _p37, filteredEntries, nextKeyboardFocus);
-				var top = _p34._0;
-				var height = _p34._1;
-				var y = (_elm_lang$core$Native_Utils.cmp(top - (((2 * height) / 3) | 0), _p37) < 0) ? (top - (((2 * height) / 3) | 0)) : ((_elm_lang$core$Native_Utils.cmp(top + (((5 * height) / 3) | 0), _p37 + _p36) > 0) ? ((top + (((5 * height) / 3) | 0)) - _p36) : _p37);
-				var _p35 = nextKeyboardFocus;
-				if (_p35.ctor === 'Nothing') {
-					return {
-						ctor: '_Tuple3',
-						_0: _elm_lang$core$Native_Utils.update(
-							state,
-							{
-								keyboardFocus: _kirchner$elm_selectize$Selectize_Selectize$first(filteredEntries)
-							}),
-						_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, config.id, 0),
-						_2: _elm_lang$core$Maybe$Just(
-							config.select(_elm_lang$core$Maybe$Nothing))
-					};
-				} else {
-					return {
-						ctor: '_Tuple3',
-						_0: _elm_lang$core$Native_Utils.update(
-							state,
-							{
-								keyboardFocus: _elm_lang$core$Maybe$Just(_p35._0)
-							}),
-						_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, config.id, y),
-						_2: _elm_lang$core$Maybe$Just(
-							config.select(_elm_lang$core$Maybe$Nothing))
-					};
-				}
+				return A4(
+					_kirchner$elm_selectize$Selectize_Selectize$scrollToKeyboardFocus,
+					config.id,
+					filteredEntries,
+					_p32._2,
+					A4(
+						_kirchner$elm_selectize$Selectize_Selectize$updateKeyboardFocus,
+						config.select,
+						filteredEntries,
+						_p32._0,
+						A2(_kirchner$elm_selectize$Selectize_Selectize$updateHeights, _p32._1, state)));
 			case 'SelectKeyboardFocusAndBlur':
 				return {
 					ctor: '_Tuple3',
@@ -12048,14 +10747,24 @@ var _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder = A2(
 		_elm_lang$core$Json_Decode$map4,
 		F4(
 			function (code, entryHeights, menuHeight, scrollTop) {
-				var _p38 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
-				switch (_p38.ctor) {
+				var _p37 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
+				switch (_p37.ctor) {
 					case 'ArrowUp':
 						return _elm_lang$core$Result$Ok(
-							A4(_kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus, _kirchner$elm_selectize$Selectize_Selectize$Up, entryHeights, menuHeight, scrollTop));
+							A3(
+								_kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus,
+								_kirchner$elm_selectize$Selectize_Selectize$Up,
+								_elm_lang$core$Maybe$Just(
+									{entries: entryHeights, menu: menuHeight}),
+								scrollTop));
 					case 'ArrowDown':
 						return _elm_lang$core$Result$Ok(
-							A4(_kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus, _kirchner$elm_selectize$Selectize_Selectize$Down, entryHeights, menuHeight, scrollTop));
+							A3(
+								_kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus,
+								_kirchner$elm_selectize$Selectize_Selectize$Down,
+								_elm_lang$core$Maybe$Just(
+									{entries: entryHeights, menu: menuHeight}),
+								scrollTop));
 					case 'Enter':
 						return _elm_lang$core$Result$Ok(_kirchner$elm_selectize$Selectize_Selectize$SelectKeyboardFocusAndBlur);
 					case 'Escape':
@@ -12067,6 +10776,31 @@ var _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder = A2(
 		_elm_lang$html$Html_Events$keyCode,
 		_kirchner$elm_selectize$Selectize_Selectize$entryHeightsDecoder,
 		_kirchner$elm_selectize$Selectize_Selectize$menuHeightDecoder,
+		_kirchner$elm_selectize$Selectize_Selectize$scrollTopDecoder));
+var _kirchner$elm_selectize$Selectize_Selectize$keydownWithoutHeightsDecoder = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	_kirchner$elm_selectize$Selectize_Selectize$fromResult,
+	A3(
+		_elm_lang$core$Json_Decode$map2,
+		F2(
+			function (code, scrollTop) {
+				var _p38 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
+				switch (_p38.ctor) {
+					case 'ArrowUp':
+						return _elm_lang$core$Result$Ok(
+							A3(_kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus, _kirchner$elm_selectize$Selectize_Selectize$Up, _elm_lang$core$Maybe$Nothing, scrollTop));
+					case 'ArrowDown':
+						return _elm_lang$core$Result$Ok(
+							A3(_kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus, _kirchner$elm_selectize$Selectize_Selectize$Down, _elm_lang$core$Maybe$Nothing, scrollTop));
+					case 'Enter':
+						return _elm_lang$core$Result$Ok(_kirchner$elm_selectize$Selectize_Selectize$SelectKeyboardFocusAndBlur);
+					case 'Escape':
+						return _elm_lang$core$Result$Ok(_kirchner$elm_selectize$Selectize_Selectize$BlurTextfield);
+					default:
+						return _elm_lang$core$Result$Err('not handling that key here');
+				}
+			}),
+		_elm_lang$html$Html_Events$keyCode,
 		_kirchner$elm_selectize$Selectize_Selectize$scrollTopDecoder));
 var _kirchner$elm_selectize$Selectize_Selectize$view = F2(
 	function (config, model) {
@@ -12144,13 +10878,20 @@ var _kirchner$elm_selectize$Selectize_Selectize$view = F2(
 					inputAttrs(
 						state.open ? {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onBlur(_kirchner$elm_selectize$Selectize_Selectize$TextfieldBlured),
+							_0: _elm_lang$html$Html_Events$onBlur(_kirchner$elm_selectize$Selectize_Selectize$CloseMenu),
 							_1: {
 								ctor: '::',
 								_0: A2(_elm_lang$html$Html_Events$on, 'keyup', _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder),
 								_1: {
 									ctor: '::',
-									_0: A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', _kirchner$elm_selectize$Selectize_Selectize$keydownOptions, _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder),
+									_0: function () {
+										var _p39 = state.heights;
+										if (_p39.ctor === 'Nothing') {
+											return A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', _kirchner$elm_selectize$Selectize_Selectize$keydownOptions, _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder);
+										} else {
+											return A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', _kirchner$elm_selectize$Selectize_Selectize$keydownOptions, _kirchner$elm_selectize$Selectize_Selectize$keydownWithoutHeightsDecoder);
+										}
+									}(),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onInput(_kirchner$elm_selectize$Selectize_Selectize$SetQuery),
@@ -12173,11 +10914,11 @@ var _kirchner$elm_selectize$Selectize_Selectize$view = F2(
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onMouseDown(
-										_kirchner$elm_selectize$Selectize_Selectize$SetPreventBlur(true)),
+										_kirchner$elm_selectize$Selectize_Selectize$PreventClosing(true)),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onMouseUp(
-											_kirchner$elm_selectize$Selectize_Selectize$SetPreventBlur(false)),
+											_kirchner$elm_selectize$Selectize_Selectize$PreventClosing(false)),
 										_1: {ctor: '[]'}
 									}
 								}
@@ -12243,65 +10984,89 @@ var _kirchner$elm_selectize$Selectize$divider = function (title) {
 	return _kirchner$elm_selectize$Selectize$Entry(
 		_kirchner$elm_selectize$Selectize_Selectize$divider(title));
 };
+var _kirchner$elm_selectize$Selectize$SharedConfig = function (a) {
+	return {ctor: 'SharedConfig', _0: a};
+};
+var _kirchner$elm_selectize$Selectize$sharedConfig = function (config) {
+	return _kirchner$elm_selectize$Selectize$SharedConfig(
+		{toLabel: config.toLabel, state: config.state, entries: config.entries, selection: config.selection, id: config.id});
+};
 var _kirchner$elm_selectize$Selectize$UpdateConfig = function (a) {
 	return {ctor: 'UpdateConfig', _0: a};
 };
-var _kirchner$elm_selectize$Selectize$updateConfig = function (config) {
-	return _kirchner$elm_selectize$Selectize$UpdateConfig(
-		_kirchner$elm_selectize$Selectize_Selectize$updateConfig(
-			_elm_lang$core$Native_Utils.update(
-				config,
+var _kirchner$elm_selectize$Selectize$updateConfig = F2(
+	function (_p0, config) {
+		var _p1 = _p0;
+		var _p5 = _p1._0;
+		return _kirchner$elm_selectize$Selectize$UpdateConfig(
+			_kirchner$elm_selectize$Selectize_Selectize$updateConfig(
 				{
+					toLabel: _p5.toLabel,
 					state: function (model) {
-						var _p0 = config.state(model);
-						return _p0._0;
+						var _p2 = _p5.state(model);
+						return _p2._0;
 					},
 					entries: function (model) {
 						return A2(
 							_elm_lang$core$List$map,
-							function (_p1) {
-								var _p2 = _p1;
-								return _p2._0;
+							function (_p3) {
+								var _p4 = _p3;
+								return _p4._0;
 							},
-							config.entries(model));
-					}
-				})));
-};
+							_p5.entries(model));
+					},
+					selection: _p5.selection,
+					id: _p5.id,
+					select: config.select
+				}));
+	});
 var _kirchner$elm_selectize$Selectize$ViewConfig = function (a) {
 	return {ctor: 'ViewConfig', _0: a};
 };
-var _kirchner$elm_selectize$Selectize$viewConfig = function (config) {
-	return _kirchner$elm_selectize$Selectize$ViewConfig(
-		_kirchner$elm_selectize$Selectize_Selectize$viewConfig(
-			_elm_lang$core$Native_Utils.update(
-				config,
+var _kirchner$elm_selectize$Selectize$viewConfig = F2(
+	function (_p6, config) {
+		var _p7 = _p6;
+		var _p11 = _p7._0;
+		return _kirchner$elm_selectize$Selectize$ViewConfig(
+			_kirchner$elm_selectize$Selectize_Selectize$viewConfig(
 				{
+					toLabel: _p11.toLabel,
 					state: function (model) {
-						var _p3 = config.state(model);
-						return _p3._0;
+						var _p8 = _p11.state(model);
+						return _p8._0;
 					},
 					entries: function (model) {
 						return A2(
 							_elm_lang$core$List$map,
-							function (_p4) {
-								var _p5 = _p4;
-								return _p5._0;
+							function (_p9) {
+								var _p10 = _p9;
+								return _p10._0;
 							},
-							config.entries(model));
-					}
-				})));
-};
+							_p11.entries(model));
+					},
+					selection: _p11.selection,
+					id: _p11.id,
+					placeholder: config.placeholder,
+					container: config.container,
+					input: config.input,
+					toggle: config.toggle,
+					menu: config.menu,
+					ul: config.ul,
+					entry: config.entry,
+					divider: config.divider
+				}));
+	});
 var _kirchner$elm_selectize$Selectize$Msg = function (a) {
 	return {ctor: 'Msg', _0: a};
 };
 var _kirchner$elm_selectize$Selectize$update = F3(
-	function (_p7, model, _p6) {
-		var _p8 = _p7;
-		var _p9 = _p6;
-		var _p10 = A3(_kirchner$elm_selectize$Selectize_Selectize$update, _p8._0, model, _p9._0);
-		var newState = _p10._0;
-		var cmd = _p10._1;
-		var maybeMsg = _p10._2;
+	function (_p13, model, _p12) {
+		var _p14 = _p13;
+		var _p15 = _p12;
+		var _p16 = A3(_kirchner$elm_selectize$Selectize_Selectize$update, _p14._0, model, _p15._0);
+		var newState = _p16._0;
+		var cmd = _p16._1;
+		var maybeMsg = _p16._2;
 		return {
 			ctor: '_Tuple3',
 			_0: _kirchner$elm_selectize$Selectize$State(newState),
@@ -12310,1142 +11075,452 @@ var _kirchner$elm_selectize$Selectize$update = F3(
 		};
 	});
 var _kirchner$elm_selectize$Selectize$view = F2(
-	function (_p11, model) {
-		var _p12 = _p11;
+	function (_p17, model) {
+		var _p18 = _p17;
 		return A2(
 			_elm_lang$html$Html$map,
 			_kirchner$elm_selectize$Selectize$Msg,
-			A2(_kirchner$elm_selectize$Selectize_Selectize$view, _p12._0, model));
+			A2(_kirchner$elm_selectize$Selectize_Selectize$view, _p18._0, model));
 	});
 
-var _kirchner$elm_selectize$Demo$treesPart3 = {
+var _kirchner$elm_selectize$Demo$nonfree = {
 	ctor: '::',
-	_0: 'Pieris floribunda',
+	_0: 'No license (#NoLicense)',
 	_1: {
 		ctor: '::',
-		_0: 'Pieris japonica',
+		_0: 'Aladdin Free Public License (#Aladdin)',
 		_1: {
 			ctor: '::',
-			_0: 'Pinus aristata',
+			_0: 'Apple Public Source License (APSL), version 1.x (#apsl1)',
 			_1: {
 				ctor: '::',
-				_0: 'Pinus armandii',
+				_0: 'Artistic License 1.0 (#ArtisticLicense)',
 				_1: {
 					ctor: '::',
-					_0: 'Pinus attenuata',
+					_0: 'AT&T Public License (#ATTPublicLicense)',
 					_1: {
 						ctor: '::',
-						_0: 'Pinus banksiana',
+						_0: 'eCos Public License, version 1.1 (#eCos11)',
 						_1: {
 							ctor: '::',
-							_0: 'Pinus bungeana',
+							_0: 'CNRI Digital Object Repository License Agreement (#DOR)',
 							_1: {
 								ctor: '::',
-								_0: 'Pinus canariensis',
+								_0: 'GPL for Computer Programs of the Public Administration (#GPL-PA)',
 								_1: {
 									ctor: '::',
-									_0: 'Pinus cembra',
+									_0: 'Jahia Community Source License (#Jahia)',
 									_1: {
 										ctor: '::',
-										_0: 'Pinus contorta',
+										_0: 'The JSON License (#JSON)',
 										_1: {
 											ctor: '::',
-											_0: 'Pinus coulteri',
+											_0: 'Old license of ksh93 (#ksh93)',
 											_1: {
 												ctor: '::',
-												_0: 'Pinus halepensis',
+												_0: 'License of Lha (#Lha)',
 												_1: {
 													ctor: '::',
-													_0: 'Pinus heldreichii',
+													_0: 'Microsoft\'s Shared Source CLI, C#, and Jscript License (#Ms-SS)',
 													_1: {
 														ctor: '::',
-														_0: 'Pinus jeffreyi',
+														_0: 'NASA Open Source Agreement (#NASA)',
 														_1: {
 															ctor: '::',
-															_0: 'Pinus koraiensis',
+															_0: 'Oculus Rift SDK License (#OculusRiftSDK)',
 															_1: {
 																ctor: '::',
-																_0: 'Pinus leucodermis',
+																_0: 'Peer-Production License (#PPL)',
 																_1: {
 																	ctor: '::',
-																	_0: 'Pinus monticola',
+																	_0: 'License of PINE (#PINE)',
 																	_1: {
 																		ctor: '::',
-																		_0: 'Pinus mugo',
+																		_0: 'Old Plan 9 license (#Plan9)',
 																		_1: {
 																			ctor: '::',
-																			_0: 'Pinus nigra',
+																			_0: 'Reciprocal Public License (#RPL)',
 																			_1: {
 																				ctor: '::',
-																				_0: 'Pinus nigra var. laricio',
+																				_0: 'Scilab license (#Scilab)',
 																				_1: {
 																					ctor: '::',
-																					_0: 'Pinus nigra var. salzmanii',
+																					_0: 'Scratch 1.4 license (#Scratch)',
 																					_1: {
 																						ctor: '::',
-																						_0: 'Pinus parviflora',
+																						_0: 'Simple Machines License (#SML)',
 																						_1: {
 																							ctor: '::',
-																							_0: 'Pinus peuce',
+																							_0: 'Sun Community Source License (#SunCommunitySourceLicense)',
 																							_1: {
 																								ctor: '::',
-																								_0: 'Pinus pinaster',
+																								_0: 'Sun Solaris Source Code (Foundation Release) License, Version 1.1 (#SunSolarisSourceCode)',
 																								_1: {
 																									ctor: '::',
-																									_0: 'Pinus pinea',
+																									_0: 'Sybase Open Watcom Public License version 1.0 (#Watcom)',
 																									_1: {
 																										ctor: '::',
-																										_0: 'Pinus ponderosa',
+																										_0: 'SystemC “Open Source” License, Version 3.0 (#SystemC-3.0)',
 																										_1: {
 																											ctor: '::',
-																											_0: 'Pinus strobus',
+																											_0: 'Truecrypt license 3.0 (#Truecrypt-3.0)',
 																											_1: {
 																												ctor: '::',
-																												_0: 'Pinus sylvestris',
+																												_0: 'University of Utah Public License (#UtahPublicLicense)',
 																												_1: {
 																													ctor: '::',
-																													_0: 'Pinus thunbergii',
+																													_0: 'YaST License (#YaST)',
+																													_1: {ctor: '[]'}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _kirchner$elm_selectize$Demo$gplIncompatible = {
+	ctor: '::',
+	_0: 'Affero General Public License version 1 (#AGPLv1.0)',
+	_1: {
+		ctor: '::',
+		_0: 'Academic Free License, all versions through 3.0 (#AcademicFreeLicense)',
+		_1: {
+			ctor: '::',
+			_0: 'Apache License, Version 1.1 (#apache1.1)',
+			_1: {
+				ctor: '::',
+				_0: 'Apache License, Version 1.0 (#apache1)',
+				_1: {
+					ctor: '::',
+					_0: 'Apple Public Source License (APSL), version 2 (#apsl2)',
+					_1: {
+						ctor: '::',
+						_0: 'BitTorrent Open Source License (#bittorrent)',
+						_1: {
+							ctor: '::',
+							_0: 'Original BSD license (#OriginalBSD)',
+							_1: {
+								ctor: '::',
+								_0: 'Common Development and Distribution License (CDDL), version 1.0 (#CDDL)',
+								_1: {
+									ctor: '::',
+									_0: 'Common Public Attribution License 1.0 (CPAL) (#CPAL)',
+									_1: {
+										ctor: '::',
+										_0: 'Common Public License Version 1.0 (#CommonPublicLicense10)',
+										_1: {
+											ctor: '::',
+											_0: 'Condor Public License (#Condor)',
+											_1: {
+												ctor: '::',
+												_0: 'Eclipse Public License Version 1.0 (#EPL)',
+												_1: {
+													ctor: '::',
+													_0: 'European Union Public License (EUPL) version 1.1 (#EUPL)',
+													_1: {
+														ctor: '::',
+														_0: 'Gnuplot license (#gnuplot)',
+														_1: {
+															ctor: '::',
+															_0: 'IBM Public License, Version 1.0 (#IBMPL)',
+															_1: {
+																ctor: '::',
+																_0: 'Jabber Open Source License, Version 1.0 (#josl)',
+																_1: {
+																	ctor: '::',
+																	_0: 'LaTeX Project Public License 1.3a (#LPPL-1.3a)',
+																	_1: {
+																		ctor: '::',
+																		_0: 'LaTeX Project Public License 1.2 (#LPPL-1.2)',
+																		_1: {
+																			ctor: '::',
+																			_0: 'Lucent Public License Version 1.02 (Plan 9 license) (#lucent102)',
+																			_1: {
+																				ctor: '::',
+																				_0: 'Microsoft Public License (Ms-PL) (#ms-pl)',
+																				_1: {
+																					ctor: '::',
+																					_0: 'Microsoft Reciprocal License (Ms-RL) (#ms-rl)',
+																					_1: {
+																						ctor: '::',
+																						_0: 'Mozilla Public License (MPL) version 1.1 (#MPL)',
+																						_1: {
+																							ctor: '::',
+																							_0: 'Netizen Open Source License (NOSL), Version 1.0 (#NOSL)',
+																							_1: {
+																								ctor: '::',
+																								_0: 'Netscape Public License (NPL), versions 1.0 and 1.1 (#NPL)',
+																								_1: {
+																									ctor: '::',
+																									_0: 'Nokia Open Source License (#Nokia)',
+																									_1: {
+																										ctor: '::',
+																										_0: 'Old OpenLDAP License, Version 2.3 (#oldOpenLDAP)',
+																										_1: {
+																											ctor: '::',
+																											_0: 'Open Software License, all versions through 3.0 (#OSL)',
+																											_1: {
+																												ctor: '::',
+																												_0: 'OpenSSL license (#OpenSSL)',
+																												_1: {
+																													ctor: '::',
+																													_0: 'Phorum License, Version 2.0 (#Phorum)',
 																													_1: {
 																														ctor: '::',
-																														_0: 'Pinus wallichiana',
+																														_0: 'PHP License, Version 3.01 (#PHP-3.01)',
 																														_1: {
 																															ctor: '::',
-																															_0: 'Pistacia lentiscus',
+																															_0: 'License of Python 1.6b1 through 2.0 and 2.1 (#PythonOld)',
 																															_1: {
 																																ctor: '::',
-																																_0: 'Pistacia terebinthus',
+																																_0: 'Q Public License (QPL), Version 1.0 (#QPL)',
 																																_1: {
 																																	ctor: '::',
-																																	_0: 'Pistacia vera',
+																																	_0: 'RealNetworks Public Source License (RPSL), Version 1.0 (#RPSL)',
 																																	_1: {
 																																		ctor: '::',
-																																		_0: 'Pittosporum tobira',
+																																		_0: 'Sun Industry Standards Source License 1.0 (#SISSL)',
 																																		_1: {
 																																			ctor: '::',
-																																			_0: 'Platanus orientalis',
+																																			_0: 'Sun Public License (#SPL)',
 																																			_1: {
 																																				ctor: '::',
-																																				_0: 'Platanus x hispanica',
+																																				_0: 'License of xinetd (#xinetd)',
 																																				_1: {
 																																					ctor: '::',
-																																					_0: 'Platycarya strobilacea',
+																																					_0: 'Yahoo! Public License 1.1 (#Yahoo)',
 																																					_1: {
 																																						ctor: '::',
-																																						_0: 'Platycladus orientalis',
+																																						_0: 'Zend License, Version 2.0 (#Zend)',
 																																						_1: {
 																																							ctor: '::',
-																																							_0: 'Plumbago auriculata',
+																																							_0: 'Zimbra Public License 1.3 (#Zimbra)',
 																																							_1: {
 																																								ctor: '::',
-																																								_0: 'Plumeria rubra',
+																																								_0: 'Zope Public License version 1 (#Zope)',
+																																								_1: {ctor: '[]'}
+																																							}
+																																						}
+																																					}
+																																				}
+																																			}
+																																		}
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _kirchner$elm_selectize$Demo$gplCompatible = {
+	ctor: '::',
+	_0: 'GNU General Public License (GPL) version 3 (#GNUGPL) (#GNUGPLv3)',
+	_1: {
+		ctor: '::',
+		_0: 'GNU General Public License (GPL) version 2 (#GPLv2)',
+		_1: {
+			ctor: '::',
+			_0: 'GNU Lesser General Public License (LGPL) version 3 (#LGPL) (#LGPLv3)',
+			_1: {
+				ctor: '::',
+				_0: 'GNU Lesser General Public License (LGPL) version 2.1 (#LGPLv2.1)',
+				_1: {
+					ctor: '::',
+					_0: 'GNU Affero General Public License (AGPL) version 3 (#AGPL) (#AGPLv3.0)',
+					_1: {
+						ctor: '::',
+						_0: 'GNU All-Permissive License (#GNUAllPermissive)',
+						_1: {
+							ctor: '::',
+							_0: 'Apache License, Version 2.0 (#apache2)',
+							_1: {
+								ctor: '::',
+								_0: 'Artistic License 2.0 (#ArtisticLicense2)',
+								_1: {
+									ctor: '::',
+									_0: 'Clarified Artistic License',
+									_1: {
+										ctor: '::',
+										_0: 'Berkeley Database License (a.k.a. the Sleepycat Software Product License) (#BerkeleyDB)',
+										_1: {
+											ctor: '::',
+											_0: 'Boost Software License (#boost)',
+											_1: {
+												ctor: '::',
+												_0: 'Modified BSD license (#ModifiedBSD)',
+												_1: {
+													ctor: '::',
+													_0: 'CC0 (#CC0)',
+													_1: {
+														ctor: '::',
+														_0: 'CeCILL version 2 (#CeCILL)',
+														_1: {
+															ctor: '::',
+															_0: 'The Clear BSD License (#clearbsd)',
+															_1: {
+																ctor: '::',
+																_0: 'Cryptix General License (#CryptixGeneralLicense)',
+																_1: {
+																	ctor: '::',
+																	_0: 'eCos license version 2.0 (#eCos2.0)',
+																	_1: {
+																		ctor: '::',
+																		_0: 'Educational Community License 2.0 (#ECL2.0)',
+																		_1: {
+																			ctor: '::',
+																			_0: 'Eiffel Forum License, version 2 (#Eiffel)',
+																			_1: {
+																				ctor: '::',
+																				_0: 'EU DataGrid Software License (#EUDataGrid)',
+																				_1: {
+																					ctor: '::',
+																					_0: 'Expat License (#Expat)',
+																					_1: {
+																						ctor: '::',
+																						_0: 'FreeBSD license (#FreeBSD)',
+																						_1: {
+																							ctor: '::',
+																							_0: 'Freetype Project License (#freetype)',
+																							_1: {
+																								ctor: '::',
+																								_0: 'Historical Permission Notice and Disclaimer (#HPND)',
+																								_1: {
+																									ctor: '::',
+																									_0: 'License of the iMatix Standard Function Library (#iMatix)',
+																									_1: {
+																										ctor: '::',
+																										_0: 'License of imlib2 (#imlib)',
+																										_1: {
+																											ctor: '::',
+																											_0: 'Independent JPEG Group License (#ijg)',
+																											_1: {
+																												ctor: '::',
+																												_0: 'Informal license (#informal)',
+																												_1: {
+																													ctor: '::',
+																													_0: 'Intel Open Source License (#intel)',
+																													_1: {
+																														ctor: '::',
+																														_0: 'ISC License (#ISC)',
+																														_1: {
+																															ctor: '::',
+																															_0: 'Mozilla Public License (MPL) version 2.0 (#MPL-2.0)',
+																															_1: {
+																																ctor: '::',
+																																_0: 'NCSA/University of Illinois Open Source License (#NCSA)',
+																																_1: {
+																																	ctor: '::',
+																																	_0: 'License of Netscape JavaScript (#NetscapeJavaScript)',
+																																	_1: {
+																																		ctor: '::',
+																																		_0: 'OpenLDAP License, Version 2.7 (#newOpenLDAP)',
+																																		_1: {
+																																			ctor: '::',
+																																			_0: 'License of Perl 5 and below (#PerlLicense)',
+																																			_1: {
+																																				ctor: '::',
+																																				_0: 'Public Domain (#PublicDomain)',
+																																				_1: {
+																																					ctor: '::',
+																																					_0: 'License of Python 2.0.1, 2.1.1, and newer versions (#Python)',
+																																					_1: {
+																																						ctor: '::',
+																																						_0: 'License of Python 1.6a2 and earlier versions (#Python1.6a2)',
+																																						_1: {
+																																							ctor: '::',
+																																							_0: 'License of Ruby (#Ruby)',
+																																							_1: {
+																																								ctor: '::',
+																																								_0: 'SGI Free Software License B, version 2.0 (#SGIFreeB)',
 																																								_1: {
 																																									ctor: '::',
-																																									_0: 'Podranea ricasoliana',
+																																									_0: 'Standard ML of New Jersey Copyright License (#StandardMLofNJ)',
 																																									_1: {
 																																										ctor: '::',
-																																										_0: 'Polygala myrtifolia',
+																																										_0: 'Unicode, Inc. License Agreement for Data Files and Software (#Unicode)',
 																																										_1: {
 																																											ctor: '::',
-																																											_0: 'Poncirus trifoliata',
+																																											_0: 'Universal Permissive License (UPL) (#UPL)',
 																																											_1: {
 																																												ctor: '::',
-																																												_0: 'Populus alba',
+																																												_0: 'The Unlicense (#Unlicense)',
 																																												_1: {
 																																													ctor: '::',
-																																													_0: 'Populus balsamifera',
+																																													_0: 'License of Vim, Version 6.1 or later (#Vim)',
 																																													_1: {
 																																														ctor: '::',
-																																														_0: 'Populus nigra',
+																																														_0: 'W3C Software Notice and License (#W3C)',
 																																														_1: {
 																																															ctor: '::',
-																																															_0: 'Populus nigra \'Italica\'',
+																																															_0: 'License of WebM (#WebM)',
 																																															_1: {
 																																																ctor: '::',
-																																																_0: 'Populus simonii',
+																																																_0: 'WTFPL, Version 2 (#WTFPL)',
 																																																_1: {
 																																																	ctor: '::',
-																																																	_0: 'Populus tremula',
+																																																	_0: 'WxWidgets License (#Wx)',
 																																																	_1: {
 																																																		ctor: '::',
-																																																		_0: 'Populus x canadensis',
+																																																		_0: 'X11 License (#X11License)',
 																																																		_1: {
 																																																			ctor: '::',
-																																																			_0: 'Populus x canescens',
+																																																			_0: 'XFree86 1.1 License (#XFree861.1License)',
 																																																			_1: {
 																																																				ctor: '::',
-																																																				_0: 'Prosopis juliflora',
+																																																				_0: 'License of ZLib (#ZLib)',
 																																																				_1: {
 																																																					ctor: '::',
-																																																					_0: 'Prunus \'Accolade\'',
-																																																					_1: {
-																																																						ctor: '::',
-																																																						_0: 'Prunus \'Kursar\'',
-																																																						_1: {
-																																																							ctor: '::',
-																																																							_0: 'Prunus armeniaca',
-																																																							_1: {
-																																																								ctor: '::',
-																																																								_0: 'Prunus avium',
-																																																								_1: {
-																																																									ctor: '::',
-																																																									_0: 'Prunus avium \'Plena\'',
-																																																									_1: {
-																																																										ctor: '::',
-																																																										_0: 'Prunus cerasifera',
-																																																										_1: {
-																																																											ctor: '::',
-																																																											_0: 'Prunus cerasifera \'Nigra\'',
-																																																											_1: {
-																																																												ctor: '::',
-																																																												_0: 'Prunus cerasifera \'Rosea\'',
-																																																												_1: {
-																																																													ctor: '::',
-																																																													_0: 'Prunus cerasus',
-																																																													_1: {
-																																																														ctor: '::',
-																																																														_0: 'Prunus cerasus \'Rhexii\'',
-																																																														_1: {
-																																																															ctor: '::',
-																																																															_0: 'Prunus davidiana',
-																																																															_1: {
-																																																																ctor: '::',
-																																																																_0: 'Prunus domestica',
-																																																																_1: {
-																																																																	ctor: '::',
-																																																																	_0: 'Prunus domestica ssp. insititia',
-																																																																	_1: {
-																																																																		ctor: '::',
-																																																																		_0: 'Prunus domestica ssp. syriaca',
-																																																																		_1: {
-																																																																			ctor: '::',
-																																																																			_0: 'Prunus domestica subsp. domestica',
-																																																																			_1: {
-																																																																				ctor: '::',
-																																																																				_0: 'Prunus domestica subsp. italica',
-																																																																				_1: {
-																																																																					ctor: '::',
-																																																																					_0: 'Prunus dulcis',
-																																																																					_1: {
-																																																																						ctor: '::',
-																																																																						_0: 'Prunus fenziliana',
-																																																																						_1: {
-																																																																							ctor: '::',
-																																																																							_0: 'Prunus incana',
-																																																																							_1: {
-																																																																								ctor: '::',
-																																																																								_0: 'Prunus incisa',
-																																																																								_1: {
-																																																																									ctor: '::',
-																																																																									_0: 'Prunus laurocerasus',
-																																																																									_1: {
-																																																																										ctor: '::',
-																																																																										_0: 'Prunus lusitanica',
-																																																																										_1: {
-																																																																											ctor: '::',
-																																																																											_0: 'Prunus maackii',
-																																																																											_1: {
-																																																																												ctor: '::',
-																																																																												_0: 'Prunus mahaleb',
-																																																																												_1: {
-																																																																													ctor: '::',
-																																																																													_0: 'Prunus mume',
-																																																																													_1: {
-																																																																														ctor: '::',
-																																																																														_0: 'Prunus nipponica var. kurilensis',
-																																																																														_1: {
-																																																																															ctor: '::',
-																																																																															_0: 'Prunus padus',
-																																																																															_1: {
-																																																																																ctor: '::',
-																																																																																_0: 'Prunus persica',
-																																																																																_1: {
-																																																																																	ctor: '::',
-																																																																																	_0: 'Prunus sargentii',
-																																																																																	_1: {
-																																																																																		ctor: '::',
-																																																																																		_0: 'Prunus serotina',
-																																																																																		_1: {
-																																																																																			ctor: '::',
-																																																																																			_0: 'Prunus serrula',
-																																																																																			_1: {
-																																																																																				ctor: '::',
-																																																																																				_0: 'Prunus serrulata \'Kanzan\'',
-																																																																																				_1: {
-																																																																																					ctor: '::',
-																																																																																					_0: 'Prunus sibirica',
-																																																																																					_1: {
-																																																																																						ctor: '::',
-																																																																																						_0: 'Prunus spinosa',
-																																																																																						_1: {
-																																																																																							ctor: '::',
-																																																																																							_0: 'Prunus subhirtella',
-																																																																																							_1: {
-																																																																																								ctor: '::',
-																																																																																								_0: 'Prunus subhirtella f. autumnalis',
-																																																																																								_1: {
-																																																																																									ctor: '::',
-																																																																																									_0: 'Prunus tomentosa',
-																																																																																									_1: {
-																																																																																										ctor: '::',
-																																																																																										_0: 'Prunus triloba',
-																																																																																										_1: {
-																																																																																											ctor: '::',
-																																																																																											_0: 'Pseudocydonia sinensis',
-																																																																																											_1: {
-																																																																																												ctor: '::',
-																																																																																												_0: 'Pseudolarix amabilis',
-																																																																																												_1: {
-																																																																																													ctor: '::',
-																																																																																													_0: 'Pseudotsuga menziesii',
-																																																																																													_1: {
-																																																																																														ctor: '::',
-																																																																																														_0: 'Ptelea trifoliata',
-																																																																																														_1: {
-																																																																																															ctor: '::',
-																																																																																															_0: 'Pterocarya fraxinifolia',
-																																																																																															_1: {
-																																																																																																ctor: '::',
-																																																																																																_0: 'Pterocarya stenoptera',
-																																																																																																_1: {
-																																																																																																	ctor: '::',
-																																																																																																	_0: 'Pterostyrax corymbosus',
-																																																																																																	_1: {
-																																																																																																		ctor: '::',
-																																																																																																		_0: 'Pterostyrax hispidus',
-																																																																																																		_1: {
-																																																																																																			ctor: '::',
-																																																																																																			_0: 'Punica granatum',
-																																																																																																			_1: {
-																																																																																																				ctor: '::',
-																																																																																																				_0: 'Pyracantha coccinea',
-																																																																																																				_1: {
-																																																																																																					ctor: '::',
-																																																																																																					_0: 'Pyrus betulifolia',
-																																																																																																					_1: {
-																																																																																																						ctor: '::',
-																																																																																																						_0: 'Pyrus calleryana \'Chanticleer\'',
-																																																																																																						_1: {
-																																																																																																							ctor: '::',
-																																																																																																							_0: 'Pyrus communis',
-																																																																																																							_1: {
-																																																																																																								ctor: '::',
-																																																																																																								_0: 'Pyrus pyraster',
-																																																																																																								_1: {
-																																																																																																									ctor: '::',
-																																																																																																									_0: 'Pyrus pyrifolia var. culta',
-																																																																																																									_1: {
-																																																																																																										ctor: '::',
-																																																																																																										_0: 'Pyrus salicifolia',
-																																																																																																										_1: {
-																																																																																																											ctor: '::',
-																																																																																																											_0: 'Quercus acutissima',
-																																																																																																											_1: {
-																																																																																																												ctor: '::',
-																																																																																																												_0: 'Quercus alba',
-																																																																																																												_1: {
-																																																																																																													ctor: '::',
-																																																																																																													_0: 'Quercus canariensis',
-																																																																																																													_1: {
-																																																																																																														ctor: '::',
-																																																																																																														_0: 'Quercus castaneifolia',
-																																																																																																														_1: {
-																																																																																																															ctor: '::',
-																																																																																																															_0: 'Quercus cerris',
-																																																																																																															_1: {
-																																																																																																																ctor: '::',
-																																																																																																																_0: 'Quercus coccifera',
-																																																																																																																_1: {
-																																																																																																																	ctor: '::',
-																																																																																																																	_0: 'Quercus coccinea',
-																																																																																																																	_1: {
-																																																																																																																		ctor: '::',
-																																																																																																																		_0: 'Quercus dentata',
-																																																																																																																		_1: {
-																																																																																																																			ctor: '::',
-																																																																																																																			_0: 'Quercus faginea',
-																																																																																																																			_1: {
-																																																																																																																				ctor: '::',
-																																																																																																																				_0: 'Quercus frainetto',
-																																																																																																																				_1: {
-																																																																																																																					ctor: '::',
-																																																																																																																					_0: 'Quercus ilex',
-																																																																																																																					_1: {
-																																																																																																																						ctor: '::',
-																																																																																																																						_0: 'Quercus ilicifolia',
-																																																																																																																						_1: {
-																																																																																																																							ctor: '::',
-																																																																																																																							_0: 'Quercus imbricaria',
-																																																																																																																							_1: {
-																																																																																																																								ctor: '::',
-																																																																																																																								_0: 'Quercus libani',
-																																																																																																																								_1: {
-																																																																																																																									ctor: '::',
-																																																																																																																									_0: 'Quercus macranthera',
-																																																																																																																									_1: {
-																																																																																																																										ctor: '::',
-																																																																																																																										_0: 'Quercus macrocarpa',
-																																																																																																																										_1: {
-																																																																																																																											ctor: '::',
-																																																																																																																											_0: 'Quercus marilandica',
-																																																																																																																											_1: {
-																																																																																																																												ctor: '::',
-																																																																																																																												_0: 'Quercus palustris',
-																																																																																																																												_1: {
-																																																																																																																													ctor: '::',
-																																																																																																																													_0: 'Quercus petraea',
-																																																																																																																													_1: {
-																																																																																																																														ctor: '::',
-																																																																																																																														_0: 'Quercus petraea \'Laciniata Crispa\'',
-																																																																																																																														_1: {
-																																																																																																																															ctor: '::',
-																																																																																																																															_0: 'Quercus phellos',
-																																																																																																																															_1: {
-																																																																																																																																ctor: '::',
-																																																																																																																																_0: 'Quercus pontica',
-																																																																																																																																_1: {
-																																																																																																																																	ctor: '::',
-																																																																																																																																	_0: 'Quercus pubescens',
-																																																																																																																																	_1: {
-																																																																																																																																		ctor: '::',
-																																																																																																																																		_0: 'Quercus pyrenaica',
-																																																																																																																																		_1: {
-																																																																																																																																			ctor: '::',
-																																																																																																																																			_0: 'Quercus robur',
-																																																																																																																																			_1: {
-																																																																																																																																				ctor: '::',
-																																																																																																																																				_0: 'Quercus robur \'Pectinata\'',
-																																																																																																																																				_1: {
-																																																																																																																																					ctor: '::',
-																																																																																																																																					_0: 'Quercus robur f. fastigiata',
-																																																																																																																																					_1: {
-																																																																																																																																						ctor: '::',
-																																																																																																																																						_0: 'Quercus rubra',
-																																																																																																																																						_1: {
-																																																																																																																																							ctor: '::',
-																																																																																																																																							_0: 'Quercus shumardii',
-																																																																																																																																							_1: {
-																																																																																																																																								ctor: '::',
-																																																																																																																																								_0: 'Quercus suber',
-																																																																																																																																								_1: {
-																																																																																																																																									ctor: '::',
-																																																																																																																																									_0: 'Quercus velutina',
-																																																																																																																																									_1: {
-																																																																																																																																										ctor: '::',
-																																																																																																																																										_0: 'Quercus x hispanica \'Lucombeana\'',
-																																																																																																																																										_1: {
-																																																																																																																																											ctor: '::',
-																																																																																																																																											_0: 'Quercus x turneri',
-																																																																																																																																											_1: {
-																																																																																																																																												ctor: '::',
-																																																																																																																																												_0: 'Rhamnus alaternus',
-																																																																																																																																												_1: {
-																																																																																																																																													ctor: '::',
-																																																																																																																																													_0: 'Rhamnus cathartica',
-																																																																																																																																													_1: {
-																																																																																																																																														ctor: '::',
-																																																																																																																																														_0: 'Rhamnus imeretina',
-																																																																																																																																														_1: {
-																																																																																																																																															ctor: '::',
-																																																																																																																																															_0: 'Rhamnus lycioides',
-																																																																																																																																															_1: {
-																																																																																																																																																ctor: '::',
-																																																																																																																																																_0: 'Rhamnus pumila',
-																																																																																																																																																_1: {
-																																																																																																																																																	ctor: '::',
-																																																																																																																																																	_0: 'Rhamnus saxatilis',
-																																																																																																																																																	_1: {
-																																																																																																																																																		ctor: '::',
-																																																																																																																																																		_0: 'Rhododendron catawbiense',
-																																																																																																																																																		_1: {
-																																																																																																																																																			ctor: '::',
-																																																																																																																																																			_0: 'Rhododendron tomentosum',
-																																																																																																																																																			_1: {
-																																																																																																																																																				ctor: '::',
-																																																																																																																																																				_0: 'Rhodotypos scandens',
-																																																																																																																																																				_1: {
-																																																																																																																																																					ctor: '::',
-																																																																																																																																																					_0: 'Rhus typhina',
-																																																																																																																																																					_1: {
-																																																																																																																																																						ctor: '::',
-																																																																																																																																																						_0: 'Ribes aureum',
-																																																																																																																																																						_1: {
-																																																																																																																																																							ctor: '::',
-																																																																																																																																																							_0: 'Ribes rubrum',
-																																																																																																																																																							_1: {
-																																																																																																																																																								ctor: '::',
-																																																																																																																																																								_0: 'Ribes sanguineum',
-																																																																																																																																																								_1: {
-																																																																																																																																																									ctor: '::',
-																																																																																																																																																									_0: 'Ribes uva-crispa var. sativum',
-																																																																																																																																																									_1: {
-																																																																																																																																																										ctor: '::',
-																																																																																																																																																										_0: 'Ricinus communis',
-																																																																																																																																																										_1: {
-																																																																																																																																																											ctor: '::',
-																																																																																																																																																											_0: 'Robinia hispida',
-																																																																																																																																																											_1: {
-																																																																																																																																																												ctor: '::',
-																																																																																																																																																												_0: 'Robinia luxurians',
-																																																																																																																																																												_1: {
-																																																																																																																																																													ctor: '::',
-																																																																																																																																																													_0: 'Robinia pseudoacacia',
-																																																																																																																																																													_1: {
-																																																																																																																																																														ctor: '::',
-																																																																																																																																																														_0: 'Robinia x margaretta \'Casque Rouge\'',
-																																																																																																																																																														_1: {
-																																																																																																																																																															ctor: '::',
-																																																																																																																																																															_0: 'Rosa canina',
-																																																																																																																																																															_1: {
-																																																																																																																																																																ctor: '::',
-																																																																																																																																																																_0: 'Rosa rugosa',
-																																																																																																																																																																_1: {
-																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																	_0: 'Rosa spinosissima',
-																																																																																																																																																																	_1: {
-																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																		_0: 'Rosa tomentosa',
-																																																																																																																																																																		_1: {
-																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																			_0: 'Rubia peregrina',
-																																																																																																																																																																			_1: {
-																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																				_0: 'Rubus fruticosus',
-																																																																																																																																																																				_1: {
-																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																					_0: 'Rubus idaeus',
-																																																																																																																																																																					_1: {
-																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																						_0: 'Rubus odoratus',
-																																																																																																																																																																						_1: {
-																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																							_0: 'Rubus spectabilis',
-																																																																																																																																																																							_1: {
-																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																								_0: 'Ruscus aculeatus',
-																																																																																																																																																																								_1: {
-																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																									_0: 'Salix alba',
-																																																																																																																																																																									_1: {
-																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																										_0: 'Salix alba \'Tristis\'',
-																																																																																																																																																																										_1: {
-																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																											_0: 'Salix aurita',
-																																																																																																																																																																											_1: {
-																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																												_0: 'Salix babylonica',
-																																																																																																																																																																												_1: {
-																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																													_0: 'Salix caprea',
-																																																																																																																																																																													_1: {
-																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																														_0: 'Salix caprea \'Kilmarnock\'',
-																																																																																																																																																																														_1: {
-																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																															_0: 'Salix cinerea',
-																																																																																																																																																																															_1: {
-																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																_0: 'Salix fragilis',
-																																																																																																																																																																																_1: {
-																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																	_0: 'Salix integra \'Hakuro Nishiki\'',
-																																																																																																																																																																																	_1: {
-																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																		_0: 'Salix irrorata',
-																																																																																																																																																																																		_1: {
-																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																			_0: 'Salix matsudana \'Tortuosa\'',
-																																																																																																																																																																																			_1: {
-																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																				_0: 'Salix purpurea',
-																																																																																																																																																																																				_1: {
-																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																					_0: 'Salix udensis f. sekka',
-																																																																																																																																																																																					_1: {
-																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																						_0: 'Salix viminalis',
-																																																																																																																																																																																						_1: {
-																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																							_0: 'Samanea saman',
-																																																																																																																																																																																							_1: {
-																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																								_0: 'Sambucus nigra',
-																																																																																																																																																																																								_1: {
-																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																									_0: 'Sambucus nigra ssp. caerulea',
-																																																																																																																																																																																									_1: {
-																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																										_0: 'Sambucus racemosa',
-																																																																																																																																																																																										_1: {
-																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																											_0: 'Sarcococca hookeriana var. humilis',
-																																																																																																																																																																																											_1: {
-																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																												_0: 'Sassafras albidum',
-																																																																																																																																																																																												_1: {
-																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																													_0: 'Schefflera actinophylla',
-																																																																																																																																																																																													_1: {
-																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																														_0: 'Schinus molle',
-																																																																																																																																																																																														_1: {
-																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																															_0: 'Sciadopitys verticillata',
-																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																_0: 'Senna didymobotrya',
-																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																	_0: 'Senna x floribunda',
-																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																		_0: 'Sequoia sempervirens',
-																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																			_0: 'Sequoiadendron giganteum',
-																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																				_0: 'Shepherdia argentea',
-																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																					_0: 'Sinocalycanthus chinensis',
-																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																						_0: 'Skimmia japonica',
-																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																							_0: 'Smilax aspera',
-																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																								_0: 'Solanum dulcamara',
-																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																									_0: 'Solanum jasminoides',
-																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																										_0: 'Sorbaria sorbifolia',
-																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																											_0: 'Sorbus alnifolia',
-																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																												_0: 'Sorbus americana',
-																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																													_0: 'Sorbus aria',
-																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																														_0: 'Sorbus aucuparia',
-																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																															_0: 'Sorbus domestica',
-																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																_0: 'Sorbus intermedia',
-																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																	_0: 'Sorbus torminalis',
-																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																		_0: 'Spartium junceum',
-																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																			_0: 'Spathodea campanulata',
-																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																				_0: 'Spiraea japonica',
-																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																					_0: 'Spiraea thunbergii',
-																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																						_0: 'Spiraea x billardii',
-																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																							_0: 'Spiraea x vanhouttei',
-																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																								_0: 'Stachyurus praecox',
-																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																									_0: 'Staphylea colchica',
-																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																										_0: 'Staphylea holocarpa',
-																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																											_0: 'Staphylea pinnata',
-																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																												_0: 'Stewartia pseudocamellia',
-																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																													_0: 'Styphnolobium japonicum',
-																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																														_0: 'Styrax japonicus',
-																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																															_0: 'Styrax obassia',
-																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																_0: 'Symphoricarpos albus',
-																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																	_0: 'Symphoricarpos x chenaultii',
-																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																		_0: 'Syringa reflexa',
-																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																			_0: 'Syringa vulgaris',
-																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																				_0: 'Taiwania cryptomerioides',
-																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																					_0: 'Tamarix parviflora',
-																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																						_0: 'Taxodium distichum',
-																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																							_0: 'Taxus baccata',
-																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																								_0: 'Tecoma capensis',
-																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																									_0: 'Tecoma stans',
-																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																										_0: 'Terminalia catappa',
-																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																											_0: 'Tetradium daniellii',
-																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																												_0: 'Thuja occidentalis',
-																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																													_0: 'Thuja plicata',
-																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																														_0: 'Thujopsis dolabrata',
-																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																															_0: 'Thymelaea hirsuta',
-																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																_0: 'Tilia americana',
-																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																	_0: 'Tilia cordata',
-																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																		_0: 'Tilia dasystyla',
-																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																			_0: 'Tilia henryana',
-																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																				_0: 'Tilia mongolica',
-																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																					_0: 'Tilia platyphyllos',
-																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																						_0: 'Tilia tomentosa',
-																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																							_0: 'Tilia tomentosa f. petiolaris',
-																																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																																								_0: 'Tilia x euchlora',
-																																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																																									_0: 'Tilia x europaea',
-																																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																																										_0: 'Tipuana tipu',
-																																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																																											_0: 'Toona sinensis',
-																																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																																												_0: 'Trachycarpus fortunei',
-																																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																																													_0: 'Tsuga canadensis',
-																																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																																														_0: 'Tsuga diversifolia',
-																																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																																															_0: 'Tsuga heterophylla',
-																																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																																_0: 'Ulex europaeus',
-																																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																																	_0: 'Ulmus glabra',
-																																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																																		_0: 'Ulmus laevis',
-																																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																																			_0: 'Ulmus minor',
-																																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																																				_0: 'Ulmus minor \'Jacqueline Hillier\'',
-																																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																																					_0: 'Ulmus minor \'Wredei\'',
-																																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																																						_0: 'Ulmus parvifolia',
-																																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																																							_0: 'Ulmus pumila',
-																																																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																																																								_0: 'Vaccinium myrtillus',
-																																																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																																																									_0: 'Vaccinium uliginosum',
-																																																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																																																										_0: 'Vaccinium vitis-idaea',
-																																																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																																																											_0: 'Vachellia xanthophloea',
-																																																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																																																												_0: 'Viburnum davidii',
-																																																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																																																													_0: 'Viburnum farreri',
-																																																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																																																														_0: 'Viburnum lantana',
-																																																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																																																															_0: 'Viburnum lantanoides',
-																																																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																																																_0: 'Viburnum lentago',
-																																																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																																																	_0: 'Viburnum opulus',
-																																																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																																																		_0: 'Viburnum opulus f. roseum',
-																																																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																																																			_0: 'Viburnum plicatum',
-																																																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																																																				_0: 'Viburnum plicatum f. sterile',
-																																																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																																																					_0: 'Viburnum rhytidophyllum',
-																																																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																																																						_0: 'Viburnum tinus',
-																																																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																																																							_0: 'Viburnum x bodnantense',
-																																																																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																																																																								_0: 'Viburnum x burkwoodii',
-																																																																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																																																																									_0: 'Viburnum x carlcephalum',
-																																																																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																																																																										_0: 'Viscum album',
-																																																																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																																																																											_0: 'Vitex agnus-castus',
-																																																																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																																																																												_0: 'Vitis coignetiae',
-																																																																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																																																																													_0: 'Vitis vinifera',
-																																																																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																																																																														_0: 'Washingtonia filifera',
-																																																																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																																																																															_0: 'Washingtonia robusta',
-																																																																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																																																																_0: 'Weigela florida',
-																																																																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																																																																	_0: 'Wisteria sinensis',
-																																																																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																																																																		_0: 'Wollemia nobilis',
-																																																																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																																																																			_0: 'Xanthocyparis nootkatensis',
-																																																																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																																																																				_0: 'Zanthoxylum simulans',
-																																																																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																																																																					_0: 'Zelkova carpinifolia',
-																																																																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																																																																						_0: 'Zelkova serrata',
-																																																																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																																																																							_0: 'Ziziphus jujuba',
-																																																																																																																																																																																																																																																																																																							_1: {ctor: '[]'}
-																																																																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																}
-																																																																																																																																																																																																															}
-																																																																																																																																																																																																														}
-																																																																																																																																																																																																													}
-																																																																																																																																																																																																												}
-																																																																																																																																																																																																											}
-																																																																																																																																																																																																										}
-																																																																																																																																																																																																									}
-																																																																																																																																																																																																								}
-																																																																																																																																																																																																							}
-																																																																																																																																																																																																						}
-																																																																																																																																																																																																					}
-																																																																																																																																																																																																				}
-																																																																																																																																																																																																			}
-																																																																																																																																																																																																		}
-																																																																																																																																																																																																	}
-																																																																																																																																																																																																}
-																																																																																																																																																																																															}
-																																																																																																																																																																																														}
-																																																																																																																																																																																													}
-																																																																																																																																																																																												}
-																																																																																																																																																																																											}
-																																																																																																																																																																																										}
-																																																																																																																																																																																									}
-																																																																																																																																																																																								}
-																																																																																																																																																																																							}
-																																																																																																																																																																																						}
-																																																																																																																																																																																					}
-																																																																																																																																																																																				}
-																																																																																																																																																																																			}
-																																																																																																																																																																																		}
-																																																																																																																																																																																	}
-																																																																																																																																																																																}
-																																																																																																																																																																															}
-																																																																																																																																																																														}
-																																																																																																																																																																													}
-																																																																																																																																																																												}
-																																																																																																																																																																											}
-																																																																																																																																																																										}
-																																																																																																																																																																									}
-																																																																																																																																																																								}
-																																																																																																																																																																							}
-																																																																																																																																																																						}
-																																																																																																																																																																					}
-																																																																																																																																																																				}
-																																																																																																																																																																			}
-																																																																																																																																																																		}
-																																																																																																																																																																	}
-																																																																																																																																																																}
-																																																																																																																																																															}
-																																																																																																																																																														}
-																																																																																																																																																													}
-																																																																																																																																																												}
-																																																																																																																																																											}
-																																																																																																																																																										}
-																																																																																																																																																									}
-																																																																																																																																																								}
-																																																																																																																																																							}
-																																																																																																																																																						}
-																																																																																																																																																					}
-																																																																																																																																																				}
-																																																																																																																																																			}
-																																																																																																																																																		}
-																																																																																																																																																	}
-																																																																																																																																																}
-																																																																																																																																															}
-																																																																																																																																														}
-																																																																																																																																													}
-																																																																																																																																												}
-																																																																																																																																											}
-																																																																																																																																										}
-																																																																																																																																									}
-																																																																																																																																								}
-																																																																																																																																							}
-																																																																																																																																						}
-																																																																																																																																					}
-																																																																																																																																				}
-																																																																																																																																			}
-																																																																																																																																		}
-																																																																																																																																	}
-																																																																																																																																}
-																																																																																																																															}
-																																																																																																																														}
-																																																																																																																													}
-																																																																																																																												}
-																																																																																																																											}
-																																																																																																																										}
-																																																																																																																									}
-																																																																																																																								}
-																																																																																																																							}
-																																																																																																																						}
-																																																																																																																					}
-																																																																																																																				}
-																																																																																																																			}
-																																																																																																																		}
-																																																																																																																	}
-																																																																																																																}
-																																																																																																															}
-																																																																																																														}
-																																																																																																													}
-																																																																																																												}
-																																																																																																											}
-																																																																																																										}
-																																																																																																									}
-																																																																																																								}
-																																																																																																							}
-																																																																																																						}
-																																																																																																					}
-																																																																																																				}
-																																																																																																			}
-																																																																																																		}
-																																																																																																	}
-																																																																																																}
-																																																																																															}
-																																																																																														}
-																																																																																													}
-																																																																																												}
-																																																																																											}
-																																																																																										}
-																																																																																									}
-																																																																																								}
-																																																																																							}
-																																																																																						}
-																																																																																					}
-																																																																																				}
-																																																																																			}
-																																																																																		}
-																																																																																	}
-																																																																																}
-																																																																															}
-																																																																														}
-																																																																													}
-																																																																												}
-																																																																											}
-																																																																										}
-																																																																									}
-																																																																								}
-																																																																							}
-																																																																						}
-																																																																					}
-																																																																				}
-																																																																			}
-																																																																		}
-																																																																	}
-																																																																}
-																																																															}
-																																																														}
-																																																													}
-																																																												}
-																																																											}
-																																																										}
-																																																									}
-																																																								}
-																																																							}
-																																																						}
-																																																					}
+																																																					_0: 'Zope Public License, versions 2.0 and 2.1 (#Zope2.0)',
+																																																					_1: {ctor: '[]'}
 																																																				}
 																																																			}
 																																																		}
@@ -13499,2031 +11574,37 @@ var _kirchner$elm_selectize$Demo$treesPart3 = {
 		}
 	}
 };
-var _kirchner$elm_selectize$Demo$treesPart2 = {
-	ctor: '::',
-	_0: 'Eriobotrya japonica',
-	_1: {
-		ctor: '::',
-		_0: 'Erythrina crista-galli',
-		_1: {
-			ctor: '::',
-			_0: 'Eucalyptus globulus',
-			_1: {
-				ctor: '::',
-				_0: 'Eucommia ulmoides',
-				_1: {
-					ctor: '::',
-					_0: 'Euonymus alatus',
-					_1: {
-						ctor: '::',
-						_0: 'Euonymus europaeus',
-						_1: {
-							ctor: '::',
-							_0: 'Euonymus fortunei',
-							_1: {
-								ctor: '::',
-								_0: 'Euonymus macropterus',
-								_1: {
-									ctor: '::',
-									_0: 'Euonymus planipes',
-									_1: {
-										ctor: '::',
-										_0: 'Exochorda giraldii',
-										_1: {
-											ctor: '::',
-											_0: 'Fagus grandifolia',
-											_1: {
-												ctor: '::',
-												_0: 'Fagus orientalis',
-												_1: {
-													ctor: '::',
-													_0: 'Fagus sylvatica',
-													_1: {
-														ctor: '::',
-														_0: 'Fagus sylvatica \'Asplenifolia\'',
-														_1: {
-															ctor: '::',
-															_0: 'Fagus sylvatica \'Felderbach\'',
-															_1: {
-																ctor: '::',
-																_0: 'Fagus sylvatica \'Pendula\'',
-																_1: {
-																	ctor: '::',
-																	_0: 'Fagus sylvatica \'Purpurea\'',
-																	_1: {
-																		ctor: '::',
-																		_0: 'Fagus sylvatica \'Tortuosa\'',
-																		_1: {
-																			ctor: '::',
-																			_0: 'Fagus sylvatica f. purpurea tricolor',
-																			_1: {
-																				ctor: '::',
-																				_0: 'Fatsia japonica',
-																				_1: {
-																					ctor: '::',
-																					_0: 'Feijoa sellowiana',
-																					_1: {
-																						ctor: '::',
-																						_0: 'Ficus benjamina',
-																						_1: {
-																							ctor: '::',
-																							_0: 'Ficus carica',
-																							_1: {
-																								ctor: '::',
-																								_0: 'Ficus lyrata',
-																								_1: {
-																									ctor: '::',
-																									_0: 'Ficus macrophylla',
-																									_1: {
-																										ctor: '::',
-																										_0: 'Ficus sycomorus',
-																										_1: {
-																											ctor: '::',
-																											_0: 'Firmiana simplex',
-																											_1: {
-																												ctor: '::',
-																												_0: 'Forsythia x intermedia',
-																												_1: {
-																													ctor: '::',
-																													_0: 'Fortunella',
-																													_1: {
-																														ctor: '::',
-																														_0: 'Fothergilla major',
-																														_1: {
-																															ctor: '::',
-																															_0: 'Frangula alnus',
-																															_1: {
-																																ctor: '::',
-																																_0: 'Fraxinus angustifolia',
-																																_1: {
-																																	ctor: '::',
-																																	_0: 'Fraxinus excelsior',
-																																	_1: {
-																																		ctor: '::',
-																																		_0: 'Fraxinus excelsior f. diversifolia',
-																																		_1: {
-																																			ctor: '::',
-																																			_0: 'Fraxinus latifolia',
-																																			_1: {
-																																				ctor: '::',
-																																				_0: 'Fraxinus ornus',
-																																				_1: {
-																																					ctor: '::',
-																																					_0: 'Fraxinus paxiana',
-																																					_1: {
-																																						ctor: '::',
-																																						_0: 'Ginkgo biloba L.',
-																																						_1: {
-																																							ctor: '::',
-																																							_0: 'Gleditsia triacanthos',
-																																							_1: {
-																																								ctor: '::',
-																																								_0: 'Grevillea robusta',
-																																								_1: {
-																																									ctor: '::',
-																																									_0: 'Gymnocladus dioicus',
-																																									_1: {
-																																										ctor: '::',
-																																										_0: 'Halesia carolina',
-																																										_1: {
-																																											ctor: '::',
-																																											_0: 'Halesia monticola',
-																																											_1: {
-																																												ctor: '::',
-																																												_0: 'Halimodendron halodendron',
-																																												_1: {
-																																													ctor: '::',
-																																													_0: 'Hamamelis virginiana',
-																																													_1: {
-																																														ctor: '::',
-																																														_0: 'Hamamelis x intermedia',
-																																														_1: {
-																																															ctor: '::',
-																																															_0: 'Hedera helix',
-																																															_1: {
-																																																ctor: '::',
-																																																_0: 'Heptacodium miconioides',
-																																																_1: {
-																																																	ctor: '::',
-																																																	_0: 'Hibiscus rosa-sinensis',
-																																																	_1: {
-																																																		ctor: '::',
-																																																		_0: 'Hibiscus syriacus',
-																																																		_1: {
-																																																			ctor: '::',
-																																																			_0: 'Hippophae rhamnoides',
-																																																			_1: {
-																																																				ctor: '::',
-																																																				_0: 'Holodiscus discolor',
-																																																				_1: {
-																																																					ctor: '::',
-																																																					_0: 'Humulus lupulus',
-																																																					_1: {
-																																																						ctor: '::',
-																																																						_0: 'Hura crepitans',
-																																																						_1: {
-																																																							ctor: '::',
-																																																							_0: 'Hydrangea arborescens',
-																																																							_1: {
-																																																								ctor: '::',
-																																																								_0: 'Hydrangea aspera ssp. aspera',
-																																																								_1: {
-																																																									ctor: '::',
-																																																									_0: 'Hydrangea aspera ssp. sargentiana',
-																																																									_1: {
-																																																										ctor: '::',
-																																																										_0: 'Hydrangea macrophylla',
-																																																										_1: {
-																																																											ctor: '::',
-																																																											_0: 'Hydrangea paniculata',
-																																																											_1: {
-																																																												ctor: '::',
-																																																												_0: 'Hydrangea petiolaris',
-																																																												_1: {
-																																																													ctor: '::',
-																																																													_0: 'Hydrangea quercifolia',
-																																																													_1: {
-																																																														ctor: '::',
-																																																														_0: 'Hypericum androsaemum',
-																																																														_1: {
-																																																															ctor: '::',
-																																																															_0: 'Hypericum balearicum',
-																																																															_1: {
-																																																																ctor: '::',
-																																																																_0: 'Ilex aquifolium',
-																																																																_1: {
-																																																																	ctor: '::',
-																																																																	_0: 'Ilex crenata',
-																																																																	_1: {
-																																																																		ctor: '::',
-																																																																		_0: 'Ilex pernyi',
-																																																																		_1: {
-																																																																			ctor: '::',
-																																																																			_0: 'Jacaranda mimosifolia',
-																																																																			_1: {
-																																																																				ctor: '::',
-																																																																				_0: 'Jasminum nudiflorum',
-																																																																				_1: {
-																																																																					ctor: '::',
-																																																																					_0: 'Jasminum officinale',
-																																																																					_1: {
-																																																																						ctor: '::',
-																																																																						_0: 'Juglans ailantifolia',
-																																																																						_1: {
-																																																																							ctor: '::',
-																																																																							_0: 'Juglans cinerea',
-																																																																							_1: {
-																																																																								ctor: '::',
-																																																																								_0: 'Juglans nigra',
-																																																																								_1: {
-																																																																									ctor: '::',
-																																																																									_0: 'Juglans regia',
-																																																																									_1: {
-																																																																										ctor: '::',
-																																																																										_0: 'Juniperus communis',
-																																																																										_1: {
-																																																																											ctor: '::',
-																																																																											_0: 'Juniperus oxycedrus',
-																																																																											_1: {
-																																																																												ctor: '::',
-																																																																												_0: 'Juniperus sabina',
-																																																																												_1: {
-																																																																													ctor: '::',
-																																																																													_0: 'Juniperus scopulorum',
-																																																																													_1: {
-																																																																														ctor: '::',
-																																																																														_0: 'Kalmia latifolia',
-																																																																														_1: {
-																																																																															ctor: '::',
-																																																																															_0: 'Kerria japonica \'Pleniflora\'',
-																																																																															_1: {
-																																																																																ctor: '::',
-																																																																																_0: 'Khaya senegalensis',
-																																																																																_1: {
-																																																																																	ctor: '::',
-																																																																																	_0: 'Koelreuteria paniculata',
-																																																																																	_1: {
-																																																																																		ctor: '::',
-																																																																																		_0: 'Kolkwitzia amabilis',
-																																																																																		_1: {
-																																																																																			ctor: '::',
-																																																																																			_0: 'Laburnum alpinum',
-																																																																																			_1: {
-																																																																																				ctor: '::',
-																																																																																				_0: 'Laburnum anagyroides',
-																																																																																				_1: {
-																																																																																					ctor: '::',
-																																																																																					_0: 'Lagerstroemia indica',
-																																																																																					_1: {
-																																																																																						ctor: '::',
-																																																																																						_0: 'Lagerstroemia speciosa',
-																																																																																						_1: {
-																																																																																							ctor: '::',
-																																																																																							_0: 'Lagunaria patersonia',
-																																																																																							_1: {
-																																																																																								ctor: '::',
-																																																																																								_0: 'Lantana camara',
-																																																																																								_1: {
-																																																																																									ctor: '::',
-																																																																																									_0: 'Larix decidua',
-																																																																																									_1: {
-																																																																																										ctor: '::',
-																																																																																										_0: 'Larix kaempferi',
-																																																																																										_1: {
-																																																																																											ctor: '::',
-																																																																																											_0: 'Larix x marschlinsii',
-																																																																																											_1: {
-																																																																																												ctor: '::',
-																																																																																												_0: 'Laurus nobilis',
-																																																																																												_1: {
-																																																																																													ctor: '::',
-																																																																																													_0: 'Lavandula angustifolia',
-																																																																																													_1: {
-																																																																																														ctor: '::',
-																																																																																														_0: 'Lavandula stoechas',
-																																																																																														_1: {
-																																																																																															ctor: '::',
-																																																																																															_0: 'Leucaena leucocephala',
-																																																																																															_1: {
-																																																																																																ctor: '::',
-																																																																																																_0: 'Leycesteria formosa',
-																																																																																																_1: {
-																																																																																																	ctor: '::',
-																																																																																																	_0: 'Ligustrum japonicum',
-																																																																																																	_1: {
-																																																																																																		ctor: '::',
-																																																																																																		_0: 'Ligustrum lucidum',
-																																																																																																		_1: {
-																																																																																																			ctor: '::',
-																																																																																																			_0: 'Ligustrum ovalifolium',
-																																																																																																			_1: {
-																																																																																																				ctor: '::',
-																																																																																																				_0: 'Ligustrum vulgare',
-																																																																																																				_1: {
-																																																																																																					ctor: '::',
-																																																																																																					_0: 'Liquidambar formosana',
-																																																																																																					_1: {
-																																																																																																						ctor: '::',
-																																																																																																						_0: 'Liquidambar orientalis',
-																																																																																																						_1: {
-																																																																																																							ctor: '::',
-																																																																																																							_0: 'Liquidambar styraciflua',
-																																																																																																							_1: {
-																																																																																																								ctor: '::',
-																																																																																																								_0: 'Liriodendron chinense',
-																																																																																																								_1: {
-																																																																																																									ctor: '::',
-																																																																																																									_0: 'Liriodendron tulipifera',
-																																																																																																									_1: {
-																																																																																																										ctor: '::',
-																																																																																																										_0: 'Lonicera caprifolium',
-																																																																																																										_1: {
-																																																																																																											ctor: '::',
-																																																																																																											_0: 'Lonicera etrusca',
-																																																																																																											_1: {
-																																																																																																												ctor: '::',
-																																																																																																												_0: 'Lonicera henryi',
-																																																																																																												_1: {
-																																																																																																													ctor: '::',
-																																																																																																													_0: 'Lonicera implexa',
-																																																																																																													_1: {
-																																																																																																														ctor: '::',
-																																																																																																														_0: 'Lonicera kamtschatica',
-																																																																																																														_1: {
-																																																																																																															ctor: '::',
-																																																																																																															_0: 'Lonicera maackii',
-																																																																																																															_1: {
-																																																																																																																ctor: '::',
-																																																																																																																_0: 'Lonicera nigra',
-																																																																																																																_1: {
-																																																																																																																	ctor: '::',
-																																																																																																																	_0: 'Lonicera periclymenum',
-																																																																																																																	_1: {
-																																																																																																																		ctor: '::',
-																																																																																																																		_0: 'Lonicera pileata',
-																																																																																																																		_1: {
-																																																																																																																			ctor: '::',
-																																																																																																																			_0: 'Lonicera tatarica',
-																																																																																																																			_1: {
-																																																																																																																				ctor: '::',
-																																																																																																																				_0: 'Lonicera x heckrottii',
-																																																																																																																				_1: {
-																																																																																																																					ctor: '::',
-																																																																																																																					_0: 'Lonicera x purpusii \'Winter Beauty\'',
-																																																																																																																					_1: {
-																																																																																																																						ctor: '::',
-																																																																																																																						_0: 'Lonicera xylosteum',
-																																																																																																																						_1: {
-																																																																																																																							ctor: '::',
-																																																																																																																							_0: 'Lycium barbarum',
-																																																																																																																							_1: {
-																																																																																																																								ctor: '::',
-																																																																																																																								_0: 'Maclura pomifera',
-																																																																																																																								_1: {
-																																																																																																																									ctor: '::',
-																																																																																																																									_0: 'Magnolia acuminata',
-																																																																																																																									_1: {
-																																																																																																																										ctor: '::',
-																																																																																																																										_0: 'Magnolia denudata',
-																																																																																																																										_1: {
-																																																																																																																											ctor: '::',
-																																																																																																																											_0: 'Magnolia grandiflora',
-																																																																																																																											_1: {
-																																																																																																																												ctor: '::',
-																																																																																																																												_0: 'Magnolia kobus',
-																																																																																																																												_1: {
-																																																																																																																													ctor: '::',
-																																																																																																																													_0: 'Magnolia liliiflora',
-																																																																																																																													_1: {
-																																																																																																																														ctor: '::',
-																																																																																																																														_0: 'Magnolia obovata',
-																																																																																																																														_1: {
-																																																																																																																															ctor: '::',
-																																																																																																																															_0: 'Magnolia sieboldii',
-																																																																																																																															_1: {
-																																																																																																																																ctor: '::',
-																																																																																																																																_0: 'Magnolia stellata',
-																																																																																																																																_1: {
-																																																																																																																																	ctor: '::',
-																																																																																																																																	_0: 'Magnolia tripetala',
-																																																																																																																																	_1: {
-																																																																																																																																		ctor: '::',
-																																																																																																																																		_0: 'Magnolia x soulangeana',
-																																																																																																																																		_1: {
-																																																																																																																																			ctor: '::',
-																																																																																																																																			_0: 'Magnolia x wiesneri',
-																																																																																																																																			_1: {
-																																																																																																																																				ctor: '::',
-																																																																																																																																				_0: 'Mahonia aquifolium',
-																																																																																																																																				_1: {
-																																																																																																																																					ctor: '::',
-																																																																																																																																					_0: 'Mahonia x media',
-																																																																																																																																					_1: {
-																																																																																																																																						ctor: '::',
-																																																																																																																																						_0: 'Malus domestica',
-																																																																																																																																						_1: {
-																																																																																																																																							ctor: '::',
-																																																																																																																																							_0: 'Malus floribunda',
-																																																																																																																																							_1: {
-																																																																																																																																								ctor: '::',
-																																																																																																																																								_0: 'Malus sargentii',
-																																																																																																																																								_1: {
-																																																																																																																																									ctor: '::',
-																																																																																																																																									_0: 'Malus sylvestris',
-																																																																																																																																									_1: {
-																																																																																																																																										ctor: '::',
-																																																																																																																																										_0: 'Malus toringoides',
-																																																																																																																																										_1: {
-																																																																																																																																											ctor: '::',
-																																																																																																																																											_0: 'Malus x purpurea',
-																																																																																																																																											_1: {
-																																																																																																																																												ctor: '::',
-																																																																																																																																												_0: 'Melia azedarach',
-																																																																																																																																												_1: {
-																																																																																																																																													ctor: '::',
-																																																																																																																																													_0: 'Mespilus germanica',
-																																																																																																																																													_1: {
-																																																																																																																																														ctor: '::',
-																																																																																																																																														_0: 'Metasequoia glyptostroboides',
-																																																																																																																																														_1: {
-																																																																																																																																															ctor: '::',
-																																																																																																																																															_0: 'Morus alba',
-																																																																																																																																															_1: {
-																																																																																																																																																ctor: '::',
-																																																																																																																																																_0: 'Morus alba f. macrophylla',
-																																																																																																																																																_1: {
-																																																																																																																																																	ctor: '::',
-																																																																																																																																																	_0: 'Morus nigra',
-																																																																																																																																																	_1: {
-																																																																																																																																																		ctor: '::',
-																																																																																																																																																		_0: 'Myoporum serratum',
-																																																																																																																																																		_1: {
-																																																																																																																																																			ctor: '::',
-																																																																																																																																																			_0: 'Myrtus communis',
-																																																																																																																																																			_1: {
-																																																																																																																																																				ctor: '::',
-																																																																																																																																																				_0: 'Nandina domestica',
-																																																																																																																																																				_1: {
-																																																																																																																																																					ctor: '::',
-																																																																																																																																																					_0: 'Nerium oleander',
-																																																																																																																																																					_1: {
-																																																																																																																																																						ctor: '::',
-																																																																																																																																																						_0: 'Nicotiana glauca',
-																																																																																																																																																						_1: {
-																																																																																																																																																							ctor: '::',
-																																																																																																																																																							_0: 'Nothofagus antarctica',
-																																																																																																																																																							_1: {
-																																																																																																																																																								ctor: '::',
-																																																																																																																																																								_0: 'Nyssa sylvatica',
-																																																																																																																																																								_1: {
-																																																																																																																																																									ctor: '::',
-																																																																																																																																																									_0: 'Olea europaea',
-																																																																																																																																																									_1: {
-																																																																																																																																																										ctor: '::',
-																																																																																																																																																										_0: 'Osmanthus x burkwoodii',
-																																																																																																																																																										_1: {
-																																																																																																																																																											ctor: '::',
-																																																																																																																																																											_0: 'Osmanthus x fortunei',
-																																																																																																																																																											_1: {
-																																																																																																																																																												ctor: '::',
-																																																																																																																																																												_0: 'Ostrya carpinifolia',
-																																																																																																																																																												_1: {
-																																																																																																																																																													ctor: '::',
-																																																																																																																																																													_0: 'Ostrya virginiana',
-																																																																																																																																																													_1: {
-																																																																																																																																																														ctor: '::',
-																																																																																																																																																														_0: 'Osyris alba',
-																																																																																																																																																														_1: {
-																																																																																																																																																															ctor: '::',
-																																																																																																																																																															_0: 'Oxydendrum arboreum',
-																																																																																																																																																															_1: {
-																																																																																																																																																																ctor: '::',
-																																																																																																																																																																_0: 'Pachypodium lamerei',
-																																																																																																																																																																_1: {
-																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																	_0: 'Paeonia x suffruticosa',
-																																																																																																																																																																	_1: {
-																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																		_0: 'Paliurus spina-christi',
-																																																																																																																																																																		_1: {
-																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																			_0: 'Parkinsonia aculeata',
-																																																																																																																																																																			_1: {
-																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																				_0: 'Parrotia persica',
-																																																																																																																																																																				_1: {
-																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																					_0: 'Parrotiopsis jaquemontiana',
-																																																																																																																																																																					_1: {
-																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																						_0: 'Parthenocissus inserta',
-																																																																																																																																																																						_1: {
-																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																							_0: 'Parthenocissus quinquefolia',
-																																																																																																																																																																							_1: {
-																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																								_0: 'Parthenocissus tricuspidata',
-																																																																																																																																																																								_1: {
-																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																									_0: 'Passiflora caerulea',
-																																																																																																																																																																									_1: {
-																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																										_0: 'Paulownia tomentosa',
-																																																																																																																																																																										_1: {
-																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																											_0: 'Peltophorum pterocarpum',
-																																																																																																																																																																											_1: {
-																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																												_0: 'Pereskia bleo',
-																																																																																																																																																																												_1: {
-																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																													_0: 'Persea americana',
-																																																																																																																																																																													_1: {
-																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																														_0: 'Petteria ramentacea',
-																																																																																																																																																																														_1: {
-																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																															_0: 'Phellodendron amurense',
-																																																																																																																																																																															_1: {
-																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																_0: 'Philadelphus coronarius',
-																																																																																																																																																																																_1: {
-																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																	_0: 'Philadelphus x virginalis',
-																																																																																																																																																																																	_1: {
-																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																		_0: 'Phillyrea angustifolia',
-																																																																																																																																																																																		_1: {
-																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																			_0: 'Phillyrea latifolia',
-																																																																																																																																																																																			_1: {
-																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																				_0: 'Phoenix canariensis',
-																																																																																																																																																																																				_1: {
-																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																					_0: 'Phoenix dactylifera',
-																																																																																																																																																																																					_1: {
-																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																						_0: 'Photinia davidiana',
-																																																																																																																																																																																						_1: {
-																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																							_0: 'Photinia x fraseri',
-																																																																																																																																																																																							_1: {
-																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																								_0: 'Physocarpus opulifolius',
-																																																																																																																																																																																								_1: {
-																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																									_0: 'Phytolacca dioica',
-																																																																																																																																																																																									_1: {
-																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																										_0: 'Picea abies',
-																																																																																																																																																																																										_1: {
-																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																											_0: 'Picea abies \'Inversa\'',
-																																																																																																																																																																																											_1: {
-																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																												_0: 'Picea asperata',
-																																																																																																																																																																																												_1: {
-																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																													_0: 'Picea breweriana',
-																																																																																																																																																																																													_1: {
-																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																														_0: 'Picea engelmanii',
-																																																																																																																																																																																														_1: {
-																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																															_0: 'Picea glauca',
-																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																_0: 'Picea glauca \'Conica\'',
-																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																	_0: 'Picea mariana',
-																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																		_0: 'Picea omorika',
-																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																			_0: 'Picea orientalis',
-																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																				_0: 'Picea polita',
-																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																					_0: 'Picea pungens \'Glauca\'',
-																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																						_0: 'Picea sitchensis',
-																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																							_0: 'Picea wilsonii',
-																																																																																																																																																																																																							_1: {ctor: '[]'}
-																																																																																																																																																																																																						}
-																																																																																																																																																																																																					}
-																																																																																																																																																																																																				}
-																																																																																																																																																																																																			}
-																																																																																																																																																																																																		}
-																																																																																																																																																																																																	}
-																																																																																																																																																																																																}
-																																																																																																																																																																																															}
-																																																																																																																																																																																														}
-																																																																																																																																																																																													}
-																																																																																																																																																																																												}
-																																																																																																																																																																																											}
-																																																																																																																																																																																										}
-																																																																																																																																																																																									}
-																																																																																																																																																																																								}
-																																																																																																																																																																																							}
-																																																																																																																																																																																						}
-																																																																																																																																																																																					}
-																																																																																																																																																																																				}
-																																																																																																																																																																																			}
-																																																																																																																																																																																		}
-																																																																																																																																																																																	}
-																																																																																																																																																																																}
-																																																																																																																																																																															}
-																																																																																																																																																																														}
-																																																																																																																																																																													}
-																																																																																																																																																																												}
-																																																																																																																																																																											}
-																																																																																																																																																																										}
-																																																																																																																																																																									}
-																																																																																																																																																																								}
-																																																																																																																																																																							}
-																																																																																																																																																																						}
-																																																																																																																																																																					}
-																																																																																																																																																																				}
-																																																																																																																																																																			}
-																																																																																																																																																																		}
-																																																																																																																																																																	}
-																																																																																																																																																																}
-																																																																																																																																																															}
-																																																																																																																																																														}
-																																																																																																																																																													}
-																																																																																																																																																												}
-																																																																																																																																																											}
-																																																																																																																																																										}
-																																																																																																																																																									}
-																																																																																																																																																								}
-																																																																																																																																																							}
-																																																																																																																																																						}
-																																																																																																																																																					}
-																																																																																																																																																				}
-																																																																																																																																																			}
-																																																																																																																																																		}
-																																																																																																																																																	}
-																																																																																																																																																}
-																																																																																																																																															}
-																																																																																																																																														}
-																																																																																																																																													}
-																																																																																																																																												}
-																																																																																																																																											}
-																																																																																																																																										}
-																																																																																																																																									}
-																																																																																																																																								}
-																																																																																																																																							}
-																																																																																																																																						}
-																																																																																																																																					}
-																																																																																																																																				}
-																																																																																																																																			}
-																																																																																																																																		}
-																																																																																																																																	}
-																																																																																																																																}
-																																																																																																																															}
-																																																																																																																														}
-																																																																																																																													}
-																																																																																																																												}
-																																																																																																																											}
-																																																																																																																										}
-																																																																																																																									}
-																																																																																																																								}
-																																																																																																																							}
-																																																																																																																						}
-																																																																																																																					}
-																																																																																																																				}
-																																																																																																																			}
-																																																																																																																		}
-																																																																																																																	}
-																																																																																																																}
-																																																																																																															}
-																																																																																																														}
-																																																																																																													}
-																																																																																																												}
-																																																																																																											}
-																																																																																																										}
-																																																																																																									}
-																																																																																																								}
-																																																																																																							}
-																																																																																																						}
-																																																																																																					}
-																																																																																																				}
-																																																																																																			}
-																																																																																																		}
-																																																																																																	}
-																																																																																																}
-																																																																																															}
-																																																																																														}
-																																																																																													}
-																																																																																												}
-																																																																																											}
-																																																																																										}
-																																																																																									}
-																																																																																								}
-																																																																																							}
-																																																																																						}
-																																																																																					}
-																																																																																				}
-																																																																																			}
-																																																																																		}
-																																																																																	}
-																																																																																}
-																																																																															}
-																																																																														}
-																																																																													}
-																																																																												}
-																																																																											}
-																																																																										}
-																																																																									}
-																																																																								}
-																																																																							}
-																																																																						}
-																																																																					}
-																																																																				}
-																																																																			}
-																																																																		}
-																																																																	}
-																																																																}
-																																																															}
-																																																														}
-																																																													}
-																																																												}
-																																																											}
-																																																										}
-																																																									}
-																																																								}
-																																																							}
-																																																						}
-																																																					}
-																																																				}
-																																																			}
-																																																		}
-																																																	}
-																																																}
-																																															}
-																																														}
-																																													}
-																																												}
-																																											}
-																																										}
-																																									}
-																																								}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-};
-var _kirchner$elm_selectize$Demo$treesPart1 = {
-	ctor: '::',
-	_0: 'Abelia x grandiflora',
-	_1: {
-		ctor: '::',
-		_0: 'Abienus festuschristus',
-		_1: {
-			ctor: '::',
-			_0: 'Abies alba',
-			_1: {
-				ctor: '::',
-				_0: 'Abies balsamea',
-				_1: {
-					ctor: '::',
-					_0: 'Abies cephalonica',
-					_1: {
-						ctor: '::',
-						_0: 'Abies concolor',
-						_1: {
-							ctor: '::',
-							_0: 'Abies equi-trojani',
-							_1: {
-								ctor: '::',
-								_0: 'Abies grandis',
-								_1: {
-									ctor: '::',
-									_0: 'Abies holophylla',
-									_1: {
-										ctor: '::',
-										_0: 'Abies homolepis',
-										_1: {
-											ctor: '::',
-											_0: 'Abies koreana',
-											_1: {
-												ctor: '::',
-												_0: 'Abies lasiocarpa',
-												_1: {
-													ctor: '::',
-													_0: 'Abies nordmanniana',
-													_1: {
-														ctor: '::',
-														_0: 'Abies pinsapo',
-														_1: {
-															ctor: '::',
-															_0: 'Abies procera',
-															_1: {
-																ctor: '::',
-																_0: 'Abies procera \'Glauca\'',
-																_1: {
-																	ctor: '::',
-																	_0: 'Abies veitchii',
-																	_1: {
-																		ctor: '::',
-																		_0: 'Acacia dealbata',
-																		_1: {
-																			ctor: '::',
-																			_0: 'Acacia karroo',
-																			_1: {
-																				ctor: '::',
-																				_0: 'Acacia retinodes',
-																				_1: {
-																					ctor: '::',
-																					_0: 'Acer buergerianum',
-																					_1: {
-																						ctor: '::',
-																						_0: 'Acer campestre',
-																						_1: {
-																							ctor: '::',
-																							_0: 'Acer cappadocicum',
-																							_1: {
-																								ctor: '::',
-																								_0: 'Acer carpinifolium',
-																								_1: {
-																									ctor: '::',
-																									_0: 'Acer caudatum subsp. caudatum',
-																									_1: {
-																										ctor: '::',
-																										_0: 'Acer circinatum',
-																										_1: {
-																											ctor: '::',
-																											_0: 'Acer cissifolium',
-																											_1: {
-																												ctor: '::',
-																												_0: 'Acer coriaceifolium',
-																												_1: {
-																													ctor: '::',
-																													_0: 'Acer davidii',
-																													_1: {
-																														ctor: '::',
-																														_0: 'Acer davidii subsp. grosserii',
-																														_1: {
-																															ctor: '::',
-																															_0: 'Acer griseum',
-																															_1: {
-																																ctor: '::',
-																																_0: 'Acer japonicum \'Aconitifolium\'',
-																																_1: {
-																																	ctor: '::',
-																																	_0: 'Acer macrophyllum',
-																																	_1: {
-																																		ctor: '::',
-																																		_0: 'Acer mandshuricum',
-																																		_1: {
-																																			ctor: '::',
-																																			_0: 'Acer monspessulanum',
-																																			_1: {
-																																				ctor: '::',
-																																				_0: 'Acer negundo',
-																																				_1: {
-																																					ctor: '::',
-																																					_0: 'Acer opalus',
-																																					_1: {
-																																						ctor: '::',
-																																						_0: 'Acer opalus ssp. obtusatum',
-																																						_1: {
-																																							ctor: '::',
-																																							_0: 'Acer palmatum',
-																																							_1: {
-																																								ctor: '::',
-																																								_0: 'Acer palmatum \'Dissectum Viridis\'',
-																																								_1: {
-																																									ctor: '::',
-																																									_0: 'Acer pensylvanicum',
-																																									_1: {
-																																										ctor: '::',
-																																										_0: 'Acer platanoides',
-																																										_1: {
-																																											ctor: '::',
-																																											_0: 'Acer platanoides \'Crimson King\'',
-																																											_1: {
-																																												ctor: '::',
-																																												_0: 'Acer platanoides f. drummondii',
-																																												_1: {
-																																													ctor: '::',
-																																													_0: 'Acer pseudoplatanus',
-																																													_1: {
-																																														ctor: '::',
-																																														_0: 'Acer pseudoplatanus \'Leopoldii\'',
-																																														_1: {
-																																															ctor: '::',
-																																															_0: 'Acer pseudoplatanus f. atropurpureum',
-																																															_1: {
-																																																ctor: '::',
-																																																_0: 'Acer rubrum',
-																																																_1: {
-																																																	ctor: '::',
-																																																	_0: 'Acer rufinerve',
-																																																	_1: {
-																																																		ctor: '::',
-																																																		_0: 'Acer saccharinum',
-																																																		_1: {
-																																																			ctor: '::',
-																																																			_0: 'Acer saccharum',
-																																																			_1: {
-																																																				ctor: '::',
-																																																				_0: 'Acer sempervirens',
-																																																				_1: {
-																																																					ctor: '::',
-																																																					_0: 'Acer tataricum',
-																																																					_1: {
-																																																						ctor: '::',
-																																																						_0: 'Acer tataricum subsp. ginnala',
-																																																						_1: {
-																																																							ctor: '::',
-																																																							_0: 'Acer tegmentosum',
-																																																							_1: {
-																																																								ctor: '::',
-																																																								_0: 'Acer triflorum',
-																																																								_1: {
-																																																									ctor: '::',
-																																																									_0: 'Acer x zoeschense',
-																																																									_1: {
-																																																										ctor: '::',
-																																																										_0: 'Actinidia deliciosa',
-																																																										_1: {
-																																																											ctor: '::',
-																																																											_0: 'Actinidia kolomikta',
-																																																											_1: {
-																																																												ctor: '::',
-																																																												_0: 'Adonidia merrillii',
-																																																												_1: {
-																																																													ctor: '::',
-																																																													_0: 'Aesculus flava',
-																																																													_1: {
-																																																														ctor: '::',
-																																																														_0: 'Aesculus glabra',
-																																																														_1: {
-																																																															ctor: '::',
-																																																															_0: 'Aesculus hippocastanum',
-																																																															_1: {
-																																																																ctor: '::',
-																																																																_0: 'Aesculus indica',
-																																																																_1: {
-																																																																	ctor: '::',
-																																																																	_0: 'Aesculus parviflora',
-																																																																	_1: {
-																																																																		ctor: '::',
-																																																																		_0: 'Aesculus pavia',
-																																																																		_1: {
-																																																																			ctor: '::',
-																																																																			_0: 'Aesculus turbinata',
-																																																																			_1: {
-																																																																				ctor: '::',
-																																																																				_0: 'Aesculus x carnea',
-																																																																				_1: {
-																																																																					ctor: '::',
-																																																																					_0: 'Aesculus x mutabilis \'Penduliflora\'',
-																																																																					_1: {
-																																																																						ctor: '::',
-																																																																						_0: 'Aesculus x neglecta \'Erythroblastos\'',
-																																																																						_1: {
-																																																																							ctor: '::',
-																																																																							_0: 'Afzelia africana',
-																																																																							_1: {
-																																																																								ctor: '::',
-																																																																								_0: 'Ailanthus altissima',
-																																																																								_1: {
-																																																																									ctor: '::',
-																																																																									_0: 'Akebia quinata',
-																																																																									_1: {
-																																																																										ctor: '::',
-																																																																										_0: 'Alangium platanifolium',
-																																																																										_1: {
-																																																																											ctor: '::',
-																																																																											_0: 'Albizia julibrissin',
-																																																																											_1: {
-																																																																												ctor: '::',
-																																																																												_0: 'Allocasuarina luehmannii',
-																																																																												_1: {
-																																																																													ctor: '::',
-																																																																													_0: 'Alnus cordata',
-																																																																													_1: {
-																																																																														ctor: '::',
-																																																																														_0: 'Alnus glutinosa',
-																																																																														_1: {
-																																																																															ctor: '::',
-																																																																															_0: 'Alnus incana',
-																																																																															_1: {
-																																																																																ctor: '::',
-																																																																																_0: 'Alnus sinuata',
-																																																																																_1: {
-																																																																																	ctor: '::',
-																																																																																	_0: 'Alnus viridis',
-																																																																																	_1: {
-																																																																																		ctor: '::',
-																																																																																		_0: 'Amelanchier asiatica',
-																																																																																		_1: {
-																																																																																			ctor: '::',
-																																																																																			_0: 'Amelanchier laevis',
-																																																																																			_1: {
-																																																																																				ctor: '::',
-																																																																																				_0: 'Amelanchier lamarckii',
-																																																																																				_1: {
-																																																																																					ctor: '::',
-																																																																																					_0: 'Amelanchier ovalis',
-																																																																																					_1: {
-																																																																																						ctor: '::',
-																																																																																						_0: 'Amelanchier spicata',
-																																																																																						_1: {
-																																																																																							ctor: '::',
-																																																																																							_0: 'Amorpha fructicosa',
-																																																																																							_1: {
-																																																																																								ctor: '::',
-																																																																																								_0: 'Anacardium occidentale',
-																																																																																								_1: {
-																																																																																									ctor: '::',
-																																																																																									_0: 'Anagyris foetida',
-																																																																																									_1: {
-																																																																																										ctor: '::',
-																																																																																										_0: 'Andromeda polifolia',
-																																																																																										_1: {
-																																																																																											ctor: '::',
-																																																																																											_0: 'Annona cherimola',
-																																																																																											_1: {
-																																																																																												ctor: '::',
-																																																																																												_0: 'Aralia elata',
-																																																																																												_1: {
-																																																																																													ctor: '::',
-																																																																																													_0: 'Araucaria araucana',
-																																																																																													_1: {
-																																																																																														ctor: '::',
-																																																																																														_0: 'Araucaria bidwillii',
-																																																																																														_1: {
-																																																																																															ctor: '::',
-																																																																																															_0: 'Araucaria columnaris',
-																																																																																															_1: {
-																																																																																																ctor: '::',
-																																																																																																_0: 'Araucaria cunninghamii',
-																																																																																																_1: {
-																																																																																																	ctor: '::',
-																																																																																																	_0: 'Araucaria heterophylla',
-																																																																																																	_1: {
-																																																																																																		ctor: '::',
-																																																																																																		_0: 'Arbutus menziesii',
-																																																																																																		_1: {
-																																																																																																			ctor: '::',
-																																																																																																			_0: 'Arbutus unedo',
-																																																																																																			_1: {
-																																																																																																				ctor: '::',
-																																																																																																				_0: 'Argania spinosa',
-																																																																																																				_1: {
-																																																																																																					ctor: '::',
-																																																																																																					_0: 'Argyrocytisus battandieri',
-																																																																																																					_1: {
-																																																																																																						ctor: '::',
-																																																																																																						_0: 'Aronia arbutifolia',
-																																																																																																						_1: {
-																																																																																																							ctor: '::',
-																																																																																																							_0: 'Aronia melanocarpa',
-																																																																																																							_1: {
-																																																																																																								ctor: '::',
-																																																																																																								_0: 'Aronia x prunifolia',
-																																																																																																								_1: {
-																																																																																																									ctor: '::',
-																																																																																																									_0: 'Asimina triloba',
-																																																																																																									_1: {
-																																																																																																										ctor: '::',
-																																																																																																										_0: 'Asparagus acutifolius',
-																																																																																																										_1: {
-																																																																																																											ctor: '::',
-																																																																																																											_0: 'Aucuba japonica',
-																																																																																																											_1: {
-																																																																																																												ctor: '::',
-																																																																																																												_0: 'Averrhoa carambola',
-																																																																																																												_1: {
-																																																																																																													ctor: '::',
-																																																																																																													_0: 'Barringtonia asiatica',
-																																																																																																													_1: {
-																																																																																																														ctor: '::',
-																																																																																																														_0: 'Bauhinia kockiana',
-																																																																																																														_1: {
-																																																																																																															ctor: '::',
-																																																																																																															_0: 'Bauhinia x blakeana',
-																																																																																																															_1: {
-																																																																																																																ctor: '::',
-																																																																																																																_0: 'Berberis julianae',
-																																																																																																																_1: {
-																																																																																																																	ctor: '::',
-																																																																																																																	_0: 'Berberis koreana',
-																																																																																																																	_1: {
-																																																																																																																		ctor: '::',
-																																																																																																																		_0: 'Berberis thunbergii',
-																																																																																																																		_1: {
-																																																																																																																			ctor: '::',
-																																																																																																																			_0: 'Berberis vulgaris',
-																																																																																																																			_1: {
-																																																																																																																				ctor: '::',
-																																																																																																																				_0: 'Betula alleghaniensis',
-																																																																																																																				_1: {
-																																																																																																																					ctor: '::',
-																																																																																																																					_0: 'Betula alnoides subsp. alnoides',
-																																																																																																																					_1: {
-																																																																																																																						ctor: '::',
-																																																																																																																						_0: 'Betula alnoides subsp. luminifera',
-																																																																																																																						_1: {
-																																																																																																																							ctor: '::',
-																																																																																																																							_0: 'Betula costata',
-																																																																																																																							_1: {
-																																																																																																																								ctor: '::',
-																																																																																																																								_0: 'Betula dahurica',
-																																																																																																																								_1: {
-																																																																																																																									ctor: '::',
-																																																																																																																									_0: 'Betula ermanii',
-																																																																																																																									_1: {
-																																																																																																																										ctor: '::',
-																																																																																																																										_0: 'Betula insignis',
-																																																																																																																										_1: {
-																																																																																																																											ctor: '::',
-																																																																																																																											_0: 'Betula lenta',
-																																																																																																																											_1: {
-																																																																																																																												ctor: '::',
-																																																																																																																												_0: 'Betula lenta f. uber',
-																																																																																																																												_1: {
-																																																																																																																													ctor: '::',
-																																																																																																																													_0: 'Betula maximowicziana',
-																																																																																																																													_1: {
-																																																																																																																														ctor: '::',
-																																																																																																																														_0: 'Betula nigra',
-																																																																																																																														_1: {
-																																																																																																																															ctor: '::',
-																																																																																																																															_0: 'Betula papyrifera',
-																																																																																																																															_1: {
-																																																																																																																																ctor: '::',
-																																																																																																																																_0: 'Betula pendula',
-																																																																																																																																_1: {
-																																																																																																																																	ctor: '::',
-																																																																																																																																	_0: 'Betula pendula f. dalecarlica',
-																																																																																																																																	_1: {
-																																																																																																																																		ctor: '::',
-																																																																																																																																		_0: 'Betula populifolia',
-																																																																																																																																		_1: {
-																																																																																																																																			ctor: '::',
-																																																																																																																																			_0: 'Betula pubescens',
-																																																																																																																																			_1: {
-																																																																																																																																				ctor: '::',
-																																																																																																																																				_0: 'Betula utilis var. jacquemontii \'Doorenbos\'',
-																																																																																																																																				_1: {
-																																																																																																																																					ctor: '::',
-																																																																																																																																					_0: 'Bougainvillea glabra',
-																																																																																																																																					_1: {
-																																																																																																																																						ctor: '::',
-																																																																																																																																						_0: 'Bougainvillea spectabilis',
-																																																																																																																																						_1: {
-																																																																																																																																							ctor: '::',
-																																																																																																																																							_0: 'Brachychiton acerifolius',
-																																																																																																																																							_1: {
-																																																																																																																																								ctor: '::',
-																																																																																																																																								_0: 'Brachychiton discolor',
-																																																																																																																																								_1: {
-																																																																																																																																									ctor: '::',
-																																																																																																																																									_0: 'Brachychiton populneus',
-																																																																																																																																									_1: {
-																																																																																																																																										ctor: '::',
-																																																																																																																																										_0: 'Brachychiton rupestris',
-																																																																																																																																										_1: {
-																																																																																																																																											ctor: '::',
-																																																																																																																																											_0: 'Broussonetia papyrifera',
-																																																																																																																																											_1: {
-																																																																																																																																												ctor: '::',
-																																																																																																																																												_0: 'Buddleja alternifolia',
-																																																																																																																																												_1: {
-																																																																																																																																													ctor: '::',
-																																																																																																																																													_0: 'Buddleja davidii',
-																																																																																																																																													_1: {
-																																																																																																																																														ctor: '::',
-																																																																																																																																														_0: 'Buddleja globosa',
-																																																																																																																																														_1: {
-																																																																																																																																															ctor: '::',
-																																																																																																																																															_0: 'Buddleja x weyeriana',
-																																																																																																																																															_1: {
-																																																																																																																																																ctor: '::',
-																																																																																																																																																_0: 'Butyrospermum parkii',
-																																																																																																																																																_1: {
-																																																																																																																																																	ctor: '::',
-																																																																																																																																																	_0: 'Buxus sempervirens',
-																																																																																																																																																	_1: {
-																																																																																																																																																		ctor: '::',
-																																																																																																																																																		_0: 'Caesalpinia gilliesii',
-																																																																																																																																																		_1: {
-																																																																																																																																																			ctor: '::',
-																																																																																																																																																			_0: 'Calicotome spinosa',
-																																																																																																																																																			_1: {
-																																																																																																																																																				ctor: '::',
-																																																																																																																																																				_0: 'Callicarpa dichotoma',
-																																																																																																																																																				_1: {
-																																																																																																																																																					ctor: '::',
-																																																																																																																																																					_0: 'Callistemon citrinus',
-																																																																																																																																																					_1: {
-																																																																																																																																																						ctor: '::',
-																																																																																																																																																						_0: 'Calocedrus decurrens',
-																																																																																																																																																						_1: {
-																																																																																																																																																							ctor: '::',
-																																																																																																																																																							_0: 'Calocedrus decurrens \'Aureovariegata\'',
-																																																																																																																																																							_1: {
-																																																																																																																																																								ctor: '::',
-																																																																																																																																																								_0: 'Calycanthus fertilis',
-																																																																																																																																																								_1: {
-																																																																																																																																																									ctor: '::',
-																																																																																																																																																									_0: 'Calycanthus floridus',
-																																																																																																																																																									_1: {
-																																																																																																																																																										ctor: '::',
-																																																																																																																																																										_0: 'Camellia japonica',
-																																																																																																																																																										_1: {
-																																																																																																																																																											ctor: '::',
-																																																																																																																																																											_0: 'Campsis radicans',
-																																																																																																																																																											_1: {
-																																																																																																																																																												ctor: '::',
-																																																																																																																																																												_0: 'Campsis x tagliabuana',
-																																																																																																																																																												_1: {
-																																																																																																																																																													ctor: '::',
-																																																																																																																																																													_0: 'Capparis spinosa',
-																																																																																																																																																													_1: {
-																																																																																																																																																														ctor: '::',
-																																																																																																																																																														_0: 'Caragana arborescens',
-																																																																																																																																																														_1: {
-																																																																																																																																																															ctor: '::',
-																																																																																																																																																															_0: 'Carpenteria californica',
-																																																																																																																																																															_1: {
-																																																																																																																																																																ctor: '::',
-																																																																																																																																																																_0: 'Carpinus betulus',
-																																																																																																																																																																_1: {
-																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																	_0: 'Carpinus betulus \'Quercifolia\'',
-																																																																																																																																																																	_1: {
-																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																		_0: 'Carpinus caroliniana',
-																																																																																																																																																																		_1: {
-																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																			_0: 'Carpinus japonica',
-																																																																																																																																																																			_1: {
-																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																				_0: 'Carya cordiformis',
-																																																																																																																																																																				_1: {
-																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																					_0: 'Carya illinoinensis',
-																																																																																																																																																																					_1: {
-																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																						_0: 'Carya laciniosa',
-																																																																																																																																																																						_1: {
-																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																							_0: 'Carya ovata',
-																																																																																																																																																																							_1: {
-																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																								_0: 'Carya tomentosa',
-																																																																																																																																																																								_1: {
-																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																									_0: 'Cascabela thevetia',
-																																																																																																																																																																									_1: {
-																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																										_0: 'Cassia siberiana',
-																																																																																																																																																																										_1: {
-																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																											_0: 'Castanea crenata',
-																																																																																																																																																																											_1: {
-																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																												_0: 'Castanea sativa',
-																																																																																																																																																																												_1: {
-																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																													_0: 'Casuarina cunninghamiana',
-																																																																																																																																																																													_1: {
-																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																														_0: 'Casuarina stricta',
-																																																																																																																																																																														_1: {
-																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																															_0: 'Catalpa bignonioides',
-																																																																																																																																																																															_1: {
-																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																_0: 'Catalpa bungei',
-																																																																																																																																																																																_1: {
-																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																	_0: 'Catalpa ovata',
-																																																																																																																																																																																	_1: {
-																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																		_0: 'Catalpa speciosa',
-																																																																																																																																																																																		_1: {
-																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																			_0: 'Catalpa x erubescens',
-																																																																																																																																																																																			_1: {
-																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																				_0: 'Ceanothus x delilianus',
-																																																																																																																																																																																				_1: {
-																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																					_0: 'Cedrus atlantica',
-																																																																																																																																																																																					_1: {
-																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																						_0: 'Cedrus atlantica \'Glauca\'',
-																																																																																																																																																																																						_1: {
-																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																							_0: 'Cedrus brevifolia',
-																																																																																																																																																																																							_1: {
-																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																								_0: 'Cedrus deodara',
-																																																																																																																																																																																								_1: {
-																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																									_0: 'Cedrus deodara \'Paktia\'',
-																																																																																																																																																																																									_1: {
-																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																										_0: 'Cedrus libani',
-																																																																																																																																																																																										_1: {
-																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																											_0: 'Ceiba speciosa',
-																																																																																																																																																																																											_1: {
-																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																												_0: 'Celtis australis',
-																																																																																																																																																																																												_1: {
-																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																													_0: 'Celtis occidentalis',
-																																																																																																																																																																																													_1: {
-																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																														_0: 'Cephalanthus occidentalis',
-																																																																																																																																																																																														_1: {
-																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																															_0: 'Cephalotaxus harringtonia',
-																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																_0: 'Cephalotaxus sinensis',
-																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																	_0: 'Ceratonia siliqua',
-																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																		_0: 'Cercidiphyllum japonicum',
-																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																			_0: 'Cercis canadensis',
-																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																				_0: 'Cercis chinensis',
-																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																					_0: 'Cercis siliquastrum',
-																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																						_0: 'Chaenomeles japonica',
-																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																							_0: 'Chaenomeles speciosa',
-																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																								_0: 'Chamaecyparis lawsoniana',
-																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																									_0: 'Chamaecyparis pisifera',
-																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																										_0: 'Chamaerops humilis',
-																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																											_0: 'Chimonanthus praecox',
-																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																												_0: 'Chionanthus retusus',
-																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																													_0: 'Chionanthus virginicus',
-																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																														_0: 'Chitalpa tashkentensis',
-																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																															_0: 'Choisya ternata',
-																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																_0: 'Cinnamomum camphora',
-																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																	_0: 'Cistus albidus',
-																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																		_0: 'Cistus crispus',
-																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																			_0: 'Cistus incanus',
-																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																				_0: 'Cistus incanus ssp. creticus',
-																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																					_0: 'Cistus ladanifer',
-																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																						_0: 'Cistus laurifolius',
-																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																							_0: 'Cistus monspeliensis',
-																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																								_0: 'Cistus populifolius',
-																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																									_0: 'Cistus salviifolius',
-																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																										_0: 'Cistus symphytifolius',
-																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																											_0: 'Citharexylum spinosum',
-																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																												_0: 'Citrus x aurantium',
-																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																													_0: 'Citrus x limon',
-																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																														_0: 'Cladrastis kentukea',
-																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																															_0: 'Clematis flammula',
-																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																_0: 'Clematis montana',
-																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																	_0: 'Clematis vitalba',
-																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																		_0: 'Clematis viticella',
-																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																			_0: 'Clerodendrum trichotomum',
-																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																				_0: 'Clethra alnifolia',
-																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																					_0: 'Cneorum tricoccon',
-																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																						_0: 'Coccoloba uvifera',
-																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																							_0: 'Cocos nucifera',
-																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																								_0: 'Colutea arborescens',
-																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																									_0: 'Cornus alba',
-																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																										_0: 'Cornus controversa',
-																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																											_0: 'Cornus florida',
-																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																												_0: 'Cornus kousa',
-																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																													_0: 'Cornus mas',
-																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																														_0: 'Cornus nuttallii',
-																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																															_0: 'Cornus officinalis',
-																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																_0: 'Cornus racemosa',
-																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																	_0: 'Cornus sanguinea',
-																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																		_0: 'Cornus sericea',
-																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																			_0: 'Corylopsis pauciflora',
-																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																				_0: 'Corylopsis spicata',
-																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																					_0: 'Corylopsis veitchiana',
-																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																						_0: 'Corylus avellana',
-																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																							_0: 'Corylus avellana \'Contorta\'',
-																																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																																								_0: 'Corylus colurna',
-																																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																																									_0: 'Corylus maxima',
-																																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																																										_0: 'Corymbia dallachiana',
-																																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																																											_0: 'Cotinus coggygria',
-																																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																																												_0: 'Cotoneaster dielsianus',
-																																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																																													_0: 'Cotoneaster floccosus',
-																																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																																														_0: 'Cotoneaster frigidus',
-																																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																																															_0: 'Cotoneaster horizontalis',
-																																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																																_0: 'Cotoneaster integerrimus',
-																																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																																	_0: 'Cotoneaster multiflorus',
-																																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																																		_0: 'Crataegus laevigata',
-																																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																																			_0: 'Crataegus laevigata \'Paul\'s Scarlet\'',
-																																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																																				_0: 'Crataegus monogyna',
-																																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																																					_0: 'Crataegus nigra',
-																																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																																						_0: 'Crataegus pedicellata',
-																																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																																							_0: 'Crataegus pinnatifida',
-																																																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																																																								_0: 'Crataegus succulenta var. macrantha',
-																																																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																																																									_0: 'Crataegus x lavallei \'Carrierei\'',
-																																																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																																																										_0: 'Crataemespilus grandiflora',
-																																																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																																																											_0: 'Cryptomeria japonica',
-																																																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																																																												_0: 'Cryptomeria japonica f. cristata',
-																																																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																																																													_0: 'Cunninghamia lanceolata',
-																																																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																																																														_0: 'Cupressus arizonica',
-																																																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																																																															_0: 'Cupressus glabra',
-																																																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																																																_0: 'Cupressus sempervirens',
-																																																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																																																	_0: 'Cycas revoluta',
-																																																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																																																		_0: 'Cydonia oblonga',
-																																																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																																																			_0: 'Cytisus scoparius',
-																																																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																																																				_0: 'Danae racemosa',
-																																																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																																																					_0: 'Daphne gnidium',
-																																																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																																																						_0: 'Daphne mezereum',
-																																																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																																																							_0: 'Dasiphora fruticosa',
-																																																																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																																																																								_0: 'Davidia involucrata',
-																																																																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																																																																									_0: 'Decaisnea fargesii',
-																																																																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																																																																										_0: 'Delonix regia',
-																																																																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																																																																											_0: 'Deutzia longifolia',
-																																																																																																																																																																																																																																																																																											_1: {
-																																																																																																																																																																																																																																																																																												ctor: '::',
-																																																																																																																																																																																																																																																																																												_0: 'Deutzia scabra',
-																																																																																																																																																																																																																																																																																												_1: {
-																																																																																																																																																																																																																																																																																													ctor: '::',
-																																																																																																																																																																																																																																																																																													_0: 'Deutzia x hybrida',
-																																																																																																																																																																																																																																																																																													_1: {
-																																																																																																																																																																																																																																																																																														ctor: '::',
-																																																																																																																																																																																																																																																																																														_0: 'Diospyros kaki',
-																																																																																																																																																																																																																																																																																														_1: {
-																																																																																																																																																																																																																																																																																															ctor: '::',
-																																																																																																																																																																																																																																																																																															_0: 'Diospyros lotus',
-																																																																																																																																																																																																																																																																																															_1: {
-																																																																																																																																																																																																																																																																																																ctor: '::',
-																																																																																																																																																																																																																																																																																																_0: 'Dipelta floribunda',
-																																																																																																																																																																																																																																																																																																_1: {
-																																																																																																																																																																																																																																																																																																	ctor: '::',
-																																																																																																																																																																																																																																																																																																	_0: 'Distylium racemosum',
-																																																																																																																																																																																																																																																																																																	_1: {
-																																																																																																																																																																																																																																																																																																		ctor: '::',
-																																																																																																																																																																																																																																																																																																		_0: 'Dracaena draco',
-																																																																																																																																																																																																																																																																																																		_1: {
-																																																																																																																																																																																																																																																																																																			ctor: '::',
-																																																																																																																																																																																																																																																																																																			_0: 'Duranta erecta',
-																																																																																																																																																																																																																																																																																																			_1: {
-																																																																																																																																																																																																																																																																																																				ctor: '::',
-																																																																																																																																																																																																																																																																																																				_0: 'Edgeworthia chrysantha',
-																																																																																																																																																																																																																																																																																																				_1: {
-																																																																																																																																																																																																																																																																																																					ctor: '::',
-																																																																																																																																																																																																																																																																																																					_0: 'Ehretia dicksonii',
-																																																																																																																																																																																																																																																																																																					_1: {
-																																																																																																																																																																																																																																																																																																						ctor: '::',
-																																																																																																																																																																																																																																																																																																						_0: 'Elaeagnus angustifolia',
-																																																																																																																																																																																																																																																																																																						_1: {
-																																																																																																																																																																																																																																																																																																							ctor: '::',
-																																																																																																																																																																																																																																																																																																							_0: 'Elaeagnus pungens',
-																																																																																																																																																																																																																																																																																																							_1: {
-																																																																																																																																																																																																																																																																																																								ctor: '::',
-																																																																																																																																																																																																																																																																																																								_0: 'Elaeagnus umbellata',
-																																																																																																																																																																																																																																																																																																								_1: {
-																																																																																																																																																																																																																																																																																																									ctor: '::',
-																																																																																																																																																																																																																																																																																																									_0: 'Elaeagnus x ebbingei',
-																																																																																																																																																																																																																																																																																																									_1: {
-																																																																																																																																																																																																																																																																																																										ctor: '::',
-																																																																																																																																																																																																																																																																																																										_0: 'Eleutherococcus sieboldianus',
-																																																																																																																																																																																																																																																																																																										_1: {
-																																																																																																																																																																																																																																																																																																											ctor: '::',
-																																																																																																																																																																																																																																																																																																											_0: 'Erica arborea',
-																																																																																																																																																																																																																																																																																																											_1: {ctor: '[]'}
-																																																																																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																																}
-																																																																																																																																																																																																																															}
-																																																																																																																																																																																																																														}
-																																																																																																																																																																																																																													}
-																																																																																																																																																																																																																												}
-																																																																																																																																																																																																																											}
-																																																																																																																																																																																																																										}
-																																																																																																																																																																																																																									}
-																																																																																																																																																																																																																								}
-																																																																																																																																																																																																																							}
-																																																																																																																																																																																																																						}
-																																																																																																																																																																																																																					}
-																																																																																																																																																																																																																				}
-																																																																																																																																																																																																																			}
-																																																																																																																																																																																																																		}
-																																																																																																																																																																																																																	}
-																																																																																																																																																																																																																}
-																																																																																																																																																																																																															}
-																																																																																																																																																																																																														}
-																																																																																																																																																																																																													}
-																																																																																																																																																																																																												}
-																																																																																																																																																																																																											}
-																																																																																																																																																																																																										}
-																																																																																																																																																																																																									}
-																																																																																																																																																																																																								}
-																																																																																																																																																																																																							}
-																																																																																																																																																																																																						}
-																																																																																																																																																																																																					}
-																																																																																																																																																																																																				}
-																																																																																																																																																																																																			}
-																																																																																																																																																																																																		}
-																																																																																																																																																																																																	}
-																																																																																																																																																																																																}
-																																																																																																																																																																																															}
-																																																																																																																																																																																														}
-																																																																																																																																																																																													}
-																																																																																																																																																																																												}
-																																																																																																																																																																																											}
-																																																																																																																																																																																										}
-																																																																																																																																																																																									}
-																																																																																																																																																																																								}
-																																																																																																																																																																																							}
-																																																																																																																																																																																						}
-																																																																																																																																																																																					}
-																																																																																																																																																																																				}
-																																																																																																																																																																																			}
-																																																																																																																																																																																		}
-																																																																																																																																																																																	}
-																																																																																																																																																																																}
-																																																																																																																																																																															}
-																																																																																																																																																																														}
-																																																																																																																																																																													}
-																																																																																																																																																																												}
-																																																																																																																																																																											}
-																																																																																																																																																																										}
-																																																																																																																																																																									}
-																																																																																																																																																																								}
-																																																																																																																																																																							}
-																																																																																																																																																																						}
-																																																																																																																																																																					}
-																																																																																																																																																																				}
-																																																																																																																																																																			}
-																																																																																																																																																																		}
-																																																																																																																																																																	}
-																																																																																																																																																																}
-																																																																																																																																																															}
-																																																																																																																																																														}
-																																																																																																																																																													}
-																																																																																																																																																												}
-																																																																																																																																																											}
-																																																																																																																																																										}
-																																																																																																																																																									}
-																																																																																																																																																								}
-																																																																																																																																																							}
-																																																																																																																																																						}
-																																																																																																																																																					}
-																																																																																																																																																				}
-																																																																																																																																																			}
-																																																																																																																																																		}
-																																																																																																																																																	}
-																																																																																																																																																}
-																																																																																																																																															}
-																																																																																																																																														}
-																																																																																																																																													}
-																																																																																																																																												}
-																																																																																																																																											}
-																																																																																																																																										}
-																																																																																																																																									}
-																																																																																																																																								}
-																																																																																																																																							}
-																																																																																																																																						}
-																																																																																																																																					}
-																																																																																																																																				}
-																																																																																																																																			}
-																																																																																																																																		}
-																																																																																																																																	}
-																																																																																																																																}
-																																																																																																																															}
-																																																																																																																														}
-																																																																																																																													}
-																																																																																																																												}
-																																																																																																																											}
-																																																																																																																										}
-																																																																																																																									}
-																																																																																																																								}
-																																																																																																																							}
-																																																																																																																						}
-																																																																																																																					}
-																																																																																																																				}
-																																																																																																																			}
-																																																																																																																		}
-																																																																																																																	}
-																																																																																																																}
-																																																																																																															}
-																																																																																																														}
-																																																																																																													}
-																																																																																																												}
-																																																																																																											}
-																																																																																																										}
-																																																																																																									}
-																																																																																																								}
-																																																																																																							}
-																																																																																																						}
-																																																																																																					}
-																																																																																																				}
-																																																																																																			}
-																																																																																																		}
-																																																																																																	}
-																																																																																																}
-																																																																																															}
-																																																																																														}
-																																																																																													}
-																																																																																												}
-																																																																																											}
-																																																																																										}
-																																																																																									}
-																																																																																								}
-																																																																																							}
-																																																																																						}
-																																																																																					}
-																																																																																				}
-																																																																																			}
-																																																																																		}
-																																																																																	}
-																																																																																}
-																																																																															}
-																																																																														}
-																																																																													}
-																																																																												}
-																																																																											}
-																																																																										}
-																																																																									}
-																																																																								}
-																																																																							}
-																																																																						}
-																																																																					}
-																																																																				}
-																																																																			}
-																																																																		}
-																																																																	}
-																																																																}
-																																																															}
-																																																														}
-																																																													}
-																																																												}
-																																																											}
-																																																										}
-																																																									}
-																																																								}
-																																																							}
-																																																						}
-																																																					}
-																																																				}
-																																																			}
-																																																		}
-																																																	}
-																																																}
-																																															}
-																																														}
-																																													}
-																																												}
-																																											}
-																																										}
-																																									}
-																																								}
-																																							}
-																																						}
-																																					}
-																																				}
-																																			}
-																																		}
-																																	}
-																																}
-																															}
-																														}
-																													}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-};
-var _kirchner$elm_selectize$Demo$trees = _elm_lang$core$List$concat(
+var _kirchner$elm_selectize$Demo$licenses = _elm_lang$core$List$concat(
 	{
 		ctor: '::',
 		_0: {
 			ctor: '::',
-			_0: _kirchner$elm_selectize$Selectize$divider('First Part'),
+			_0: _kirchner$elm_selectize$Selectize$divider('GPL-Compatible Free Software Licenses'),
 			_1: {ctor: '[]'}
 		},
 		_1: {
 			ctor: '::',
-			_0: A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize$entry, _kirchner$elm_selectize$Demo$treesPart1),
+			_0: A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize$entry, _kirchner$elm_selectize$Demo$gplCompatible),
 			_1: {
 				ctor: '::',
 				_0: {
 					ctor: '::',
-					_0: _kirchner$elm_selectize$Selectize$divider('Second Part'),
+					_0: _kirchner$elm_selectize$Selectize$divider('GPL-Incompatible Free Software Licenses'),
 					_1: {ctor: '[]'}
 				},
 				_1: {
 					ctor: '::',
-					_0: A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize$entry, _kirchner$elm_selectize$Demo$treesPart2),
+					_0: A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize$entry, _kirchner$elm_selectize$Demo$gplIncompatible),
 					_1: {
 						ctor: '::',
 						_0: {
 							ctor: '::',
-							_0: _kirchner$elm_selectize$Selectize$divider('Third Part'),
+							_0: _kirchner$elm_selectize$Selectize$divider('Nonfree Software Licenses'),
 							_1: {ctor: '[]'}
 						},
 						_1: {
 							ctor: '::',
-							_0: A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize$entry, _kirchner$elm_selectize$Demo$treesPart3),
+							_0: A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize$entry, _kirchner$elm_selectize$Demo$nonfree),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -15531,26 +11612,31 @@ var _kirchner$elm_selectize$Demo$trees = _elm_lang$core$List$concat(
 			}
 		}
 	});
-var _kirchner$elm_selectize$Demo$toLabel = function (tree) {
-	return tree;
+var _kirchner$elm_selectize$Demo$toLabel = function (license) {
+	return license;
 };
 var _kirchner$elm_selectize$Demo$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
-var _kirchner$elm_selectize$Demo$viewConfig = _kirchner$elm_selectize$Selectize$viewConfig(
+var _kirchner$elm_selectize$Demo$sharedConfig = _kirchner$elm_selectize$Selectize$sharedConfig(
 	{
 		toLabel: _kirchner$elm_selectize$Demo$toLabel,
 		state: function (_) {
 			return _.menu;
 		},
 		entries: function (_p0) {
-			return _kirchner$elm_selectize$Demo$trees;
+			return _kirchner$elm_selectize$Demo$licenses;
 		},
 		selection: function (_) {
 			return _.selection;
 		},
-		id: 'tree-menu',
-		placeholder: 'Select a Tree',
+		id: 'license-menu'
+	});
+var _kirchner$elm_selectize$Demo$viewConfig = A2(
+	_kirchner$elm_selectize$Selectize$viewConfig,
+	_kirchner$elm_selectize$Demo$sharedConfig,
+	{
+		placeholder: 'Select a License',
 		container: {
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$class('selectize__container'),
@@ -15672,6 +11758,24 @@ var _kirchner$elm_selectize$Demo$viewConfig = _kirchner$elm_selectize$Selectize$
 			};
 		}
 	});
+var _kirchner$elm_selectize$Demo$andDo = F2(
+	function (cmd, _p1) {
+		var _p2 = _p1;
+		return {
+			ctor: '_Tuple2',
+			_0: _p2._0,
+			_1: _elm_lang$core$Platform_Cmd$batch(
+				{
+					ctor: '::',
+					_0: cmd,
+					_1: {
+						ctor: '::',
+						_0: _p2._1,
+						_1: {ctor: '[]'}
+					}
+				})
+		};
+	});
 var _kirchner$elm_selectize$Demo$init = {
 	ctor: '_Tuple2',
 	_0: {selection: _elm_lang$core$Maybe$Nothing, menu: _kirchner$elm_selectize$Selectize$empty},
@@ -15681,71 +11785,43 @@ var _kirchner$elm_selectize$Demo$Model = F2(
 	function (a, b) {
 		return {selection: a, menu: b};
 	});
-var _kirchner$elm_selectize$Demo$SelectTree = function (a) {
-	return {ctor: 'SelectTree', _0: a};
+var _kirchner$elm_selectize$Demo$SelectLicense = function (a) {
+	return {ctor: 'SelectLicense', _0: a};
 };
-var _kirchner$elm_selectize$Demo$updateConfig = _kirchner$elm_selectize$Selectize$updateConfig(
-	{
-		toLabel: _kirchner$elm_selectize$Demo$toLabel,
-		state: function (_) {
-			return _.menu;
-		},
-		entries: function (_p1) {
-			return _kirchner$elm_selectize$Demo$trees;
-		},
-		selection: function (_) {
-			return _.selection;
-		},
-		id: 'tree-menu',
-		select: _kirchner$elm_selectize$Demo$SelectTree
-	});
+var _kirchner$elm_selectize$Demo$updateConfig = A2(
+	_kirchner$elm_selectize$Selectize$updateConfig,
+	_kirchner$elm_selectize$Demo$sharedConfig,
+	{select: _kirchner$elm_selectize$Demo$SelectLicense});
 var _kirchner$elm_selectize$Demo$MenuMsg = function (a) {
 	return {ctor: 'MenuMsg', _0: a};
 };
 var _kirchner$elm_selectize$Demo$update = F2(
 	function (msg, model) {
-		var _p2 = msg;
-		if (_p2.ctor === 'MenuMsg') {
-			var _p3 = A3(_kirchner$elm_selectize$Selectize$update, _kirchner$elm_selectize$Demo$updateConfig, model, _p2._0);
-			var newMenu = _p3._0;
-			var cmd = _p3._1;
-			var maybeMsg = _p3._2;
+		var _p3 = msg;
+		if (_p3.ctor === 'MenuMsg') {
+			var _p4 = A3(_kirchner$elm_selectize$Selectize$update, _kirchner$elm_selectize$Demo$updateConfig, model, _p3._0);
+			var newMenu = _p4._0;
+			var menuCmd = _p4._1;
+			var maybeMsg = _p4._2;
 			var newModel = _elm_lang$core$Native_Utils.update(
 				model,
 				{menu: newMenu});
-			var _p4 = maybeMsg;
-			if (_p4.ctor === 'Just') {
-				return function (_p5) {
-					var _p6 = _p5;
-					return {
-						ctor: '_Tuple2',
-						_0: _p6._0,
-						_1: _elm_lang$core$Platform_Cmd$batch(
-							{
-								ctor: '::',
-								_0: _p6._1,
-								_1: {
-									ctor: '::',
-									_0: A2(_elm_lang$core$Platform_Cmd$map, _kirchner$elm_selectize$Demo$MenuMsg, cmd),
-									_1: {ctor: '[]'}
-								}
-							})
-					};
-				}(
-					A2(_kirchner$elm_selectize$Demo$update, _p4._0, newModel));
+			var cmd = A2(_elm_lang$core$Platform_Cmd$map, _kirchner$elm_selectize$Demo$MenuMsg, menuCmd);
+			var _p5 = maybeMsg;
+			if (_p5.ctor === 'Just') {
+				return A2(
+					_kirchner$elm_selectize$Demo$andDo,
+					cmd,
+					A2(_kirchner$elm_selectize$Demo$update, _p5._0, newModel));
 			} else {
-				return {
-					ctor: '_Tuple2',
-					_0: newModel,
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _kirchner$elm_selectize$Demo$MenuMsg, cmd)
-				};
+				return {ctor: '_Tuple2', _0: newModel, _1: cmd};
 			}
 		} else {
 			return {
 				ctor: '_Tuple2',
 				_0: _elm_lang$core$Native_Utils.update(
 					model,
-					{selection: _p2._0}),
+					{selection: _p3._0}),
 				_1: _elm_lang$core$Platform_Cmd$none
 			};
 		}
@@ -15758,7 +11834,7 @@ var _kirchner$elm_selectize$Demo$view = function (model) {
 			_0: _elm_lang$html$Html_Attributes$style(
 				{
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'width', _1: '30rem'},
+					_0: {ctor: '_Tuple2', _0: 'width', _1: '40rem'},
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
