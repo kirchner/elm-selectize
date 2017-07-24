@@ -3,12 +3,14 @@ module Selectize
         ( Entry
         , HtmlDetails
         , Msg
+        , SharedConfig
         , State
         , UpdateConfig
         , ViewConfig
         , divider
         , empty
         , entry
+        , sharedConfig
         , update
         , updateConfig
         , view
@@ -78,13 +80,17 @@ where the update configuration is given by
 
     updateConfig : Selectize.UpdateConfig String Msg Model
     updateConfig =
-        Selectize.updateConfig
+        Selectize.updateConfig sharedConfig
+            { select = SelectTree }
+
+    sharedConfig : Selectize.SharedConfig String Model
+    sharedConfig =
+        Selectize.sharedConfig
             { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
             , state = \model -> model.menu
             , entries = \model -> model.entries
             , selection = \model -> model.selection
             , id = "tree-menu"
-            , select = SelectTree
             }
 
 Finally, the menu can be rendered like this
@@ -98,13 +104,8 @@ with the view configuration given by
 
     viewConfig : Selectize.ViewConfig String Model
     viewConfig =
-        Selectize.viewConfig
-            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
-            , state = \model -> model.menu
-            , entries = \model -> model.entries
-            , selection = \model -> model.selection
-            , id = "tree-menu"
-            , placeholder = "Select a Tree"
+        Selectize.viewConfig sharedConfig
+            { placeholder = "Select a Tree"
             , container =
                 [ Attributes.class "selectize__container" ]
             , input =
@@ -168,14 +169,19 @@ with the view configuration given by
 @docs State, empty, Entry, entry, divider
 
 
+# Configuration
+
+@docs SharedConfig, sharedConfig, UpdateConfig, updateConfig, ViewConfig, viewConfig
+
+
 # Update
 
-@docs Msg, update, UpdateConfig, updateConfig
+@docs Msg, update
 
 
 # View
 
-@docs view, ViewConfig, viewConfig, HtmlDetails
+@docs view, HtmlDetails
 
 -}
 
@@ -225,6 +231,55 @@ divider title =
 {- configuration -}
 
 
+{-| The part of the configuration which is shared by `update` and `view`.
+-}
+type SharedConfig a model
+    = SharedConfig
+        { toLabel : a -> String
+        , state : model -> State a
+        , entries : model -> List (Entry a)
+        , selection : model -> Maybe a
+        , id : String
+        }
+
+
+{-| Create the shared configuration, for example
+
+    sharedConfig : Selectize.SharedConfig String Model
+    sharedConfig =
+        Selectize.sharedConfig
+            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
+            , state = .menu
+            , entries = .entries
+            , selection = .selection
+            , id = "tree-menu"
+            }
+
+  - `toLabel` should return a unique string representation of `a`.
+  - tell the dropdown with `state`, `entries` and `selection` how to
+    obtain each of them from the model
+  - `id` should be a unique CSS-id for the dropdown (we need this to
+    handle focus and blur events correctly)
+
+-}
+sharedConfig :
+    { toLabel : a -> String
+    , state : model -> State a
+    , entries : model -> List (Entry a)
+    , selection : model -> Maybe a
+    , id : String
+    }
+    -> SharedConfig a model
+sharedConfig config =
+    SharedConfig
+        { toLabel = config.toLabel
+        , state = config.state
+        , entries = config.entries
+        , selection = config.selection
+        , id = config.id
+        }
+
+
 {-| The configuration for `Selectize.update`.
 -}
 type UpdateConfig a msg model
@@ -235,46 +290,33 @@ type UpdateConfig a msg model
 
     updateConfig : Selectize.UpdateConfig String Msg Model
     updateConfig =
-        Selectize.updateConfig
-            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
-            , state = .menu
-            , entries = .entries
-            , selection = .selection
-            , id = "tree-menu"
-            , select = SelectTree
-            }
+        Selectize.updateConfig sharedConfig
+            { select = SelectTree }
 
-  - `toLabel` should return a unique string representation of `a`.
-  - tell the dropdown with `state`, `entries` and `selection` how to
-    obtain each of them from the model
-  - `id` should be a unique CSS-id for the dropdown (we need this to
-    handle focus and blur events correctly)
   - tell the dropdown with `select` how we can ask the main application to
     change the selection
 
 -}
 updateConfig :
-    { toLabel : a -> String
-    , state : model -> State a
-    , entries : model -> List (Entry a)
-    , selection : model -> Maybe a
-    , id : String
-    , select : Maybe a -> msg
-    }
+    SharedConfig a model
+    -> { select : Maybe a -> msg }
     -> UpdateConfig a msg model
-updateConfig config =
+updateConfig (SharedConfig sharedConfig) config =
     UpdateConfig <|
         Internal.updateConfig
-            { config
-                | state =
-                    \model ->
-                        case config.state model of
-                            State state ->
-                                state
-                , entries =
-                    \model ->
-                        config.entries model
-                            |> List.map (\(Entry entry) -> entry)
+            { toLabel = sharedConfig.toLabel
+            , state =
+                \model ->
+                    case sharedConfig.state model of
+                        State state ->
+                            state
+            , entries =
+                \model ->
+                    sharedConfig.entries model
+                        |> List.map (\(Entry entry) -> entry)
+            , selection = sharedConfig.selection
+            , id = sharedConfig.id
+            , select = config.select
             }
 
 
@@ -288,13 +330,8 @@ type ViewConfig a model
 
     viewConfig : Selectize.ViewConfig String Model
     viewConfig =
-        Selectize.viewConfig
-            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
-            , state = .menu
-            , entries = .entries
-            , selection = .selection
-            , id = "tree-menu"
-            , placeholder = "Select a Tree"
+        Selectize.viewConfig sharedConfig
+            { placeholder = "Select a Tree"
             , container = [ ... ]
             , input =
                 \sthSelected open -> [ ... ]
@@ -316,8 +353,6 @@ type ViewConfig a model
                     }
             }
 
-  - `toLabel`, `state`, `entries`, `selection` and `id` have to be the
-    same as in the `updateConfig`
   - tell us the `placeholder` if the selection is empty
   - `container`, `input`, `toggle`, `menu`, `ul`, `entry` and `divider`
     can be used to style the different parts of the dropdown view, c.f.
@@ -325,34 +360,41 @@ type ViewConfig a model
 
 -}
 viewConfig :
-    { toLabel : a -> String
-    , state : model -> State a
-    , entries : model -> List (Entry a)
-    , selection : model -> Maybe a
-    , id : String
-    , placeholder : String
-    , container : List (Html.Attribute Never)
-    , input : Bool -> Bool -> List (Html.Attribute Never)
-    , toggle : Bool -> Html Never
-    , menu : List (Html.Attribute Never)
-    , ul : List (Html.Attribute Never)
-    , entry : a -> Bool -> Bool -> HtmlDetails Never
-    , divider : String -> HtmlDetails Never
-    }
+    SharedConfig a model
+    ->
+        { placeholder : String
+        , container : List (Html.Attribute Never)
+        , input : Bool -> Bool -> List (Html.Attribute Never)
+        , toggle : Bool -> Html Never
+        , menu : List (Html.Attribute Never)
+        , ul : List (Html.Attribute Never)
+        , entry : a -> Bool -> Bool -> HtmlDetails Never
+        , divider : String -> HtmlDetails Never
+        }
     -> ViewConfig a model
-viewConfig config =
+viewConfig (SharedConfig sharedConfig) config =
     ViewConfig <|
         Internal.viewConfig
-            { config
-                | state =
-                    \model ->
-                        case config.state model of
-                            State state ->
-                                state
-                , entries =
-                    \model ->
-                        config.entries model
-                            |> List.map (\(Entry entry) -> entry)
+            { toLabel = sharedConfig.toLabel
+            , state =
+                \model ->
+                    case sharedConfig.state model of
+                        State state ->
+                            state
+            , entries =
+                \model ->
+                    sharedConfig.entries model
+                        |> List.map (\(Entry entry) -> entry)
+            , selection = sharedConfig.selection
+            , id = sharedConfig.id
+            , placeholder = config.placeholder
+            , container = config.container
+            , input = config.input
+            , toggle = config.toggle
+            , menu = config.menu
+            , ul = config.ul
+            , entry = config.entry
+            , divider = config.divider
             }
 
 
@@ -374,8 +416,8 @@ type Msg a
     = Msg (Internal.Msg a)
 
 
-{-| The dropdown's update function. C.f. the modul documentation for an
-example how to hook it into your main update.
+{-| The dropdown's update function. C.f. the modul documentation to see
+what boilerplate is needed in your main update.
 -}
 update :
     UpdateConfig a msg model

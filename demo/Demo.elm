@@ -79,27 +79,27 @@ andDo cmd ( model, cmds ) =
     )
 
 
-updateConfig : Selectize.UpdateConfig String Msg Model
-updateConfig =
-    Selectize.updateConfig
+sharedConfig : Selectize.SharedConfig String Model
+sharedConfig =
+    Selectize.sharedConfig
         { toLabel = toLabel
         , state = .menu
         , entries = \_ -> trees
         , selection = .selection
         , id = "tree-menu"
-        , select = SelectTree
         }
+
+
+updateConfig : Selectize.UpdateConfig String Msg Model
+updateConfig =
+    Selectize.updateConfig sharedConfig
+        { select = SelectTree }
 
 
 viewConfig : Selectize.ViewConfig String Model
 viewConfig =
-    Selectize.viewConfig
-        { toLabel = toLabel
-        , state = .menu
-        , entries = \_ -> trees
-        , selection = .selection
-        , id = "tree-menu"
-        , placeholder = "Select a Tree"
+    Selectize.viewConfig sharedConfig
+        { placeholder = "Select a Tree"
         , container =
             [ Attributes.class "selectize__container" ]
         , input =
