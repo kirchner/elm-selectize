@@ -10188,7 +10188,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$scrollTopDecoder = A2(
 		A2(
 			_debois$elm_dom$DOM$childNode,
 			1,
-			A2(_elm_lang$core$Json_Decode$field, 'scrollTop', _elm_lang$core$Json_Decode$int))));
+			A2(_elm_lang$core$Json_Decode$field, 'scrollTop', _elm_lang$core$Json_Decode$float))));
 var _kirchner$elm_selectize$Selectize_Selectize$menuHeightDecoder = A2(
 	_kirchner$elm_selectize$Selectize_Selectize_ops[':>'],
 	_debois$elm_dom$DOM$target,
@@ -10198,7 +10198,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$menuHeightDecoder = A2(
 		A2(
 			_debois$elm_dom$DOM$childNode,
 			1,
-			A2(_elm_lang$core$Json_Decode$field, 'clientHeight', _elm_lang$core$Json_Decode$int))));
+			A2(_elm_lang$core$Json_Decode$field, 'clientHeight', _elm_lang$core$Json_Decode$float))));
 var _kirchner$elm_selectize$Selectize_Selectize$entryHeightsDecoder = A2(
 	_kirchner$elm_selectize$Selectize_Selectize_ops[':>'],
 	_debois$elm_dom$DOM$target,
@@ -10212,7 +10212,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$entryHeightsDecoder = A2(
 				_kirchner$elm_selectize$Selectize_Selectize_ops[':>'],
 				_debois$elm_dom$DOM$childNode(0),
 				_debois$elm_dom$DOM$childNodes(
-					A2(_elm_lang$core$Json_Decode$field, 'offsetHeight', _elm_lang$core$Json_Decode$int))))));
+					A2(_elm_lang$core$Json_Decode$field, 'offsetHeight', _elm_lang$core$Json_Decode$float))))));
 var _kirchner$elm_selectize$Selectize_Selectize$textfieldId = function (id) {
 	return A2(_elm_lang$core$Basics_ops['++'], id, '__textfield');
 };
@@ -10558,7 +10558,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$scroll = F2(
 			A2(
 				_elm_lang$dom$Dom_Scroll$toY,
 				_kirchner$elm_selectize$Selectize_Selectize$menuId(id),
-				_elm_lang$core$Basics$toFloat(y)));
+				y));
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$scrollToKeyboardFocus = F4(
 	function (id, filteredEntries, scrollTop, _p24) {
@@ -10582,7 +10582,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$scrollToKeyboardFocus = F4(
 				_elm_lang$core$Maybe$Just(_p26._0));
 			var top = _p27._0;
 			var entryHeight = _p27._1;
-			var y = (_elm_lang$core$Native_Utils.cmp(top - (((2 * entryHeight) / 3) | 0), scrollTop) < 0) ? (top - (((2 * entryHeight) / 3) | 0)) : ((_elm_lang$core$Native_Utils.cmp(top + (((5 * entryHeight) / 3) | 0), scrollTop + heights.menu) > 0) ? ((top + (((5 * entryHeight) / 3) | 0)) - heights.menu) : scrollTop);
+			var y = (_elm_lang$core$Native_Utils.cmp(top - ((2 * entryHeight) / 3), scrollTop) < 0) ? (top - ((2 * entryHeight) / 3)) : ((_elm_lang$core$Native_Utils.cmp(top + ((5 * entryHeight) / 3), scrollTop + heights.menu) > 0) ? ((top + ((5 * entryHeight) / 3)) - heights.menu) : scrollTop);
 			return {
 				ctor: '_Tuple3',
 				_0: _p30,
@@ -10644,7 +10644,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F3(
 							heights: _elm_lang$core$Maybe$Just(_p35),
 							scrollTop: _p32._1
 						}),
-					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, config.id, top - (((_p35.menu - height) / 2) | 0)),
+					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, config.id, top - ((_p35.menu - height) / 2)),
 					_2: _elm_lang$core$Maybe$Nothing
 				};
 			case 'CloseMenu':
