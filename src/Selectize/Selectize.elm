@@ -56,13 +56,13 @@ type alias State a =
 
     -- dom measurements
     , heights : Maybe Heights
-    , scrollTop : Int
+    , scrollTop : Float
     }
 
 
 type alias Heights =
-    { entries : List Int
-    , menu : Int
+    { entries : List Float
+    , menu : Float
     }
 
 
@@ -190,7 +190,7 @@ viewConfig config =
 type Msg a
     = NoOp
       -- open/close menu
-    | OpenMenu Heights Int
+    | OpenMenu Heights Float
     | CloseMenu
     | BlurTextfield
     | PreventClosing Bool
@@ -199,7 +199,7 @@ type Msg a
       -- handle focus and selection
     | SetMouseFocus (Maybe a)
     | Select a
-    | SetKeyboardFocus Movement (Maybe Heights) Int
+    | SetKeyboardFocus Movement (Maybe Heights) Float
     | SelectKeyboardFocusAndBlur
     | ClearSelection
 
@@ -249,7 +249,7 @@ update config model msg =
                 , heights = Just heights
                 , scrollTop = scrollTop
               }
-            , scroll config.id (top - (heights.menu - height) // 2)
+            , scroll config.id (top - (heights.menu - height) / 2)
             , Nothing
             )
 
@@ -394,7 +394,7 @@ updateKeyboardFocus select filteredEntries movement state =
 scrollToKeyboardFocus :
     String
     -> List (Entry a)
-    -> Int
+    -> Float
     -> ( WithKeyboardFocus a (WithHeights r), Cmd (Msg a), Maybe msg )
     -> ( WithKeyboardFocus a (WithHeights r), Cmd (Msg a), Maybe msg )
 scrollToKeyboardFocus id filteredEntries scrollTop ( state, cmd, maybeMsg ) =
@@ -408,10 +408,10 @@ scrollToKeyboardFocus id filteredEntries scrollTop ( state, cmd, maybeMsg ) =
                     topAndHeight heights.entries filteredEntries (Just focus)
 
                 y =
-                    if (top - 2 * entryHeight // 3) < scrollTop then
-                        top - 2 * entryHeight // 3
-                    else if top + 5 * entryHeight // 3 > (scrollTop + heights.menu) then
-                        top + 5 * entryHeight // 3 - heights.menu
+                    if (top - 2 * entryHeight / 3) < scrollTop then
+                        top - 2 * entryHeight / 3
+                    else if top + 5 * entryHeight / 3 > (scrollTop + heights.menu) then
+                        top + 5 * entryHeight / 3 - heights.menu
                     else
                         scrollTop
             in
@@ -728,7 +728,7 @@ getPrevious current next result =
 {-| Compute the distance of the entry to the beginning of the list and
 its height, as it is rendered in the DOM.
 -}
-topAndHeight : List Int -> List (Entry a) -> Maybe a -> ( Int, Int )
+topAndHeight : List Float -> List (Entry a) -> Maybe a -> ( Float, Float )
 topAndHeight entryHeights filteredEntries focus =
     case focus of
         Just a ->
@@ -739,11 +739,11 @@ topAndHeight entryHeights filteredEntries focus =
 
 
 topAndHeightHelper :
-    List Int
+    List Float
     -> List (Entry a)
     -> a
-    -> ( Int, Int )
-    -> ( Int, Int )
+    -> ( Float, Float )
+    -> ( Float, Float )
 topAndHeightHelper entryHeights filteredEntries focus ( distance, height ) =
     case ( entryHeights, filteredEntries ) of
         ( height :: otherHeights, entry :: otherEntries ) ->
@@ -784,10 +784,10 @@ mapToNoOp =
 {- cmds -}
 
 
-scroll : String -> Int -> Cmd (Msg a)
+scroll : String -> Float -> Cmd (Msg a)
 scroll id y =
     Task.attempt (\_ -> NoOp) <|
-        Dom.Scroll.toY (menuId id) (toFloat y)
+        Dom.Scroll.toY (menuId id) y
 
 
 blur : String -> Cmd (Msg a)
@@ -800,28 +800,28 @@ blur id =
 {- decoder -}
 
 
-entryHeightsDecoder : Decoder (List Int)
+entryHeightsDecoder : Decoder (List Float)
 entryHeightsDecoder =
     DOM.target
         :> DOM.parentElement
         :> DOM.childNode 1
         :> DOM.childNode 0
         :> DOM.childNodes
-            (Decode.field "offsetHeight" Decode.int)
+            (Decode.field "offsetHeight" Decode.float)
 
 
-menuHeightDecoder : Decoder Int
+menuHeightDecoder : Decoder Float
 menuHeightDecoder =
     DOM.target
         :> DOM.parentElement
-        :> DOM.childNode 1 (Decode.field "clientHeight" Decode.int)
+        :> DOM.childNode 1 (Decode.field "clientHeight" Decode.float)
 
 
-scrollTopDecoder : Decoder Int
+scrollTopDecoder : Decoder Float
 scrollTopDecoder =
     DOM.target
         :> DOM.parentElement
-        :> DOM.childNode 1 (Decode.field "scrollTop" Decode.int)
+        :> DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
 
 
 fromResult : Result String a -> Decoder a

@@ -175,10 +175,10 @@ textfieldFocused =
     Fuzz.map2 S.OpenMenu
         (Fuzz.map2
             S.Heights
-            (listCount (Fuzz.intRange 0 42) (List.length trees))
-            (Fuzz.intRange 0 100)
+            (listCount (Fuzz.intRange 0 42 |> Fuzz.map toFloat) (List.length trees))
+            (Fuzz.intRange 0 100 |> Fuzz.map toFloat)
         )
-        (Fuzz.intRange 0 1000)
+        (Fuzz.intRange 0 1000 |> Fuzz.map toFloat)
 
 
 textfieldBlured : Fuzzer (S.Msg String)
@@ -219,11 +219,11 @@ setKeyboardFocus =
         movement
         (Fuzz.map2
             S.Heights
-            (listCount (Fuzz.intRange 0 42) (List.length trees))
-            (Fuzz.intRange 0 100)
+            (listCount (Fuzz.intRange 0 42 |> Fuzz.map toFloat) (List.length trees))
+            (Fuzz.intRange 0 100 |> Fuzz.map toFloat)
             |> Fuzz.maybe
         )
-        (Fuzz.intRange 0 1000)
+        (Fuzz.intRange 0 1000 |> Fuzz.map toFloat)
 
 
 selectKeyboardFocusAndBlur : Fuzzer (S.Msg String)
