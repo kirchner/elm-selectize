@@ -27,7 +27,8 @@ import Dom.Scroll
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
-import Html.Lazy as Lazy
+import Html.Keyed
+import Html.Lazy
 import Json.Decode as Decode exposing (Decoder)
 import Keyboard.Extra
     exposing
@@ -440,9 +441,9 @@ view config model =
         selection =
             config.selection model
 
-        filteredEntries =
+        filteredEntries query =
             config.entries model
-                |> filter config.toLabel state.query
+                |> filter config.toLabel query
 
         -- attributes
         containerAttrs attrs =
@@ -465,7 +466,7 @@ view config model =
     in
     Html.div
         (containerAttrs <|
-            if state.open && not (filteredEntries |> List.isEmpty) then
+            if state.open && not (filteredEntries state.query |> List.isEmpty) then
                 []
             else
                 [ Attributes.style [ ( "overflow", "hidden" ) ] ]
@@ -487,18 +488,20 @@ view config model =
                     []
             )
             []
-        , Html.div
-            ([ Attributes.id (menuId config.id)
-             , Events.onMouseDown (PreventClosing True)
-             , Events.onMouseUp (PreventClosing False)
-             ]
-                ++ noOp config.menu
-            )
-            [ filteredEntries
-                |> List.map
-                    (viewEntry state.open config.entry config.divider state)
-                |> Html.ul (noOp config.ul)
-            ]
+        , flip Html.Lazy.lazy state.query <|
+            \query ->
+                Html.div
+                    ([ Attributes.id (menuId config.id)
+                     , Events.onMouseDown (PreventClosing True)
+                     , Events.onMouseUp (PreventClosing False)
+                     ]
+                        ++ noOp config.menu
+                    )
+                    [ filteredEntries query
+                        |> List.map
+                            (viewEntry config.toLabel state.open config.entry config.divider state)
+                        |> Html.Keyed.ul (noOp config.ul)
+                    ]
         , Html.div
             [ Attributes.style
                 [ ( "pointer-events"
@@ -602,13 +605,14 @@ keyupDecoder =
 
 
 viewEntry :
-    Bool
+    (a -> String)
+    -> Bool
     -> (a -> Bool -> Bool -> HtmlDetails Never)
     -> (String -> HtmlDetails Never)
     -> State a
     -> Entry a
-    -> Html (Msg a)
-viewEntry open renderEntry renderDivider state entry =
+    -> ( String, Html (Msg a) )
+viewEntry toLabel open renderEntry renderDivider state entry =
     let
         { attributes, children } =
             case entry of
@@ -623,8 +627,13 @@ viewEntry open renderEntry renderDivider state entry =
         liAttrs attrs =
             attrs ++ noOp attributes
     in
-    Lazy.lazy2
-        Html.li
+    ( case entry of
+        Entry entry ->
+            toLabel entry
+
+        Divider title ->
+            title
+    , Html.li
         (liAttrs <|
             case entry of
                 Entry entry ->
@@ -640,6 +649,7 @@ viewEntry open renderEntry renderDivider state entry =
                     []
         )
         (children |> List.map mapToNoOp)
+    )
 
 
 
