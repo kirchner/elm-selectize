@@ -26,7 +26,6 @@ import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
 import Html.Keyed
-import Html.Lazy
 import Json.Decode as Decode exposing (Decoder)
 import Keyboard.Extra
     exposing
@@ -431,26 +430,24 @@ view config id toLabel entries selection state =
                     []
             )
             []
-        , flip Html.Lazy.lazy state.query <|
-            \query ->
-                Html.div
-                    ([ Attributes.id (menuId id)
-                     , Events.onMouseDown (PreventClosing True)
-                     , Events.onMouseUp (PreventClosing False)
-                     ]
-                        ++ noOp config.menu
+        , Html.div
+            ([ Attributes.id (menuId id)
+             , Events.onMouseDown (PreventClosing True)
+             , Events.onMouseUp (PreventClosing False)
+             ]
+                ++ noOp config.menu
+            )
+            [ actualEntries
+                |> List.map
+                    (viewEntry
+                        toLabel
+                        state.open
+                        config.entry
+                        config.divider
+                        state
                     )
-                    [ actualEntries
-                        |> List.map
-                            (viewEntry
-                                toLabel
-                                state.open
-                                config.entry
-                                config.divider
-                                state
-                            )
-                        |> Html.Keyed.ul (noOp config.ul)
-                    ]
+                |> Html.Keyed.ul (noOp config.ul)
+            ]
         , Html.div
             [ Attributes.style
                 [ ( "pointer-events"
