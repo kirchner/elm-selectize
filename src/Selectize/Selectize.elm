@@ -849,26 +849,26 @@ blur id =
 
 entryHeightsDecoder : Decoder (List Float)
 entryHeightsDecoder =
-    DOM.target
-        :> DOM.parentElement
-        :> DOM.childNode 1
-        :> DOM.childNode 0
-        :> DOM.childNodes
-            (Decode.field "offsetHeight" Decode.float)
+    Decode.field "offsetHeight" Decode.float
+        |> DOM.childNodes
+        |> DOM.childNode 0
+        |> DOM.childNode 1
+        |> DOM.parentElement
+        |> DOM.target
 
 
 menuHeightDecoder : Decoder Float
 menuHeightDecoder =
-    DOM.target
-        :> DOM.parentElement
-        :> DOM.childNode 1 (Decode.field "clientHeight" Decode.float)
+    DOM.childNode 1 (Decode.field "clientHeight" Decode.float)
+        |> DOM.parentElement
+        |> DOM.target
 
 
 scrollTopDecoder : Decoder Float
 scrollTopDecoder =
-    DOM.target
-        :> DOM.parentElement
-        :> DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
+    DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
+        |> DOM.parentElement
+        |> DOM.target
 
 
 fromResult : Result String a -> Decoder a
@@ -879,9 +879,3 @@ fromResult result =
 
         Err reason ->
             Decode.fail reason
-
-
-infixr 5 :>
-(:>) : (a -> b) -> a -> b
-(:>) f x =
-    f x
