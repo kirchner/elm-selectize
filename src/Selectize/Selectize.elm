@@ -38,209 +38,6 @@ import Keyboard.Extra
 import Task
 
 
----- ZIPLIST
-
-
-type alias ZipList a =
-    { front : List (EntryWithHeight a)
-    , current : EntryWithHeight a
-    , back : List (EntryWithHeight a)
-    , currentTop : Float
-    }
-
-
-type alias EntryWithHeight a =
-    ( Entry a, Float )
-
-
-currentEntry : ZipList a -> a
-currentEntry zipList =
-    case zipList.current of
-        ( Entry a, _ ) ->
-            a
-
-        _ ->
-            -- TODO: remove this! (we need to fix previous and next if
-            -- at the beginning or end of the list)
-            Debug.crash "this should be impossible"
-
-
-zipCurrentScrollTop : ZipList a -> Float
-zipCurrentScrollTop zipList =
-    zipList.currentTop
-
-
-zipCurrentHeight : ZipList a -> Float
-zipCurrentHeight zipList =
-    zipList.current |> Tuple.second
-
-
-fromList : List (Entry a) -> List Float -> Maybe (ZipList a)
-fromList entries entryHeights =
-    case ( entries, entryHeights ) of
-        ( firstEntry :: restEntries, firstHeight :: restHeights ) ->
-            Just
-                ({ front = []
-                 , current = ( firstEntry, firstHeight )
-                 , back = zip restEntries restHeights
-                 , currentTop = 0
-                 }
-                    |> zipFirst
-                )
-
-        _ ->
-            Nothing
-
-
-fromListWithFilter :
-    (a -> Bool)
-    -> List (Entry a)
-    -> List Float
-    -> Maybe (ZipList a)
-fromListWithFilter keep entries entryHeights =
-    let
-        filtered =
-            zip entries entryHeights
-                |> List.filter
-                    (\( entry, height ) ->
-                        case entry of
-                            Entry a ->
-                                keep a
-
-                            Divider _ ->
-                                True
-                    )
-    in
-    case filtered of
-        first :: rest ->
-            Just
-                ({ front = []
-                 , current = first
-                 , back = rest
-                 , currentTop = 0
-                 }
-                    |> zipFirst
-                )
-
-        _ ->
-            Nothing
-
-
-zipFirst : ZipList a -> ZipList a
-zipFirst zipList =
-    case zipList.current of
-        ( Divider _, _ ) ->
-            case zipList.back of
-                [] ->
-                    zipList
-
-                next :: rest ->
-                    zipFirst
-                        { front = zipList.current :: zipList.front
-                        , current = next
-                        , back = rest
-                        , currentTop =
-                            zipList.currentTop
-                                + Tuple.second zipList.current
-                        }
-
-        _ ->
-            zipList
-
-
-zipReverseFirst : ZipList a -> ZipList a
-zipReverseFirst zipList =
-    case zipList.current of
-        ( Divider _, _ ) ->
-            case zipList.front of
-                [] ->
-                    zipList
-
-                previous :: rest ->
-                    zipReverseFirst
-                        { front = rest
-                        , current = previous
-                        , back = zipList.current :: zipList.back
-                        , currentTop =
-                            zipList.currentTop
-                                - Tuple.second zipList.current
-                        }
-
-        _ ->
-            zipList
-
-
-zipNext : ZipList a -> ZipList a
-zipNext zipList =
-    case zipList.back of
-        [] ->
-            zipList
-
-        next :: rest ->
-            zipFirst
-                { front = zipList.current :: zipList.front
-                , current = next
-                , back = rest
-                , currentTop =
-                    zipList.currentTop
-                        + Tuple.second zipList.current
-                }
-
-
-zipPrevious : ZipList a -> ZipList a
-zipPrevious zipList =
-    case zipList.front of
-        [] ->
-            zipList
-
-        previous :: rest ->
-            zipReverseFirst
-                { front = rest
-                , current = previous
-                , back = zipList.current :: zipList.back
-                , currentTop =
-                    zipList.currentTop
-                        - Tuple.second zipList.current
-                }
-
-
-moveForwardTo : a -> ZipList a -> ZipList a
-moveForwardTo a zipList =
-    moveForwardToHelper a zipList
-        |> Maybe.withDefault zipList
-
-
-moveForwardToHelper : a -> ZipList a -> Maybe (ZipList a)
-moveForwardToHelper a zipList =
-    if (zipList.current |> Tuple.first) == Entry a then
-        Just zipList
-    else
-        case zipList.back of
-            [] ->
-                Nothing
-
-            _ ->
-                zipList
-                    |> zipNext
-                    |> moveForwardToHelper a
-
-
-zip : List a -> List b -> List ( a, b )
-zip listA listB =
-    zipHelper listA listB [] |> List.reverse
-
-
-zipHelper : List a -> List b -> List ( a, b ) -> List ( a, b )
-zipHelper listA listB sum =
-    case ( listA, listB ) of
-        ( a :: restA, b :: restB ) ->
-            zipHelper restA restB (( a, b ) :: sum)
-
-        _ ->
-            sum
-
-
-
 ---- MODEL
 
 
@@ -879,3 +676,206 @@ fromResult result =
 
         Err reason ->
             Decode.fail reason
+
+
+
+---- ZIPLIST
+
+
+type alias ZipList a =
+    { front : List (EntryWithHeight a)
+    , current : EntryWithHeight a
+    , back : List (EntryWithHeight a)
+    , currentTop : Float
+    }
+
+
+type alias EntryWithHeight a =
+    ( Entry a, Float )
+
+
+currentEntry : ZipList a -> a
+currentEntry zipList =
+    case zipList.current of
+        ( Entry a, _ ) ->
+            a
+
+        _ ->
+            -- TODO: remove this! (we need to fix previous and next if
+            -- at the beginning or end of the list)
+            Debug.crash "this should be impossible"
+
+
+zipCurrentScrollTop : ZipList a -> Float
+zipCurrentScrollTop zipList =
+    zipList.currentTop
+
+
+zipCurrentHeight : ZipList a -> Float
+zipCurrentHeight zipList =
+    zipList.current |> Tuple.second
+
+
+fromList : List (Entry a) -> List Float -> Maybe (ZipList a)
+fromList entries entryHeights =
+    case ( entries, entryHeights ) of
+        ( firstEntry :: restEntries, firstHeight :: restHeights ) ->
+            Just
+                ({ front = []
+                 , current = ( firstEntry, firstHeight )
+                 , back = zip restEntries restHeights
+                 , currentTop = 0
+                 }
+                    |> zipFirst
+                )
+
+        _ ->
+            Nothing
+
+
+fromListWithFilter :
+    (a -> Bool)
+    -> List (Entry a)
+    -> List Float
+    -> Maybe (ZipList a)
+fromListWithFilter keep entries entryHeights =
+    let
+        filtered =
+            zip entries entryHeights
+                |> List.filter
+                    (\( entry, height ) ->
+                        case entry of
+                            Entry a ->
+                                keep a
+
+                            Divider _ ->
+                                True
+                    )
+    in
+    case filtered of
+        first :: rest ->
+            Just
+                ({ front = []
+                 , current = first
+                 , back = rest
+                 , currentTop = 0
+                 }
+                    |> zipFirst
+                )
+
+        _ ->
+            Nothing
+
+
+zipFirst : ZipList a -> ZipList a
+zipFirst zipList =
+    case zipList.current of
+        ( Divider _, _ ) ->
+            case zipList.back of
+                [] ->
+                    zipList
+
+                next :: rest ->
+                    zipFirst
+                        { front = zipList.current :: zipList.front
+                        , current = next
+                        , back = rest
+                        , currentTop =
+                            zipList.currentTop
+                                + Tuple.second zipList.current
+                        }
+
+        _ ->
+            zipList
+
+
+zipReverseFirst : ZipList a -> ZipList a
+zipReverseFirst zipList =
+    case zipList.current of
+        ( Divider _, _ ) ->
+            case zipList.front of
+                [] ->
+                    zipList
+
+                previous :: rest ->
+                    zipReverseFirst
+                        { front = rest
+                        , current = previous
+                        , back = zipList.current :: zipList.back
+                        , currentTop =
+                            zipList.currentTop
+                                - Tuple.second zipList.current
+                        }
+
+        _ ->
+            zipList
+
+
+zipNext : ZipList a -> ZipList a
+zipNext zipList =
+    case zipList.back of
+        [] ->
+            zipList
+
+        next :: rest ->
+            zipFirst
+                { front = zipList.current :: zipList.front
+                , current = next
+                , back = rest
+                , currentTop =
+                    zipList.currentTop
+                        + Tuple.second zipList.current
+                }
+
+
+zipPrevious : ZipList a -> ZipList a
+zipPrevious zipList =
+    case zipList.front of
+        [] ->
+            zipList
+
+        previous :: rest ->
+            zipReverseFirst
+                { front = rest
+                , current = previous
+                , back = zipList.current :: zipList.back
+                , currentTop =
+                    zipList.currentTop
+                        - Tuple.second zipList.current
+                }
+
+
+moveForwardTo : a -> ZipList a -> ZipList a
+moveForwardTo a zipList =
+    moveForwardToHelper a zipList
+        |> Maybe.withDefault zipList
+
+
+moveForwardToHelper : a -> ZipList a -> Maybe (ZipList a)
+moveForwardToHelper a zipList =
+    if (zipList.current |> Tuple.first) == Entry a then
+        Just zipList
+    else
+        case zipList.back of
+            [] ->
+                Nothing
+
+            _ ->
+                zipList
+                    |> zipNext
+                    |> moveForwardToHelper a
+
+
+zip : List a -> List b -> List ( a, b )
+zip listA listB =
+    zipHelper listA listB [] |> List.reverse
+
+
+zipHelper : List a -> List b -> List ( a, b ) -> List ( a, b )
+zipHelper listA listB sum =
+    case ( listA, listB ) of
+        ( a :: restA, b :: restB ) ->
+            zipHelper restA restB (( a, b ) :: sum)
+
+        _ ->
+            sum
