@@ -2,8 +2,8 @@ module Tests exposing (..)
 
 import Expect
 import Fuzz exposing (Fuzzer)
-import Selectize.Selectize exposing (..)
 import Random
+import Selectize.Selectize exposing (..)
 import Test exposing (..)
 
 
@@ -50,10 +50,16 @@ testFirst =
     describe "first"
         [ fuzz (Fuzz.intRange 0 42) "first entries are dividers" <|
             \count ->
-                (List.repeat count (divider "divider")
-                    ++ (trees1 |> List.map entry)
-                )
-                    |> first
+                let
+                    entries =
+                        List.repeat count (divider "divider")
+                            ++ (trees1 |> List.map entry)
+
+                    heights =
+                        List.repeat (List.length entries) 30
+                in
+                fromList entries heights
+                    |> Maybe.map currentEntry
                     |> Expect.equal (List.head trees1)
         ]
 
@@ -66,20 +72,25 @@ testNext =
                 let
                     entries =
                         (trees1 |> List.map entry)
-                            ++ [ entry currentEntry ]
+                            ++ [ entry current ]
                             ++ List.repeat count (divider "divider")
-                            ++ [ entry nextEntry ]
+                            ++ [ entry next ]
                             ++ (trees2 |> List.map entry)
 
-                    currentEntry =
+                    heights =
+                        List.repeat (List.length entries) 30
+
+                    current =
                         treeA
 
-                    nextEntry =
+                    next =
                         treeB
                 in
-                currentEntry
-                    |> next entries
-                    |> Expect.equal nextEntry
+                fromList entries heights
+                    |> Maybe.map (moveForwardTo current)
+                    |> Maybe.map zipNext
+                    |> Maybe.map currentEntry
+                    |> Expect.equal (Just next)
         ]
 
 
@@ -91,20 +102,25 @@ testPrevious =
                 let
                     entries =
                         (trees1 |> List.map entry)
-                            ++ [ entry previousEntry ]
+                            ++ [ entry previous ]
                             ++ List.repeat count (divider "divider")
-                            ++ [ entry currentEntry ]
+                            ++ [ entry current ]
                             ++ (trees2 |> List.map entry)
 
-                    currentEntry =
+                    heights =
+                        List.repeat (List.length entries) 30
+
+                    current =
                         treeA
 
-                    previousEntry =
+                    previous =
                         treeB
                 in
-                currentEntry
-                    |> previous entries
-                    |> Expect.equal previousEntry
+                fromList entries heights
+                    |> Maybe.map (moveForwardTo current)
+                    |> Maybe.map zipPrevious
+                    |> Maybe.map currentEntry
+                    |> Expect.equal (Just previous)
         ]
 
 
@@ -130,15 +146,25 @@ testTopAndHeight =
                         List.minimum entryHeights
                             |> Maybe.withDefault 0
                 in
-                List.head trees1
-                    |> topAndHeight entryHeights entries
-                    |> Expect.all
-                        [ Tuple.first >> Expect.atLeast 0
-                        , Tuple.first >> Expect.atMost sum
-                        , Tuple.second >> Expect.atLeast 0
-                        , Tuple.second >> Expect.atMost maximum
-                        , Tuple.second >> Expect.atLeast minimum
-                        ]
+                case fromList entries entryHeights of
+                    Just zipList ->
+                        zipList
+                            |> Expect.all
+                                [ zipCurrentScrollTop
+                                    >> Expect.all
+                                        [ Expect.atLeast 0
+                                        , Expect.atMost sum
+                                        ]
+                                , zipCurrentHeight
+                                    >> Expect.all
+                                        [ Expect.atLeast 0
+                                        , Expect.atMost maximum
+                                        , Expect.atLeast minimum
+                                        ]
+                                ]
+
+                    Nothing ->
+                        Expect.fail "could not create zipList"
         ]
 
 

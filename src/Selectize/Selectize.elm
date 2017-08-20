@@ -6,13 +6,21 @@ module Selectize.Selectize
         , Msg(..)
         , State
         , ViewConfig
+        , ZipList
+        , currentEntry
         , divider
         , empty
         , entry
         , filter
+        , fromList
+        , moveForwardTo
         , update
         , view
         , viewConfig
+        , zipCurrentHeight
+        , zipCurrentScrollTop
+        , zipNext
+        , zipPrevious
         )
 
 import DOM
