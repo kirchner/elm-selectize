@@ -194,29 +194,29 @@ import Selectize.Selectize as Internal
 
 {-| The internal state of the dropdown menu. This lives in your model.
 -}
-type State a
-    = State (Internal.State a)
+type alias State a
+    = Internal.State a
 
 
 {-| The initial dropdown state.
 -}
 empty : State a
 empty =
-    State Internal.empty
+    Internal.empty
 
 
 {-| Each entry of the menu has to be wrapped in this type. C.f. `entry`
 and `divider`.
 -}
-type Entry a
-    = Entry (Internal.Entry a)
+type alias Entry a
+    = Internal.Entry a
 
 
 {-| Create a selectable `Entry a`.
 -}
 entry : a -> Entry a
 entry a =
-    Entry (Internal.entry a)
+    Internal.entry a
 
 
 {-| Create a divider, which cannot be selected and which is skipped
@@ -224,7 +224,7 @@ while traversing the list via arrow up/down keys.
 -}
 divider : String -> Entry a
 divider title =
-    Entry (Internal.divider title)
+    Internal.divider title
 
 
 
@@ -283,7 +283,7 @@ sharedConfig config =
 {-| The configuration for `Selectize.update`.
 -}
 type UpdateConfig a msg model
-    = UpdateConfig (Internal.UpdateConfig a msg model)
+    = UpdateConfig (SharedConfig a model) (Maybe a -> msg)
 
 
 {-| Create the update configuration, for example
@@ -301,29 +301,14 @@ updateConfig :
     SharedConfig a model
     -> { select : Maybe a -> msg }
     -> UpdateConfig a msg model
-updateConfig (SharedConfig sharedConfig) config =
-    UpdateConfig <|
-        Internal.updateConfig
-            { toLabel = sharedConfig.toLabel
-            , state =
-                \model ->
-                    case sharedConfig.state model of
-                        State state ->
-                            state
-            , entries =
-                \model ->
-                    sharedConfig.entries model
-                        |> List.map (\(Entry entry) -> entry)
-            , selection = sharedConfig.selection
-            , id = sharedConfig.id
-            , select = config.select
-            }
+updateConfig sharedConfig config =
+    UpdateConfig sharedConfig config.select
 
 
 {-| The configuration for `Selectize.view`.
 -}
 type ViewConfig a model
-    = ViewConfig (Internal.ViewConfig a model)
+    = ViewConfig (SharedConfig a model) (Internal.ViewConfig a)
 
 
 {-| Create the view configuration, for example
@@ -372,30 +357,17 @@ viewConfig :
         , divider : String -> HtmlDetails Never
         }
     -> ViewConfig a model
-viewConfig (SharedConfig sharedConfig) config =
-    ViewConfig <|
-        Internal.viewConfig
-            { toLabel = sharedConfig.toLabel
-            , state =
-                \model ->
-                    case sharedConfig.state model of
-                        State state ->
-                            state
-            , entries =
-                \model ->
-                    sharedConfig.entries model
-                        |> List.map (\(Entry entry) -> entry)
-            , selection = sharedConfig.selection
-            , id = sharedConfig.id
-            , placeholder = config.placeholder
-            , container = config.container
-            , input = config.input
-            , toggle = config.toggle
-            , menu = config.menu
-            , ul = config.ul
-            , entry = config.entry
-            , divider = config.divider
-            }
+viewConfig sharedConfig config =
+    ViewConfig sharedConfig
+        { placeholder = config.placeholder
+        , container = config.container
+        , input = config.input
+        , toggle = config.toggle
+        , menu = config.menu
+        , ul = config.ul
+        , entry = config.entry
+        , divider = config.divider
+        }
 
 
 {-| `entry` and `divider` should return this.
@@ -412,8 +384,8 @@ type alias HtmlDetails msg =
 
 {-| The dropdown menu produces these messages.
 -}
-type Msg a
-    = Msg (Internal.Msg a)
+type alias Msg a
+    = Internal.Msg a
 
 
 {-| The dropdown's update function. C.f. the modul documentation to see
@@ -424,12 +396,19 @@ update :
     -> model
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update (UpdateConfig config) model (Msg msg) =
+update (UpdateConfig (SharedConfig sharedConfig) select) model msg =
     let
         ( newState, cmd, maybeMsg ) =
-            Internal.update config model msg
+            Internal.update
+                sharedConfig.id
+                sharedConfig.toLabel
+                select
+                (sharedConfig.entries model)
+                (sharedConfig.selection model)
+                (sharedConfig.state model)
+                msg
     in
-    ( State newState, cmd |> Cmd.map Msg, maybeMsg )
+    ( newState, cmd, maybeMsg )
 
 
 
@@ -439,6 +418,10 @@ update (UpdateConfig config) model (Msg msg) =
 {-| The dropdown's view function.
 -}
 view : ViewConfig a model -> model -> Html (Msg a)
-view (ViewConfig config) model =
-    Internal.view config model
-        |> Html.map Msg
+view (ViewConfig (SharedConfig sharedConfig) viewConfig) model =
+    Internal.view viewConfig
+        sharedConfig.id
+        sharedConfig.toLabel
+        (sharedConfig.entries model)
+        (sharedConfig.selection model)
+        (sharedConfig.state model)

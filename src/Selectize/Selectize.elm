@@ -5,7 +5,6 @@ module Selectize.Selectize
         , Movement(..)
         , Msg(..)
         , State
-        , UpdateConfig
         , ViewConfig
         , divider
         , empty
@@ -16,7 +15,6 @@ module Selectize.Selectize
         , previous
         , topAndHeight
         , update
-        , updateConfig
         , view
         , viewConfig
         )
@@ -83,37 +81,21 @@ empty =
 {- configuration -}
 
 
-type alias UpdateConfig a msg model =
-    SharedConfig a model { select : Maybe a -> msg }
-
-
-type alias ViewConfig a model =
-    SharedConfig a
-        model
-        { placeholder : String
-        , container : List (Html.Attribute Never)
-        , input : Bool -> Bool -> List (Html.Attribute Never)
-        , toggle : Bool -> Html Never
-        , menu : List (Html.Attribute Never)
-        , ul : List (Html.Attribute Never)
-        , entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-        }
+type alias ViewConfig a =
+    { placeholder : String
+    , container : List (Html.Attribute Never)
+    , input : Bool -> Bool -> List (Html.Attribute Never)
+    , toggle : Bool -> Html Never
+    , menu : List (Html.Attribute Never)
+    , ul : List (Html.Attribute Never)
+    , entry : a -> Bool -> Bool -> HtmlDetails Never
+    , divider : String -> HtmlDetails Never
+    }
 
 
 type alias HtmlDetails msg =
     { attributes : List (Html.Attribute msg)
     , children : List (Html msg)
-    }
-
-
-type alias SharedConfig a model rest =
-    { rest
-        | toLabel : a -> String
-        , state : model -> State a
-        , entries : model -> List (Entry a)
-        , selection : model -> Maybe a
-        , id : String
     }
 
 
@@ -132,32 +114,8 @@ divider title =
     Divider title
 
 
-updateConfig :
-    { toLabel : a -> String
-    , state : model -> State a
-    , entries : model -> List (Entry a)
-    , selection : model -> Maybe a
-    , id : String
-    , select : Maybe a -> msg
-    }
-    -> UpdateConfig a msg model
-updateConfig config =
-    { toLabel = config.toLabel
-    , state = config.state
-    , entries = config.entries
-    , selection = config.selection
-    , id = config.id
-    , select = config.select
-    }
-
-
 viewConfig :
-    { toLabel : a -> String
-    , state : model -> State a
-    , entries : model -> List (Entry a)
-    , selection : model -> Maybe a
-    , id : String
-    , placeholder : String
+    { placeholder : String
     , container : List (Html.Attribute Never)
     , input : Bool -> Bool -> List (Html.Attribute Never)
     , toggle : Bool -> Html Never
@@ -166,14 +124,9 @@ viewConfig :
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
     }
-    -> ViewConfig a model
+    -> ViewConfig a
 viewConfig config =
-    { toLabel = config.toLabel
-    , state = config.state
-    , entries = config.entries
-    , selection = config.selection
-    , id = config.id
-    , placeholder = config.placeholder
+    { placeholder = config.placeholder
     , container = config.container
     , input = config.input
     , toggle = config.toggle
@@ -213,18 +166,15 @@ type Movement
 
 
 update :
-    UpdateConfig a msg model
-    -> model
+    String
+    -> (a -> String)
+    -> (Maybe a -> msg)
+    -> List (Entry a)
+    -> Maybe a
+    -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update config model msg =
-    let
-        state =
-            config.state model
-
-        entries =
-            config.entries model
-    in
+update id toLabel select entries selection state msg =
     case msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
@@ -232,12 +182,12 @@ update config model msg =
         OpenMenu heights scrollTop ->
             let
                 keyboardFocus =
-                    case config.selection model of
+                    case selection of
                         Nothing ->
                             first entries
 
                         _ ->
-                            config.selection model
+                            selection
 
                 ( top, height ) =
                     topAndHeight heights.entries entries keyboardFocus
@@ -250,7 +200,7 @@ update config model msg =
                 , heights = Just heights
                 , scrollTop = scrollTop
               }
-            , scroll config.id (top - (heights.menu - height) / 2)
+            , scroll id (top - (heights.menu - height) / 2)
             , Nothing
             )
 
@@ -265,7 +215,7 @@ update config model msg =
 
         BlurTextfield ->
             ( state
-            , blur config.id
+            , blur id
             , Nothing
             )
 
@@ -280,13 +230,13 @@ update config model msg =
                 | query = newQuery
                 , keyboardFocus =
                     entries
-                        |> filter config.toLabel newQuery
+                        |> filter toLabel newQuery
                         |> first
                 , mouseFocus = Nothing
               }
                 |> resetHeights
-            , scroll config.id 0
-            , Just (config.select Nothing)
+            , scroll id 0
+            , Just (select Nothing)
             )
 
         SetMouseFocus focus ->
@@ -298,29 +248,29 @@ update config model msg =
         Select a ->
             ( state |> reset
             , Cmd.none
-            , Just (config.select (Just a))
+            , Just (select (Just a))
             )
 
         SetKeyboardFocus movement maybeHeights scrollTop ->
             let
                 filteredEntries =
-                    entries |> filter config.toLabel state.query
+                    entries |> filter toLabel state.query
             in
             state
                 |> updateHeights maybeHeights
-                |> updateKeyboardFocus config.select filteredEntries movement
-                |> scrollToKeyboardFocus config.id filteredEntries scrollTop
+                |> updateKeyboardFocus select filteredEntries movement
+                |> scrollToKeyboardFocus id filteredEntries scrollTop
 
         SelectKeyboardFocusAndBlur ->
             ( state |> reset
-            , blur config.id
-            , Just (config.select state.keyboardFocus)
+            , blur id
+            , Just (select state.keyboardFocus)
             )
 
         ClearSelection ->
             ( state
             , Cmd.none
-            , Just (config.select Nothing)
+            , Just (select Nothing)
             )
 
 
@@ -432,18 +382,19 @@ scrollToKeyboardFocus id filteredEntries scrollTop ( state, cmd, maybeMsg ) =
 {- view -}
 
 
-view : ViewConfig a model -> model -> Html (Msg a)
-view config model =
+view :
+    ViewConfig a
+    -> String
+    -> (a -> String)
+    -> List (Entry a)
+    -> Maybe a
+    -> State a
+    -> Html (Msg a)
+view config id toLabel entries selection state =
     let
-        state =
-            config.state model
-
-        selection =
-            config.selection model
-
         filteredEntries query =
-            config.entries model
-                |> filter config.toLabel query
+            entries
+                |> filter toLabel query
 
         -- attributes
         containerAttrs attrs =
@@ -452,11 +403,11 @@ view config model =
         inputAttrs attrs =
             [ [ Attributes.placeholder
                     (selection
-                        |> Maybe.map config.toLabel
+                        |> Maybe.map toLabel
                         |> Maybe.withDefault config.placeholder
                     )
               , Attributes.value state.query
-              , Attributes.id (textfieldId config.id)
+              , Attributes.id (textfieldId id)
               , Events.on "focus" focusDecoder
               ]
             , attrs
@@ -491,7 +442,7 @@ view config model =
         , flip Html.Lazy.lazy state.query <|
             \query ->
                 Html.div
-                    ([ Attributes.id (menuId config.id)
+                    ([ Attributes.id (menuId id)
                      , Events.onMouseDown (PreventClosing True)
                      , Events.onMouseUp (PreventClosing False)
                      ]
@@ -499,7 +450,7 @@ view config model =
                     )
                     [ filteredEntries query
                         |> List.map
-                            (viewEntry config.toLabel state.open config.entry config.divider state)
+                            (viewEntry toLabel state.open config.entry config.divider state)
                         |> Html.Keyed.ul (noOp config.ul)
                     ]
         , Html.div
