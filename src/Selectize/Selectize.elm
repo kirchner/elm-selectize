@@ -48,13 +48,15 @@ import Task
 
 type alias State a =
     { query : String
+    , filteredEntries : Maybe (List ( Entry a, Float ))
     , keyboardFocus : Maybe a
     , mouseFocus : Maybe a
     , preventBlur : Bool
     , open : Bool
 
     -- dom measurements
-    , heights : Maybe Heights
+    , entryHeights : List Float
+    , menuHeight : Float
     , scrollTop : Float
     }
 
@@ -68,11 +70,13 @@ type alias Heights =
 empty : State a
 empty =
     { query = ""
+    , filteredEntries = Nothing
     , keyboardFocus = Nothing
     , mouseFocus = Nothing
     , preventBlur = False
     , open = False
-    , heights = Nothing
+    , entryHeights = []
+    , menuHeight = 0
     , scrollTop = 0
     }
 
@@ -153,7 +157,7 @@ type Msg a
       -- handle focus and selection
     | SetMouseFocus (Maybe a)
     | Select a
-    | SetKeyboardFocus Movement (Maybe Heights) Float
+    | SetKeyboardFocus Movement Float
     | SelectKeyboardFocusAndBlur
     | ClearSelection
 
@@ -181,23 +185,28 @@ update id toLabel select entries selection state msg =
 
         OpenMenu heights scrollTop ->
             let
+                filteredEntries =
+                    zip entries heights.entries
+
                 keyboardFocus =
                     case selection of
                         Nothing ->
-                            first entries
+                            first filteredEntries
 
                         _ ->
                             selection
 
                 ( top, height ) =
-                    topAndHeight heights.entries entries keyboardFocus
+                    topAndHeight filteredEntries keyboardFocus
             in
             ( { state
-                | keyboardFocus = keyboardFocus
+                | filteredEntries = Just filteredEntries
+                , keyboardFocus = keyboardFocus
                 , mouseFocus = Nothing
                 , query = ""
                 , open = True
-                , heights = Just heights
+                , entryHeights = heights.entries
+                , menuHeight = heights.menu
                 , scrollTop = scrollTop
               }
             , scroll id (top - (heights.menu - height) / 2)
@@ -226,15 +235,17 @@ update id toLabel select entries selection state msg =
             )
 
         SetQuery newQuery ->
+            let
+                newFilteredEntries =
+                    zip entries state.entryHeights
+                        |> filter toLabel newQuery
+            in
             ( { state
                 | query = newQuery
-                , keyboardFocus =
-                    entries
-                        |> filter toLabel newQuery
-                        |> first
+                , filteredEntries = Just newFilteredEntries
+                , keyboardFocus = first newFilteredEntries
                 , mouseFocus = Nothing
               }
-                |> resetHeights
             , scroll id 0
             , Just (select Nothing)
             )
@@ -251,15 +262,18 @@ update id toLabel select entries selection state msg =
             , Just (select (Just a))
             )
 
-        SetKeyboardFocus movement maybeHeights scrollTop ->
-            let
-                filteredEntries =
-                    entries |> filter toLabel state.query
-            in
-            state
-                |> updateHeights maybeHeights
-                |> updateKeyboardFocus select filteredEntries movement
-                |> scrollToKeyboardFocus id filteredEntries scrollTop
+        SetKeyboardFocus movement scrollTop ->
+            case state.filteredEntries of
+                Nothing ->
+                    ( state
+                    , Cmd.none
+                    , Nothing
+                    )
+
+                Just filteredEntries ->
+                    state
+                        |> updateKeyboardFocus select filteredEntries movement
+                        |> scrollToKeyboardFocus id filteredEntries scrollTop
 
         SelectKeyboardFocusAndBlur ->
             ( state |> reset
@@ -278,38 +292,20 @@ type alias WithKeyboardFocus a r =
     { r | keyboardFocus : Maybe a }
 
 
-type alias WithHeights r =
-    { r | heights : Maybe Heights }
-
-
 reset : State a -> State a
 reset state =
     { state
         | query = ""
+        , filteredEntries = Nothing
         , open = False
         , mouseFocus = Nothing
         , keyboardFocus = Nothing
     }
 
 
-resetHeights : WithHeights r -> WithHeights r
-resetHeights state =
-    { state | heights = Nothing }
-
-
-updateHeights : Maybe Heights -> WithHeights r -> WithHeights r
-updateHeights maybeHeights state =
-    case maybeHeights of
-        Just newHeights ->
-            { state | heights = Just newHeights }
-
-        Nothing ->
-            state
-
-
 updateKeyboardFocus :
     (Maybe a -> msg)
-    -> List (Entry a)
+    -> List ( Entry a, Float )
     -> Movement
     -> WithKeyboardFocus a r
     -> ( WithKeyboardFocus a r, Cmd (Msg a), Maybe msg )
@@ -344,25 +340,25 @@ updateKeyboardFocus select filteredEntries movement state =
 
 scrollToKeyboardFocus :
     String
-    -> List (Entry a)
+    -> List ( Entry a, Float )
     -> Float
-    -> ( WithKeyboardFocus a (WithHeights r), Cmd (Msg a), Maybe msg )
-    -> ( WithKeyboardFocus a (WithHeights r), Cmd (Msg a), Maybe msg )
+    -> ( State a, Cmd (Msg a), Maybe msg )
+    -> ( State a, Cmd (Msg a), Maybe msg )
 scrollToKeyboardFocus id filteredEntries scrollTop ( state, cmd, maybeMsg ) =
     case state.keyboardFocus of
         Just focus ->
             let
-                heights =
-                    state.heights |> Maybe.withDefault { entries = [], menu = 0 }
-
                 ( top, entryHeight ) =
-                    topAndHeight heights.entries filteredEntries (Just focus)
+                    topAndHeight filteredEntries (Just focus)
 
                 y =
                     if (top - 2 * entryHeight / 3) < scrollTop then
                         top - 2 * entryHeight / 3
-                    else if top + 5 * entryHeight / 3 > (scrollTop + heights.menu) then
-                        top + 5 * entryHeight / 3 - heights.menu
+                    else if
+                        (top + 5 * entryHeight / 3)
+                            > (scrollTop + state.menuHeight)
+                    then
+                        top + 5 * entryHeight / 3 - state.menuHeight
                     else
                         scrollTop
             in
@@ -392,9 +388,10 @@ view :
     -> Html (Msg a)
 view config id toLabel entries selection state =
     let
-        filteredEntries query =
-            entries
-                |> filter toLabel query
+        actualEntries =
+            state.filteredEntries
+                |> Maybe.map (List.map Tuple.first)
+                |> Maybe.withDefault entries
 
         -- attributes
         containerAttrs attrs =
@@ -417,7 +414,7 @@ view config id toLabel entries selection state =
     in
     Html.div
         (containerAttrs <|
-            if state.open && not (filteredEntries state.query |> List.isEmpty) then
+            if state.open && not (actualEntries |> List.isEmpty) then
                 []
             else
                 [ Attributes.style [ ( "overflow", "hidden" ) ] ]
@@ -427,12 +424,7 @@ view config id toLabel entries selection state =
                 if state.open then
                     [ Events.onBlur CloseMenu
                     , Events.on "keyup" keyupDecoder
-                    , case state.heights of
-                        Nothing ->
-                            Events.onWithOptions "keydown" keydownOptions keydownDecoder
-
-                        Just _ ->
-                            Events.onWithOptions "keydown" keydownOptions keydownWithoutHeightsDecoder
+                    , Events.onWithOptions "keydown" keydownOptions keydownDecoder
                     , Events.onInput SetQuery
                     ]
                 else
@@ -448,9 +440,15 @@ view config id toLabel entries selection state =
                      ]
                         ++ noOp config.menu
                     )
-                    [ filteredEntries query
+                    [ actualEntries
                         |> List.map
-                            (viewEntry toLabel state.open config.entry config.divider state)
+                            (viewEntry
+                                toLabel
+                                state.open
+                                config.entry
+                                config.divider
+                                state
+                            )
                         |> Html.Keyed.ul (noOp config.ul)
                     ]
         , Html.div
@@ -487,41 +485,14 @@ keydownOptions =
 
 keydownDecoder : Decoder (Msg a)
 keydownDecoder =
-    Decode.map4
-        (\code entryHeights menuHeight scrollTop ->
-            case code |> fromCode of
-                ArrowUp ->
-                    Ok (SetKeyboardFocus Up (Just { entries = entryHeights, menu = menuHeight }) scrollTop)
-
-                ArrowDown ->
-                    Ok (SetKeyboardFocus Down (Just { entries = entryHeights, menu = menuHeight }) scrollTop)
-
-                Enter ->
-                    Ok SelectKeyboardFocusAndBlur
-
-                Escape ->
-                    Ok BlurTextfield
-
-                _ ->
-                    Err "not handling that key here"
-        )
-        Events.keyCode
-        entryHeightsDecoder
-        menuHeightDecoder
-        scrollTopDecoder
-        |> Decode.andThen fromResult
-
-
-keydownWithoutHeightsDecoder : Decoder (Msg a)
-keydownWithoutHeightsDecoder =
     Decode.map2
         (\code scrollTop ->
             case code |> fromCode of
                 ArrowUp ->
-                    Ok (SetKeyboardFocus Up Nothing scrollTop)
+                    Ok (SetKeyboardFocus Up scrollTop)
 
                 ArrowDown ->
-                    Ok (SetKeyboardFocus Down Nothing scrollTop)
+                    Ok (SetKeyboardFocus Down scrollTop)
 
                 Enter ->
                     Ok SelectKeyboardFocusAndBlur
@@ -610,10 +581,14 @@ viewEntry toLabel open renderEntry renderDivider state entry =
 {-| Return all entries which contain the given query. Return the whole
 list if the query equals `""`.
 -}
-filter : (a -> String) -> String -> List (Entry a) -> List (Entry a)
+filter :
+    (a -> String)
+    -> String
+    -> List ( Entry a, Float )
+    -> List ( Entry a, Float )
 filter toLabel query entries =
     let
-        containsQuery entry =
+        containsQuery ( entry, _ ) =
             case entry of
                 Entry entry ->
                     toLabel entry
@@ -628,13 +603,13 @@ filter toLabel query entries =
 
 {-| Return the first entry which is not a `Divider`
 -}
-first : List (Entry a) -> Maybe a
+first : List ( Entry a, Float ) -> Maybe a
 first entries =
     case entries of
         [] ->
             Nothing
 
-        entry :: rest ->
+        ( entry, _ ) :: rest ->
             case entry of
                 Entry entry ->
                     Just entry
@@ -646,7 +621,7 @@ first entries =
 {-| Return the entry after the given one, which is not a `Divider`.
 Returns the provided entry if there is no next.
 -}
-next : List (Entry a) -> a -> a
+next : List ( Entry a, Float ) -> a -> a
 next entries current =
     -- this is an adaption of the implementation in
     -- thebritican/elm-autocomplete
@@ -658,7 +633,7 @@ next entries current =
 {-| Return the entry before (i.e. above) the given one, which is not
 a `Divider`. Returns the provided entry if there is no previous.
 -}
-previous : List (Entry a) -> a -> a
+previous : List ( Entry a, Float ) -> a -> a
 previous entries current =
     -- this is an adaption of the implementation in
     -- thebritican/elm-autocomplete
@@ -667,8 +642,8 @@ previous entries current =
         |> Maybe.withDefault current
 
 
-getPrevious : a -> Entry a -> Maybe a -> Maybe a
-getPrevious current next result =
+getPrevious : a -> ( Entry a, Float ) -> Maybe a -> Maybe a
+getPrevious current ( next, _ ) result =
     case next of
         Entry nextA ->
             if nextA == current then
@@ -682,6 +657,21 @@ getPrevious current next result =
             result
 
 
+zip : List a -> List b -> List ( a, b )
+zip listA listB =
+    zipHelper listA listB [] |> List.reverse
+
+
+zipHelper : List a -> List b -> List ( a, b ) -> List ( a, b )
+zipHelper listA listB sum =
+    case ( listA, listB ) of
+        ( a :: restA, b :: restB ) ->
+            zipHelper restA restB (( a, b ) :: sum)
+
+        _ ->
+            sum
+
+
 
 {- view helper -}
 
@@ -689,30 +679,28 @@ getPrevious current next result =
 {-| Compute the distance of the entry to the beginning of the list and
 its height, as it is rendered in the DOM.
 -}
-topAndHeight : List Float -> List (Entry a) -> Maybe a -> ( Float, Float )
-topAndHeight entryHeights filteredEntries focus =
+topAndHeight : List ( Entry a, Float ) -> Maybe a -> ( Float, Float )
+topAndHeight filteredEntries focus =
     case focus of
         Just a ->
-            topAndHeightHelper entryHeights filteredEntries a ( 0, 0 )
+            topAndHeightHelper filteredEntries a ( 0, 0 )
 
         Nothing ->
             ( 0, 0 )
 
 
 topAndHeightHelper :
-    List Float
-    -> List (Entry a)
+    List ( Entry a, Float )
     -> a
     -> ( Float, Float )
     -> ( Float, Float )
-topAndHeightHelper entryHeights filteredEntries focus ( distance, height ) =
-    case ( entryHeights, filteredEntries ) of
-        ( height :: otherHeights, entry :: otherEntries ) ->
+topAndHeightHelper filteredEntries focus ( distance, height ) =
+    case filteredEntries of
+        ( entry, height ) :: otherEntries ->
             if entry == Entry focus then
                 ( distance, height )
             else
                 topAndHeightHelper
-                    otherHeights
                     otherEntries
                     focus
                     ( distance + height, 0 )
