@@ -7,6 +7,17 @@ import Selectize.Selectize exposing (..)
 import Test exposing (..)
 
 
+suite : Test
+suite =
+    describe "unit tests"
+        [ testFilter
+        , testFirst
+        , testNext
+        , testPrevious
+        , testTopAndHeight
+        ]
+
+
 testFilter : Test
 testFilter =
     let

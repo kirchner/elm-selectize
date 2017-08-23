@@ -9,6 +9,13 @@ import Selectize.Selectize as S
 import Test exposing (..)
 
 
+suite : Test
+suite =
+    describe "architecture tests"
+        [ testUpdate ]
+
+
+
 {- actual tests -}
 
 

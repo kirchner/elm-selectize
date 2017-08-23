@@ -7,7 +7,7 @@ let
   elm-repl = pkgs.elmPackages.elm-repl;
 
   nodePackages = (import node-packages/composition-v6.nix {});
-  elm-test = nodePackages.elm-test;
+  elm-live = nodePackages.elm-live;
 
 in
 
@@ -16,12 +16,13 @@ pkgs.stdenv.mkDerivation {
   name = "elm-env";
 
   buildInputs = [
-    elm-make elm-package elm-repl elm-test
+    elm-make elm-package elm-repl elm-live
   ];
 
   shellHook = ''
-    elm-test --watch
-    exit
+    cd tests
+    elm-package install
+    elm-live TestRunner.elm
   '';
 
 }

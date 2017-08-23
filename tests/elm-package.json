@@ -10,6 +10,7 @@
     ],
     "exposed-modules": [],
     "dependencies": {
+        "elm-community/html-test-runner": "1.0.6 <= v < 2.0.0",
         "NoRedInk/elm-decode-pipeline": "3.0.0 <= v < 4.0.0",
         "debois/elm-dom": "1.2.3 <= v < 2.0.0",
         "eeue56/elm-html-test": "4.1.0 <= v < 5.0.0",

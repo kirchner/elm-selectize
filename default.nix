@@ -28,6 +28,7 @@ pkgs.stdenv.mkDerivation {
   ];
 
   shellHook = ''
+    elm-package install
     elm-live demo/Demo.elm \
         --dir=gh-pages \
         --output=gh-pages/elm.js \
