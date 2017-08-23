@@ -8,7 +8,23 @@ This is a customizable dropdown menu with the following features:
   scroll`
 * you can insert non-selectable dividers between entries
 
-Check out the [demo](https://kirchner.github.io/elm-selectize) or run it locally by executing `./elm-live.sh`
+Check out the [demo](https://kirchner.github.io/elm-selectize) or run it
+locally by executing `./elm-live.sh`
 
 The list of menu entries and the actual selection live in your model.  The
 styling and rendering of the entries can be fully customized.
+
+
+## Nix Support
+
+If you are using [NixOS](https://nixos.org/) you run the demo locally via
+
+```
+$ nix-shell
+```
+
+You can run the test suite with
+
+```
+$ nix-shell test.nix
+```
