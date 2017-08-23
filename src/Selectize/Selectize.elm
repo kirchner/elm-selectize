@@ -55,7 +55,8 @@ type alias State a =
     , filteredEntries : Maybe (List (Entry a))
     , mouseFocus : Maybe a
     , preventBlur : Bool
-    , open : Bool
+    , open :
+        Bool
 
     -- dom measurements
     , entryHeights : List Float
@@ -728,14 +729,12 @@ fromList : List (Entry a) -> List Float -> Maybe (ZipList a)
 fromList entries entryHeights =
     case ( entries, entryHeights ) of
         ( firstEntry :: restEntries, firstHeight :: restHeights ) ->
-            Just
-                ({ front = []
-                 , current = ( firstEntry, firstHeight )
-                 , back = zip restEntries restHeights
-                 , currentTop = 0
-                 }
-                    |> zipFirst
-                )
+            { front = []
+            , current = ( firstEntry, firstHeight )
+            , back = zip restEntries restHeights
+            , currentTop = 0
+            }
+                |> zipFirst
 
         _ ->
             Nothing
@@ -762,26 +761,24 @@ fromListWithFilter keep entries entryHeights =
     in
     case filtered of
         first :: rest ->
-            Just
-                ({ front = []
-                 , current = first
-                 , back = rest
-                 , currentTop = 0
-                 }
-                    |> zipFirst
-                )
+            { front = []
+            , current = first
+            , back = rest
+            , currentTop = 0
+            }
+                |> zipFirst
 
         _ ->
             Nothing
 
 
-zipFirst : ZipList a -> ZipList a
+zipFirst : ZipList a -> Maybe (ZipList a)
 zipFirst zipList =
     case zipList.current of
         ( Divider _, _ ) ->
             case zipList.back of
                 [] ->
-                    zipList
+                    Nothing
 
                 next :: rest ->
                     zipFirst
@@ -794,16 +791,16 @@ zipFirst zipList =
                         }
 
         _ ->
-            zipList
+            Just zipList
 
 
-zipReverseFirst : ZipList a -> ZipList a
+zipReverseFirst : ZipList a -> Maybe (ZipList a)
 zipReverseFirst zipList =
     case zipList.current of
         ( Divider _, _ ) ->
             case zipList.front of
                 [] ->
-                    zipList
+                    Nothing
 
                 previous :: rest ->
                     zipReverseFirst
@@ -816,7 +813,7 @@ zipReverseFirst zipList =
                         }
 
         _ ->
-            zipList
+            Just zipList
 
 
 zipNext : ZipList a -> ZipList a
@@ -826,14 +823,15 @@ zipNext zipList =
             zipList
 
         next :: rest ->
-            zipFirst
-                { front = zipList.current :: zipList.front
-                , current = next
-                , back = rest
-                , currentTop =
-                    zipList.currentTop
-                        + Tuple.second zipList.current
-                }
+            { front = zipList.current :: zipList.front
+            , current = next
+            , back = rest
+            , currentTop =
+                zipList.currentTop
+                    + Tuple.second zipList.current
+            }
+                |> zipFirst
+                |> Maybe.withDefault zipList
 
 
 zipPrevious : ZipList a -> ZipList a
@@ -843,14 +841,15 @@ zipPrevious zipList =
             zipList
 
         previous :: rest ->
-            zipReverseFirst
-                { front = rest
-                , current = previous
-                , back = zipList.current :: zipList.back
-                , currentTop =
-                    zipList.currentTop
-                        - Tuple.second zipList.current
-                }
+            { front = rest
+            , current = previous
+            , back = zipList.current :: zipList.back
+            , currentTop =
+                zipList.currentTop
+                    - Tuple.second zipList.current
+            }
+                |> zipReverseFirst
+                |> Maybe.withDefault zipList
 
 
 moveForwardTo : a -> ZipList a -> ZipList a

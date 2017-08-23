@@ -56,19 +56,24 @@ testUpdate =
                 finalModel.menu
                     |> Expect.all
                         [ .mouseFocus >> expectMember
-                        , .keyboardFocus >> expectMember
+                        , .zipList >> Maybe.map S.currentEntry >> expectMember
                         ]
         , msgTest "First possible entry is keyboardFocused after query change"
             app
             setQuery
           <|
             \_ _ _ _ finalModel ->
-                finalModel.menu.keyboardFocus
-                    |> Expect.equal
-                        (trees
-                            |> S.filter identity finalModel.menu.query
-                            |> S.first
-                        )
+                if finalModel.menu.open then
+                    finalModel.menu.zipList
+                        |> Maybe.map S.currentEntry
+                        |> Maybe.map S.entry
+                        |> Expect.equal
+                            (treesWithoutDivider
+                                |> S.filter identity finalModel.menu.query
+                                |> List.head
+                            )
+                else
+                    Expect.pass
         , msgTest "model is unchanged after clear selection"
             app
             clearSelection
@@ -88,7 +93,8 @@ expectReset menu =
     menu
         |> Expect.all
             [ .query >> Expect.equal ""
-            , .keyboardFocus >> Expect.equal Nothing
+            , .zipList >> Expect.equal Nothing
+            , .filteredEntries >> Expect.equal Nothing
             , .mouseFocus >> Expect.equal Nothing
             , .open >> Expect.false "Expected the menu to be closed"
             ]
@@ -134,21 +140,9 @@ update : S.Msg String -> Model -> Model
 update msg model =
     let
         ( newMenu, _, _ ) =
-            S.update updateConfig model msg
+            S.update "menu" identity (\_ -> ()) trees model.selection model.menu msg
     in
     { model | menu = newMenu }
-
-
-updateConfig : S.UpdateConfig String () Model
-updateConfig =
-    S.updateConfig
-        { toLabel = identity
-        , state = .menu
-        , entries = \_ -> trees
-        , selection = .selection
-        , id = "menu"
-        , select = \_ -> ()
-        }
 
 
 
@@ -222,14 +216,8 @@ select =
 
 setKeyboardFocus : Fuzzer (S.Msg String)
 setKeyboardFocus =
-    Fuzz.map3 S.SetKeyboardFocus
+    Fuzz.map2 S.SetKeyboardFocus
         movement
-        (Fuzz.map2
-            S.Heights
-            (listCount (Fuzz.intRange 0 42 |> Fuzz.map toFloat) (List.length trees))
-            (Fuzz.intRange 0 100 |> Fuzz.map toFloat)
-            |> Fuzz.maybe
-        )
         (Fuzz.intRange 0 1000 |> Fuzz.map toFloat)
 
 
@@ -275,6 +263,14 @@ trees =
         [ [ S.divider "First Part" ]
         , treesPart1 |> List.map S.entry
         , [ S.divider "Second Part" ]
+        , treesPart2 |> List.map S.entry
+        ]
+
+
+treesWithoutDivider : List (S.Entry String)
+treesWithoutDivider =
+    List.concat
+        [ treesPart1 |> List.map S.entry
         , treesPart2 |> List.map S.entry
         ]
 
