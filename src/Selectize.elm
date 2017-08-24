@@ -3,14 +3,17 @@ module Selectize
         ( Entry
         , HtmlDetails
         , Msg
+        , Selector
         , SharedConfig
         , State
         , UpdateConfig
         , ViewConfig
+        , button
         , divider
         , empty
         , entry
         , sharedConfig
+        , textfield
         , update
         , updateConfig
         , view
@@ -181,7 +184,7 @@ with the view configuration given by
 
 # View
 
-@docs view, HtmlDetails
+@docs view, HtmlDetails, Selector, button, textfield
 
 -}
 
@@ -194,8 +197,8 @@ import Selectize.Selectize as Internal
 
 {-| The internal state of the dropdown menu. This lives in your model.
 -}
-type alias State a
-    = Internal.State a
+type alias State a =
+    Internal.State a
 
 
 {-| The initial dropdown state.
@@ -208,8 +211,8 @@ empty =
 {-| Each entry of the menu has to be wrapped in this type. C.f. `entry`
 and `divider`.
 -}
-type alias Entry a
-    = Internal.Entry a
+type alias Entry a =
+    Internal.Entry a
 
 
 {-| Create a selectable `Entry a`.
@@ -349,7 +352,6 @@ viewConfig :
     ->
         { placeholder : String
         , container : List (Html.Attribute Never)
-        , input : Bool -> Bool -> List (Html.Attribute Never)
         , toggle : Bool -> Html Never
         , menu : List (Html.Attribute Never)
         , ul : List (Html.Attribute Never)
@@ -361,7 +363,6 @@ viewConfig sharedConfig config =
     ViewConfig sharedConfig
         { placeholder = config.placeholder
         , container = config.container
-        , input = config.input
         , toggle = config.toggle
         , menu = config.menu
         , ul = config.ul
@@ -384,8 +385,8 @@ type alias HtmlDetails msg =
 
 {-| The dropdown menu produces these messages.
 -}
-type alias Msg a
-    = Internal.Msg a
+type alias Msg a =
+    Internal.Msg a
 
 
 {-| The dropdown's update function. C.f. the modul documentation to see
@@ -417,11 +418,29 @@ update (UpdateConfig (SharedConfig sharedConfig) select) model msg =
 
 {-| The dropdown's view function.
 -}
-view : ViewConfig a model -> model -> Html (Msg a)
-view (ViewConfig (SharedConfig sharedConfig) viewConfig) model =
+view : ViewConfig a model -> Selector a -> model -> Html (Msg a)
+view (ViewConfig (SharedConfig sharedConfig) viewConfig) selector model =
     Internal.view viewConfig
+        selector
         sharedConfig.id
         sharedConfig.toLabel
         (sharedConfig.entries model)
         (sharedConfig.selection model)
         (sharedConfig.state model)
+
+
+{-| -}
+type alias Selector a =
+    Internal.Selector a
+
+
+{-| -}
+button : (Bool -> Bool -> List (Html.Attribute Never)) -> Selector a
+button input =
+    Internal.viewButton input
+
+
+{-| -}
+textfield : (Bool -> Bool -> List (Html.Attribute Never)) -> Selector a
+textfield input =
+    Internal.viewTextfield input

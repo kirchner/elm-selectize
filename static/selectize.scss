@@ -4,6 +4,50 @@
     height: 36px;
   }
 
+  &__button {
+    border: 1px solid #d0d0d0;
+    padding: 6px 8px;
+    padding-right: 24px;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    cursor: pointer;
+
+    color: #303030;
+    background-color: #ffffff;
+
+    text-align: left;
+
+    font-family: "Source Sans Pro","Helvetica Neue",Arial,sans-serif;
+    font-size: 15px;
+    line-height: 21px;
+    -webkit-font-smoothing: inherit;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.1);
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+
+    &:focus {
+      outline: none !important;
+      border-color: #66afe9;
+    }
+
+    &--no-selection {
+      color: #808080;
+    }
+
+    &--menu-open {
+      cursor: auto;
+    }
+  }
+
   &__textfield {
     border: 1px solid #d0d0d0;
     padding: 6px 8px;

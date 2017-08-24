@@ -24,14 +24,16 @@ main =
 
 type alias Model =
     { selection : Maybe String
-    , menu : Selectize.State String
+    , textfieldMenu : Selectize.State String
+    , buttonMenu : Selectize.State String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
     ( { selection = Nothing
-      , menu = Selectize.empty
+      , textfieldMenu = Selectize.empty
+      , buttonMenu = Selectize.empty
       }
     , Cmd.none
     )
@@ -42,23 +44,49 @@ init =
 
 
 type Msg
-    = MenuMsg (Selectize.Msg String)
+    = TextfieldMenuMsg (Selectize.Msg String)
+    | ButtonMenuMsg (Selectize.Msg String)
     | SelectLicense (Maybe String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        MenuMsg selectizeMsg ->
+        TextfieldMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update updateConfig model selectizeMsg
+                    Selectize.update
+                        (updateConfig .textfieldMenu "textfield-menu")
+                        model
+                        selectizeMsg
 
                 newModel =
-                    { model | menu = newMenu }
+                    { model | textfieldMenu = newMenu }
 
                 cmd =
-                    menuCmd |> Cmd.map MenuMsg
+                    menuCmd |> Cmd.map TextfieldMenuMsg
+            in
+            case maybeMsg of
+                Just nextMsg ->
+                    update nextMsg newModel
+                        |> andDo cmd
+
+                Nothing ->
+                    ( newModel, cmd )
+
+        ButtonMenuMsg selectizeMsg ->
+            let
+                ( newMenu, menuCmd, maybeMsg ) =
+                    Selectize.update
+                        (updateConfig .buttonMenu "button-menu")
+                        model
+                        selectizeMsg
+
+                newModel =
+                    { model | buttonMenu = newMenu }
+
+                cmd =
+                    menuCmd |> Cmd.map ButtonMenuMsg
             in
             case maybeMsg of
                 Just nextMsg ->
@@ -79,38 +107,64 @@ andDo cmd ( model, cmds ) =
     )
 
 
-sharedConfig : Selectize.SharedConfig String Model
-sharedConfig =
+sharedConfig :
+    (Model -> Selectize.State String)
+    -> String
+    -> Selectize.SharedConfig String Model
+sharedConfig state id =
     Selectize.sharedConfig
         { toLabel = toLabel
-        , state = .menu
+        , state = state
         , entries = \_ -> licenses
         , selection = .selection
-        , id = "license-menu"
+        , id = id
         }
 
 
-updateConfig : Selectize.UpdateConfig String Msg Model
-updateConfig =
-    Selectize.updateConfig sharedConfig
+updateConfig :
+    (Model -> Selectize.State String)
+    -> String
+    -> Selectize.UpdateConfig String Msg Model
+updateConfig state id =
+    Selectize.updateConfig (sharedConfig state id)
         { select = SelectLicense }
 
 
-viewConfig : Selectize.ViewConfig String Model
-viewConfig =
-    Selectize.viewConfig sharedConfig
+textfieldSelector : Selectize.Selector String
+textfieldSelector =
+    Selectize.textfield <|
+        \sthSelected open ->
+            [ Attributes.class "selectize__textfield"
+            , Attributes.classList
+                [ ( "selectize__textfield--selection", sthSelected )
+                , ( "selectize__textfield--no-selection", not sthSelected )
+                , ( "selectize__textfield--menu-open", open )
+                ]
+            ]
+
+
+buttonSelector : Selectize.Selector String
+buttonSelector =
+    Selectize.button <|
+        \sthSelected open ->
+            [ Attributes.class "selectize__button"
+            , Attributes.classList
+                [ ( "selectize__button--selection", sthSelected )
+                , ( "selectize__button--no-selection", not sthSelected )
+                , ( "selectize__button--menu-open", open )
+                ]
+            ]
+
+
+viewConfig :
+    (Model -> Selectize.State String)
+    -> String
+    -> Selectize.ViewConfig String Model
+viewConfig state id =
+    Selectize.viewConfig (sharedConfig state id)
         { placeholder = "Select a License"
         , container =
             [ Attributes.class "selectize__container" ]
-        , input =
-            \sthSelected open ->
-                [ Attributes.class "selectize__textfield"
-                , Attributes.classList
-                    [ ( "selectize__textfield--selection", sthSelected )
-                    , ( "selectize__textfield--no-selection", not sthSelected )
-                    , ( "selectize__textfield--menu-open", open )
-                    ]
-                ]
         , toggle =
             \open ->
                 Html.div
@@ -177,7 +231,15 @@ view model =
         [ Attributes.style
             [ ( "width", "40rem" ) ]
         ]
-        [ Selectize.view viewConfig model |> Html.map MenuMsg ]
+        [ Selectize.view (viewConfig .textfieldMenu "textfield-menu")
+            textfieldSelector
+            model
+            |> Html.map TextfieldMenuMsg
+        , Selectize.view (viewConfig .buttonMenu "button-menu")
+            buttonSelector
+            model
+            |> Html.map ButtonMenuMsg
+        ]
 
 
 

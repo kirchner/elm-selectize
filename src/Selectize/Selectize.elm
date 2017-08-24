@@ -4,6 +4,7 @@ module Selectize.Selectize
         , Heights
         , Movement(..)
         , Msg(..)
+        , Selector
         , State
         , ViewConfig
         , ZipList
@@ -16,7 +17,9 @@ module Selectize.Selectize
         , moveForwardTo
         , update
         , view
+        , viewButton
         , viewConfig
+        , viewTextfield
         , zipCurrentHeight
         , zipCurrentScrollTop
         , zipNext
@@ -92,7 +95,6 @@ empty =
 type alias ViewConfig a =
     { placeholder : String
     , container : List (Html.Attribute Never)
-    , input : Bool -> Bool -> List (Html.Attribute Never)
     , toggle : Bool -> Html Never
     , menu : List (Html.Attribute Never)
     , ul : List (Html.Attribute Never)
@@ -125,7 +127,6 @@ divider title =
 viewConfig :
     { placeholder : String
     , container : List (Html.Attribute Never)
-    , input : Bool -> Bool -> List (Html.Attribute Never)
     , toggle : Bool -> Html Never
     , menu : List (Html.Attribute Never)
     , ul : List (Html.Attribute Never)
@@ -136,7 +137,6 @@ viewConfig :
 viewConfig config =
     { placeholder = config.placeholder
     , container = config.container
-    , input = config.input
     , toggle = config.toggle
     , menu = config.menu
     , ul = config.ul
@@ -386,13 +386,14 @@ scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
 
 view :
     ViewConfig a
+    -> Selector a
     -> String
     -> (a -> String)
     -> List (Entry a)
     -> Maybe a
     -> State a
     -> Html (Msg a)
-view config id toLabel entries selection state =
+view config selector id toLabel entries selection state =
     let
         actualEntries =
             state.filteredEntries
@@ -405,20 +406,10 @@ view config id toLabel entries selection state =
         containerAttrs attrs =
             attrs ++ noOp config.container
 
-        inputAttrs attrs =
-            [ [ Attributes.placeholder
-                    (selection
-                        |> Maybe.map toLabel
-                        |> Maybe.withDefault config.placeholder
-                    )
-              , Attributes.value state.query
-              , Attributes.id (textfieldId id)
-              , Events.on "focus" focusDecoder
-              ]
-            , attrs
-            , noOp (config.input (selection /= Nothing) state.open)
-            ]
-                |> List.concat
+        text =
+            selection
+                |> Maybe.map toLabel
+                |> Maybe.withDefault config.placeholder
     in
     Html.div
         (containerAttrs <|
@@ -427,18 +418,12 @@ view config id toLabel entries selection state =
             else
                 [ Attributes.style [ ( "overflow", "hidden" ) ] ]
         )
-        [ Html.input
-            (inputAttrs <|
-                if state.open then
-                    [ Events.onBlur CloseMenu
-                    , Events.on "keyup" keyupDecoder
-                    , Events.onWithOptions "keydown" keydownOptions keydownDecoder
-                    , Events.onInput SetQuery
-                    ]
-                else
-                    []
-            )
-            []
+        [ selector
+            id
+            text
+            state.query
+            (selection /= Nothing)
+            state.open
         , Html.div
             ([ Attributes.id (menuId id)
              , Events.onMouseDown (PreventClosing True)
@@ -470,6 +455,82 @@ view config id toLabel entries selection state =
             ]
             [ config.toggle state.open |> mapToNoOp ]
         ]
+
+
+type alias Selector a =
+    String
+    -> String
+    -> String
+    -> Bool
+    -> Bool
+    -> Html (Msg a)
+
+
+viewButton :
+    (Bool -> Bool -> List (Html.Attribute Never))
+    -> String
+    -> String
+    -> String
+    -> Bool
+    -> Bool
+    -> Html (Msg a)
+viewButton attrs id text _ selected open =
+    let
+        inputAttrs attrs_ =
+            [ [ Attributes.id (textfieldId id)
+              , Events.on "focus" focusDecoder
+              ]
+            , attrs_
+            , noOp (attrs selected open)
+            ]
+                |> List.concat
+    in
+    Html.button
+        (inputAttrs <|
+            if open then
+                [ Events.onBlur CloseMenu
+                , Events.on "keyup" keyupDecoder
+                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                ]
+            else
+                []
+        )
+        [ Html.text text ]
+
+
+viewTextfield :
+    (Bool -> Bool -> List (Html.Attribute Never))
+    -> String
+    -> String
+    -> String
+    -> Bool
+    -> Bool
+    -> Html (Msg a)
+viewTextfield attrs id text query selected open =
+    let
+        inputAttrs attrs_ =
+            [ [ Attributes.placeholder text
+              , Attributes.value query
+              , Attributes.id (textfieldId id)
+              , Events.on "focus" focusDecoder
+              ]
+            , attrs_
+            , noOp (attrs selected open)
+            ]
+                |> List.concat
+    in
+    Html.input
+        (inputAttrs <|
+            if open then
+                [ Events.onBlur CloseMenu
+                , Events.on "keyup" keyupDecoder
+                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                , Events.onInput SetQuery
+                ]
+            else
+                []
+        )
+        []
 
 
 focusDecoder : Decoder (Msg a)
