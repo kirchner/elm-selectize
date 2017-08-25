@@ -4,18 +4,14 @@ module Selectize
         , HtmlDetails
         , Msg
         , Selector
-        , SharedConfig
         , State
-        , UpdateConfig
         , ViewConfig
         , button
+        , closed
         , divider
-        , empty
         , entry
-        , sharedConfig
         , textfield
         , update
-        , updateConfig
         , view
         , viewConfig
         )
@@ -42,6 +38,18 @@ If you want to use it, your model should look something like this
         , latinName : String
         }
 
+The state of the dropdown menu is instanciated via
+
+    menu =
+        Selectize.closed "unique-menu-id"
+            (\tree -> tree.name ++ " - " ++ tree.latinName)
+            trees
+            Nothing
+
+with
+
+    trees : List Tree
+
 And you have to hook it up in your update function like so
 
     type Msg
@@ -54,7 +62,7 @@ And you have to hook it up in your update function like so
             MenuMsg selectizeMsg ->
                 let
                     ( newMenu, menuCmd, maybeMsg ) =
-                        Selectize.update updateConfig model selectizeMsg
+                        Selectize.update SelectTree model.menu selectizeMsg
 
                     newModel =
                         { model | menu = newMenu }
@@ -79,47 +87,23 @@ And you have to hook it up in your update function like so
         , Cmd.batch [ cmd, cmds ]
         )
 
-where the update configuration is given by
-
-    updateConfig : Selectize.UpdateConfig String Msg Model
-    updateConfig =
-        Selectize.updateConfig sharedConfig
-            { select = SelectTree }
-
-    sharedConfig : Selectize.SharedConfig String Model
-    sharedConfig =
-        Selectize.sharedConfig
-            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
-            , state = \model -> model.menu
-            , entries = \model -> model.entries
-            , selection = \model -> model.selection
-            , id = "tree-menu"
-            }
-
 Finally, the menu can be rendered like this
 
     view : Model -> Html Msg
     view model =
         Html.div []
-            [ Selectize.view viewConfig model |> Html.map MenuMsg ]
+            [ Selectize.view viewConfig selector model.menu
+                |> Html.map MenuMsg
+            ]
 
 with the view configuration given by
 
     viewConfig : Selectize.ViewConfig String Model
     viewConfig =
-        Selectize.viewConfig sharedConfig
+        Selectize.viewConfig
             { placeholder = "Select a Tree"
             , container =
                 [ Attributes.class "selectize__container" ]
-            , input =
-                \sthSelected open ->
-                    [ Attributes.class "selectize__textfield"
-                    , Attributes.classList
-                        [ ( "selectize__textfield--selection", sthSelected )
-                        , ( "selectize__textfield--no-selection", not sthSelected )
-                        , ( "selectize__textfield--menu-open", open )
-                        ]
-                    ]
             , toggle =
                 \open ->
                     Html.div
@@ -166,15 +150,25 @@ with the view configuration given by
                     }
             }
 
+and a selector given by, for example,
+
+    selector : Selectize.selector Tree
+    selector =
+        Selectize.textfield <|
+            input =
+                \sthSelected open ->
+                    [ Attributes.class "selectize__textfield"
+                    , Attributes.classList
+                        [ ( "selectize__textfield--selection", sthSelected )
+                        , ( "selectize__textfield--no-selection", not sthSelected )
+                        , ( "selectize__textfield--menu-open", open )
+                        ]
+                    ]
+
 
 # Types
 
-@docs State, empty, Entry, entry, divider
-
-
-# Configuration
-
-@docs SharedConfig, sharedConfig, UpdateConfig, updateConfig, ViewConfig, viewConfig
+@docs State, closed, Entry, entry, divider
 
 
 # Update
@@ -184,7 +178,7 @@ with the view configuration given by
 
 # View
 
-@docs view, HtmlDetails, Selector, button, textfield
+@docs view, ViewConfig, viewConfig, HtmlDetails, Selector, button, textfield
 
 -}
 
@@ -201,15 +195,24 @@ type alias State a =
     Internal.State a
 
 
-{-| The initial dropdown state.
+{-| Use this function to initialize your dropdown menu. It will have
+the provided entries, possibly a pre-selection and be closed. The
+provided id should be unique. If for some reason the entries change,
+just reinstantiate your dropdown state with this function.
 -}
-empty : State a
-empty =
-    Internal.empty
+closed :
+    String
+    -> (a -> String)
+    -> List (Entry a)
+    -> Maybe a
+    -> State a
+closed id toLabel entries initialSelection =
+    Internal.closed id toLabel entries initialSelection
 
 
-{-| Each entry of the menu has to be wrapped in this type. C.f. `entry`
-and `divider`.
+{-| Each entry of the menu has to be wrapped in this type. We need this,
+as an entry can either be selectable (and therefore also focusable) or
+not. You can construct these using `entry` and `divider`.
 -}
 type alias Entry a =
     Internal.Entry a
@@ -222,8 +225,8 @@ entry a =
     Internal.entry a
 
 
-{-| Create a divider, which cannot be selected and which is skipped
-while traversing the list via arrow up/down keys.
+{-| Create a divider, which cannot neither be selected or get focus. It
+is therefore skipped while traversing the list via arrow up/down keys.
 -}
 divider : String -> Entry a
 divider title =
@@ -234,95 +237,19 @@ divider title =
 {- configuration -}
 
 
-{-| The part of the configuration which is shared by `update` and `view`.
--}
-type SharedConfig a model
-    = SharedConfig
-        { toLabel : a -> String
-        , state : model -> State a
-        , entries : model -> List (Entry a)
-        , selection : model -> Maybe a
-        , id : String
-        }
-
-
-{-| Create the shared configuration, for example
-
-    sharedConfig : Selectize.SharedConfig String Model
-    sharedConfig =
-        Selectize.sharedConfig
-            { toLabel = \tree -> tree.name ++ "(" ++ tree.latinName ++ ")"
-            , state = .menu
-            , entries = .entries
-            , selection = .selection
-            , id = "tree-menu"
-            }
-
-  - `toLabel` should return a unique string representation of `a`.
-  - tell the dropdown with `state`, `entries` and `selection` how to
-    obtain each of them from the model
-  - `id` should be a unique CSS-id for the dropdown (we need this to
-    handle focus and blur events correctly)
-
--}
-sharedConfig :
-    { toLabel : a -> String
-    , state : model -> State a
-    , entries : model -> List (Entry a)
-    , selection : model -> Maybe a
-    , id : String
-    }
-    -> SharedConfig a model
-sharedConfig config =
-    SharedConfig
-        { toLabel = config.toLabel
-        , state = config.state
-        , entries = config.entries
-        , selection = config.selection
-        , id = config.id
-        }
-
-
-{-| The configuration for `Selectize.update`.
--}
-type UpdateConfig a msg model
-    = UpdateConfig (SharedConfig a model) (Maybe a -> msg)
-
-
-{-| Create the update configuration, for example
-
-    updateConfig : Selectize.UpdateConfig String Msg Model
-    updateConfig =
-        Selectize.updateConfig sharedConfig
-            { select = SelectTree }
-
-  - tell the dropdown with `select` how we can ask the main application to
-    change the selection
-
--}
-updateConfig :
-    SharedConfig a model
-    -> { select : Maybe a -> msg }
-    -> UpdateConfig a msg model
-updateConfig sharedConfig config =
-    UpdateConfig sharedConfig config.select
-
-
 {-| The configuration for `Selectize.view`.
 -}
 type ViewConfig a model
-    = ViewConfig (SharedConfig a model) (Internal.ViewConfig a)
+    = ViewConfig (Internal.ViewConfig a)
 
 
 {-| Create the view configuration, for example
 
     viewConfig : Selectize.ViewConfig String Model
     viewConfig =
-        Selectize.viewConfig sharedConfig
+        Selectize.viewConfig
             { placeholder = "Select a Tree"
             , container = [ ... ]
-            , input =
-                \sthSelected open -> [ ... ]
             , toggle =
                 \open ->
                     Html.div
@@ -342,25 +269,23 @@ type ViewConfig a model
             }
 
   - tell us the `placeholder` if the selection is empty
-  - `container`, `input`, `toggle`, `menu`, `ul`, `entry` and `divider`
-    can be used to style the different parts of the dropdown view, c.f.
-    the modul documentation for an example.
+  - `container`, `toggle`, `menu`, `ul`, `entry` and `divider` can be
+    used to style the different parts of the dropdown view, c.f. the
+    modul documentation for an example.
 
 -}
 viewConfig :
-    SharedConfig a model
-    ->
-        { placeholder : String
-        , container : List (Html.Attribute Never)
-        , toggle : Bool -> Html Never
-        , menu : List (Html.Attribute Never)
-        , ul : List (Html.Attribute Never)
-        , entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-        }
+    { placeholder : String
+    , container : List (Html.Attribute Never)
+    , toggle : Bool -> Html Never
+    , menu : List (Html.Attribute Never)
+    , ul : List (Html.Attribute Never)
+    , entry : a -> Bool -> Bool -> HtmlDetails Never
+    , divider : String -> HtmlDetails Never
+    }
     -> ViewConfig a model
-viewConfig sharedConfig config =
-    ViewConfig sharedConfig
+viewConfig config =
+    ViewConfig
         { placeholder = config.placeholder
         , container = config.container
         , toggle = config.toggle
@@ -389,27 +314,16 @@ type alias Msg a =
     Internal.Msg a
 
 
-{-| The dropdown's update function. C.f. the modul documentation to see
+{-| The dropdown's update function. C.f. the module documentation to see
 what boilerplate is needed in your main update.
 -}
 update :
-    UpdateConfig a msg model
-    -> model
+    (Maybe a -> msg)
+    -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update (UpdateConfig (SharedConfig sharedConfig) select) model msg =
-    let
-        ( newState, cmd, maybeMsg ) =
-            Internal.update
-                sharedConfig.id
-                sharedConfig.toLabel
-                select
-                (sharedConfig.entries model)
-                (sharedConfig.selection model)
-                (sharedConfig.state model)
-                msg
-    in
-    ( newState, cmd, maybeMsg )
+update select state msg =
+    Internal.update select state msg
 
 
 
@@ -418,15 +332,9 @@ update (UpdateConfig (SharedConfig sharedConfig) select) model msg =
 
 {-| The dropdown's view function.
 -}
-view : ViewConfig a model -> Selector a -> model -> Html (Msg a)
-view (ViewConfig (SharedConfig sharedConfig) viewConfig) selector model =
-    Internal.view viewConfig
-        selector
-        sharedConfig.id
-        sharedConfig.toLabel
-        (sharedConfig.entries model)
-        (sharedConfig.selection model)
-        (sharedConfig.state model)
+view : ViewConfig a model -> Selector a -> State a -> Html (Msg a)
+view (ViewConfig viewConfig) selector state =
+    Internal.view viewConfig selector state
 
 
 {-| -}

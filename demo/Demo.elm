@@ -32,8 +32,18 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( { selection = Nothing
-      , textfieldMenu = Selectize.empty
-      , buttonMenu = Selectize.empty
+      , textfieldMenu =
+            Selectize.closed
+                "textfield-menu"
+                identity
+                licenses
+                Nothing
+      , buttonMenu =
+            Selectize.closed
+                "button-menu"
+                identity
+                licenses
+                Nothing
       }
     , Cmd.none
     )
@@ -55,9 +65,8 @@ update msg model =
         TextfieldMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update
-                        (updateConfig .textfieldMenu "textfield-menu")
-                        model
+                    Selectize.update SelectLicense
+                        model.textfieldMenu
                         selectizeMsg
 
                 newModel =
@@ -77,9 +86,8 @@ update msg model =
         ButtonMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update
-                        (updateConfig .buttonMenu "button-menu")
-                        model
+                    Selectize.update SelectLicense
+                        model.buttonMenu
                         selectizeMsg
 
                 newModel =
@@ -105,29 +113,6 @@ andDo cmd ( model, cmds ) =
     ( model
     , Cmd.batch [ cmd, cmds ]
     )
-
-
-sharedConfig :
-    (Model -> Selectize.State String)
-    -> String
-    -> Selectize.SharedConfig String Model
-sharedConfig state id =
-    Selectize.sharedConfig
-        { toLabel = toLabel
-        , state = state
-        , entries = \_ -> licenses
-        , selection = .selection
-        , id = id
-        }
-
-
-updateConfig :
-    (Model -> Selectize.State String)
-    -> String
-    -> Selectize.UpdateConfig String Msg Model
-updateConfig state id =
-    Selectize.updateConfig (sharedConfig state id)
-        { select = SelectLicense }
 
 
 textfieldSelector : Selectize.Selector String
@@ -156,12 +141,9 @@ buttonSelector =
             ]
 
 
-viewConfig :
-    (Model -> Selectize.State String)
-    -> String
-    -> Selectize.ViewConfig String Model
-viewConfig state id =
-    Selectize.viewConfig (sharedConfig state id)
+viewConfig : Selectize.ViewConfig String Model
+viewConfig =
+    Selectize.viewConfig
         { placeholder = "Select a License"
         , container =
             [ Attributes.class "selectize__container" ]
@@ -229,16 +211,26 @@ view : Model -> Html Msg
 view model =
     Html.div
         [ Attributes.style
-            [ ( "width", "40rem" ) ]
+            [ ( "display", "flex" ) ]
         ]
-        [ Selectize.view (viewConfig .textfieldMenu "textfield-menu")
-            textfieldSelector
-            model
-            |> Html.map TextfieldMenuMsg
-        , Selectize.view (viewConfig .buttonMenu "button-menu")
-            buttonSelector
-            model
-            |> Html.map ButtonMenuMsg
+        [ Html.div
+            [ Attributes.style
+                [ ( "width", "30rem" )
+                , ( "padding", "1rem" )
+                ]
+            ]
+            [ Selectize.view viewConfig textfieldSelector model.textfieldMenu
+                |> Html.map TextfieldMenuMsg
+            ]
+        , Html.div
+            [ Attributes.style
+                [ ( "width", "30rem" )
+                , ( "padding", "1rem" )
+                ]
+            ]
+            [ Selectize.view viewConfig buttonSelector model.buttonMenu
+                |> Html.map ButtonMenuMsg
+            ]
         ]
 
 

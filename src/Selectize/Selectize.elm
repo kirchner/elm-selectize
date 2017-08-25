@@ -8,9 +8,9 @@ module Selectize.Selectize
         , State
         , ViewConfig
         , ZipList
+        , closed
         , currentEntry
         , divider
-        , empty
         , entry
         , filter
         , fromList
@@ -53,13 +53,15 @@ import Task
 
 
 type alias State a =
-    { query : String
+    { id : String
+    , entries : List (LEntry a)
+    , initialSelection : Maybe ( a, String )
+    , query : String
     , zipList : Maybe (ZipList a)
-    , filteredEntries : Maybe (List (Entry a))
+    , filteredEntries : Maybe (List (LEntry a))
     , mouseFocus : Maybe a
     , preventBlur : Bool
-    , open :
-        Bool
+    , open : Bool
 
     -- dom measurements
     , entryHeights : List Float
@@ -74,11 +76,50 @@ type alias Heights =
     }
 
 
-empty : State a
-empty =
-    { query = ""
+type LEntry a
+    = LEntry a String
+    | LDivider String
+
+
+removeLabel : LEntry a -> Entry a
+removeLabel labeledEntry =
+    case labeledEntry of
+        LEntry a _ ->
+            Entry a
+
+        LDivider text ->
+            Divider text
+
+
+closed : String -> (a -> String) -> List (Entry a) -> Maybe a -> State a
+closed id toLabel entries initialSelection =
+    let
+        addLabel entry =
+            case entry of
+                Entry a ->
+                    LEntry a (toLabel a)
+
+                Divider text ->
+                    LDivider text
+
+        labeledEntries =
+            entries |> List.map addLabel
+    in
+    { id = id
+    , entries = labeledEntries
+    , initialSelection =
+        case initialSelection of
+            Just a ->
+                if entries |> List.member (Entry a) then
+                    Just ( a, toLabel a )
+                else
+                    Nothing
+
+            Nothing ->
+                Nothing
+    , query = ""
     , zipList = Nothing
-    , filteredEntries = Nothing
+    , filteredEntries = Just labeledEntries
     , mouseFocus = Nothing
     , preventBlur = False
     , open = False
@@ -174,26 +215,22 @@ type Movement
 
 
 update :
-    String
-    -> (a -> String)
-    -> (Maybe a -> msg)
-    -> List (Entry a)
-    -> Maybe a
+    (Maybe a -> msg)
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update id toLabel select entries selection state msg =
+update select state msg =
     case msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
 
         OpenMenu heights scrollTop ->
             let
-                zipList =
-                    fromList entries heights.entries
+                newZipList =
+                    fromList state.entries heights.entries
                         |> Maybe.map
-                            (case selection of
-                                Just a ->
+                            (case state.initialSelection of
+                                Just ( a, _ ) ->
                                     moveForwardTo a
 
                                 Nothing ->
@@ -201,18 +238,17 @@ update id toLabel select entries selection state msg =
                             )
 
                 top =
-                    zipList
+                    newZipList
                         |> Maybe.map zipCurrentScrollTop
                         |> Maybe.withDefault 0
 
                 height =
-                    zipList
+                    newZipList
                         |> Maybe.map zipCurrentHeight
                         |> Maybe.withDefault 0
             in
             ( { state
-                | zipList = zipList
-                , filteredEntries = Just entries
+                | zipList = newZipList
                 , mouseFocus = Nothing
                 , query = ""
                 , open = True
@@ -220,7 +256,7 @@ update id toLabel select entries selection state msg =
                 , menuHeight = heights.menu
                 , scrollTop = scrollTop
               }
-            , scroll id (top - (heights.menu - height) / 2)
+            , scroll state.id (top - (heights.menu - height) / 2)
             , Nothing
             )
 
@@ -235,7 +271,7 @@ update id toLabel select entries selection state msg =
 
         BlurTextfield ->
             ( state
-            , blur id
+            , blur state.id
             , Nothing
             )
 
@@ -248,16 +284,11 @@ update id toLabel select entries selection state msg =
         SetQuery newQuery ->
             let
                 newZipList =
-                    fromListWithFilter keep entries state.entryHeights
-
-                keep entry =
-                    toLabel entry
-                        |> String.toLower
-                        |> String.contains (String.toLower newQuery)
+                    fromListWithFilter newQuery state.entries state.entryHeights
 
                 newFilteredEntries =
-                    entries
-                        |> filter toLabel newQuery
+                    state.entries
+                        |> filter newQuery
             in
             ( { state
                 | query = newQuery
@@ -265,7 +296,7 @@ update id toLabel select entries selection state msg =
                 , filteredEntries = Just newFilteredEntries
                 , mouseFocus = Nothing
               }
-            , scroll id 0
+            , scroll state.id 0
             , Just (select Nothing)
             )
 
@@ -276,7 +307,12 @@ update id toLabel select entries selection state msg =
             )
 
         Select a ->
-            ( state |> reset
+            let
+                selection =
+                    a |> selectFirst state.entries
+            in
+            ( { state | initialSelection = selection }
+                |> reset
             , Cmd.none
             , Just (select (Just a))
             )
@@ -284,19 +320,46 @@ update id toLabel select entries selection state msg =
         SetKeyboardFocus movement scrollTop ->
             state
                 |> updateKeyboardFocus select movement
-                |> scrollToKeyboardFocus id scrollTop
+                |> scrollToKeyboardFocus state.id scrollTop
 
         SelectKeyboardFocusAndBlur ->
-            ( state |> reset
-            , blur id
+            let
+                maybeA =
+                    state.zipList |> Maybe.map currentEntry
+
+                selection =
+                    maybeA
+                        |> Maybe.andThen (selectFirst state.entries)
+            in
+            ( { state | initialSelection = selection }
+                |> reset
+            , blur state.id
             , Just (select (state.zipList |> Maybe.map currentEntry))
             )
 
         ClearSelection ->
-            ( state
+            ( { state | initialSelection = Nothing }
             , Cmd.none
             , Just (select Nothing)
             )
+
+
+selectFirst : List (LEntry a) -> a -> Maybe ( a, String )
+selectFirst entries a =
+    case entries of
+        [] ->
+            Nothing
+
+        first :: rest ->
+            case first of
+                LEntry value label ->
+                    if a == value then
+                        Just ( a, label )
+                    else
+                        selectFirst rest a
+
+                _ ->
+                    selectFirst rest a
 
 
 type alias WithKeyboardFocus a r =
@@ -387,17 +450,13 @@ scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
 view :
     ViewConfig a
     -> Selector a
-    -> String
-    -> (a -> String)
-    -> List (Entry a)
-    -> Maybe a
     -> State a
     -> Html (Msg a)
-view config selector id toLabel entries selection state =
+view config selector state =
     let
         actualEntries =
             state.filteredEntries
-                |> Maybe.withDefault entries
+                |> Maybe.withDefault state.entries
 
         keyboardFocus =
             state.zipList |> Maybe.map currentEntry
@@ -407,8 +466,8 @@ view config selector id toLabel entries selection state =
             attrs ++ noOp config.container
 
         text =
-            selection
-                |> Maybe.map toLabel
+            state.initialSelection
+                |> Maybe.map Tuple.second
                 |> Maybe.withDefault config.placeholder
     in
     Html.div
@@ -419,13 +478,13 @@ view config selector id toLabel entries selection state =
                 [ Attributes.style [ ( "overflow", "hidden" ) ] ]
         )
         [ selector
-            id
+            state.id
             text
             state.query
-            (selection /= Nothing)
+            (state.initialSelection /= Nothing)
             state.open
         , Html.div
-            ([ Attributes.id (menuId id)
+            ([ Attributes.id (menuId state.id)
              , Events.onMouseDown (PreventClosing True)
              , Events.onMouseUp (PreventClosing False)
              ]
@@ -434,7 +493,6 @@ view config selector id toLabel entries selection state =
             [ actualEntries
                 |> List.map
                     (viewEntry
-                        toLabel
                         state.open
                         config.entry
                         config.divider
@@ -595,39 +653,38 @@ keyupDecoder =
 
 
 viewEntry :
-    (a -> String)
-    -> Bool
+    Bool
     -> (a -> Bool -> Bool -> HtmlDetails Never)
     -> (String -> HtmlDetails Never)
     -> Maybe a
     -> Maybe a
-    -> Entry a
+    -> LEntry a
     -> ( String, Html (Msg a) )
-viewEntry toLabel open renderEntry renderDivider keyboardFocus mouseFocus entry =
+viewEntry open renderEntry renderDivider keyboardFocus mouseFocus entry =
     let
         { attributes, children } =
             case entry of
-                Entry entry ->
+                LEntry entry label ->
                     renderEntry entry
                         (mouseFocus == Just entry)
                         (keyboardFocus == Just entry)
 
-                Divider title ->
+                LDivider title ->
                     renderDivider title
 
         liAttrs attrs =
             attrs ++ noOp attributes
     in
     ( case entry of
-        Entry entry ->
-            toLabel entry
+        LEntry entry label ->
+            label
 
-        Divider title ->
+        LDivider title ->
             title
     , Html.li
         (liAttrs <|
             case entry of
-                Entry entry ->
+                LEntry entry _ ->
                     if open then
                         [ Events.onClick (Select entry)
                         , Events.onMouseEnter (SetMouseFocus (Just entry))
@@ -636,7 +693,7 @@ viewEntry toLabel open renderEntry renderDivider keyboardFocus mouseFocus entry 
                     else
                         []
 
-                Divider _ ->
+                _ ->
                     []
         )
         (children |> List.map mapToNoOp)
@@ -651,23 +708,30 @@ viewEntry toLabel open renderEntry renderDivider keyboardFocus mouseFocus entry 
 list if the query equals `""`.
 -}
 filter :
-    (a -> String)
-    -> String
-    -> List (Entry a)
-    -> List (Entry a)
-filter toLabel query entries =
+    String
+    -> List (LEntry a)
+    -> List (LEntry a)
+filter query entries =
     let
         containsQuery entry =
             case entry of
-                Entry entry ->
-                    toLabel entry
-                        |> String.toLower
-                        |> String.contains (String.toLower query)
+                LEntry a label ->
+                    if label |> contains query then
+                        Just entry
+                    else
+                        Nothing
 
-                Divider _ ->
-                    True
+                _ ->
+                    Just entry
     in
-    entries |> List.filter containsQuery
+    entries |> List.filterMap containsQuery
+
+
+contains : String -> String -> Bool
+contains query label =
+    label
+        |> String.toLower
+        |> String.contains (String.toLower query)
 
 
 
@@ -786,9 +850,9 @@ zipCurrentHeight zipList =
     zipList.current |> Tuple.second
 
 
-fromList : List (Entry a) -> List Float -> Maybe (ZipList a)
+fromList : List (LEntry a) -> List Float -> Maybe (ZipList a)
 fromList entries entryHeights =
-    case ( entries, entryHeights ) of
+    case ( entries |> List.map removeLabel, entryHeights ) of
         ( firstEntry :: restEntries, firstHeight :: restHeights ) ->
             { front = []
             , current = ( firstEntry, firstHeight )
@@ -802,22 +866,25 @@ fromList entries entryHeights =
 
 
 fromListWithFilter :
-    (a -> Bool)
-    -> List (Entry a)
+    String
+    -> List (LEntry a)
     -> List Float
     -> Maybe (ZipList a)
-fromListWithFilter keep entries entryHeights =
+fromListWithFilter query entries entryHeights =
     let
         filtered =
             zip entries entryHeights
-                |> List.filter
+                |> List.filterMap
                     (\( entry, height ) ->
                         case entry of
-                            Entry a ->
-                                keep a
+                            LEntry a label ->
+                                if label |> contains query then
+                                    Just ( Entry a, height )
+                                else
+                                    Nothing
 
-                            Divider _ ->
-                                True
+                            LDivider text ->
+                                Just ( Divider text, height )
                     )
     in
     case filtered of
