@@ -540,8 +540,7 @@ button config id selection _ open =
         [ Html.div
             (buttonAttrs <|
                 if open then
-                    [ Events.onClick BlurTextfield
-                    , Events.onBlur CloseMenu
+                    [ Events.onBlur CloseMenu
                     , Events.on "keyup" keyupDecoder
                     , Events.onWithOptions "keydown" keydownOptions keydownDecoder
                     ]
