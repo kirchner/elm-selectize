@@ -477,7 +477,6 @@ view config selector selection state =
              , Events.onMouseDown (PreventClosing True)
              , Events.onMouseUp (PreventClosing False)
              , Attributes.style [ ( "position", "absolute" ) ]
-             , Attributes.tabindex -1
              ]
                 ++ noOp config.menu
             )
@@ -619,8 +618,7 @@ buttons :
 buttons clearButton toggleButton sthSelected open =
     Html.div
         [ Attributes.style
-            [ ( "pointer-events", "auto" )
-            , ( "position", "absolute" )
+            [ ( "position", "absolute" )
             , ( "right", "0" )
             , ( "top", "0" )
             , ( "display", "flex" )
