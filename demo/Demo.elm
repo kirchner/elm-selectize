@@ -134,35 +134,43 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    Html.div
-        [ Attributes.style
-            [ ( "display", "flex" )
-            , ( "flex-flow", "column" )
-            ]
-        ]
-        [ Html.div
-            [ Attributes.style
-                [ ( "width", "30rem" )
-                , ( "padding", "1rem" )
-                ]
-            ]
-            [ Selectize.view viewConfig
-                textfieldSelector
-                model.selection
-                model.textfieldMenu
-                |> Html.map TextfieldMenuMsg
-            ]
+    Html.div []
+        [ Html.h3 []
+            [ Html.text "Dropdown Menus" ]
         , Html.div
             [ Attributes.style
-                [ ( "width", "30rem" )
-                , ( "padding", "1rem" )
+                [ ( "display", "flex" )
+                , ( "flex-flow", "column" )
                 ]
             ]
-            [ Selectize.view viewConfig
-                buttonSelector
-                model.selection
-                model.buttonMenu
-                |> Html.map ButtonMenuMsg
+            [ Html.div
+                [ Attributes.class "container" ]
+                [ Html.div
+                    [ Attributes.class "caption" ]
+                    [ Html.text "with autocompletion: " ]
+                , Html.div
+                    [ Attributes.style [ ( "width", "30rem" ) ] ]
+                    [ Selectize.view viewConfig
+                        textfieldSelector
+                        model.selection
+                        model.textfieldMenu
+                        |> Html.map TextfieldMenuMsg
+                    ]
+                ]
+            , Html.div
+                [ Attributes.class "container" ]
+                [ Html.div
+                    [ Attributes.class "caption" ]
+                    [ Html.text "without autocompletion: " ]
+                , Html.div
+                    [ Attributes.style [ ( "width", "30rem" ) ] ]
+                    [ Selectize.view viewConfig
+                        buttonSelector
+                        model.selection
+                        model.buttonMenu
+                        |> Html.map ButtonMenuMsg
+                    ]
+                ]
             ]
         ]
 
