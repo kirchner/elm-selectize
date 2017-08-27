@@ -1,6 +1,7 @@
 module Selectize.Selectize
     exposing
         ( Entry
+        , LEntry(..)
         , Heights
         , Movement(..)
         , Msg(..)

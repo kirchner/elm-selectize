@@ -66,10 +66,10 @@ testUpdate =
                 if finalModel.menu.open then
                     finalModel.menu.zipList
                         |> Maybe.map S.currentEntry
-                        |> Maybe.map S.entry
+                        |> Maybe.map entry
                         |> Expect.equal
                             (treesWithoutDivider
-                                |> S.filter identity finalModel.menu.query
+                                |> S.filter finalModel.menu.query
                                 |> List.head
                             )
                 else
@@ -131,7 +131,7 @@ type alias Model =
 
 init : Model
 init =
-    { menu = S.empty
+    { menu = S.closed "menu" identity trees
     , selection = Nothing
     }
 
@@ -140,7 +140,7 @@ update : S.Msg String -> Model -> Model
 update msg model =
     let
         ( newMenu, _, _ ) =
-            S.update "menu" identity (\_ -> ()) trees model.selection model.menu msg
+            S.update (\_ -> ()) model.selection model.menu msg
     in
     { model | menu = newMenu }
 
@@ -257,6 +257,10 @@ listCount fuzzer count =
 {- data -}
 
 
+entry tree =
+    S.LEntry tree tree
+
+
 trees : List (S.Entry String)
 trees =
     List.concat
@@ -267,11 +271,11 @@ trees =
         ]
 
 
-treesWithoutDivider : List (S.Entry String)
+treesWithoutDivider : List (S.LEntry String)
 treesWithoutDivider =
     List.concat
-        [ treesPart1 |> List.map S.entry
-        , treesPart2 |> List.map S.entry
+        [ treesPart1 |> List.map entry
+        , treesPart2 |> List.map entry
         ]
 
 

@@ -21,9 +21,6 @@ suite =
 testFilter : Test
 testFilter =
     let
-        toLabel =
-            identity
-
         entriesIn =
             List.map entry
                 [ "foobar"
@@ -36,22 +33,25 @@ testFilter =
                 [ "foobar"
                 , "foofoo"
                 ]
+
+        entry tree =
+            LEntry tree tree
     in
     describe "filter"
         [ test "empty query returns orginal list" <|
             \_ ->
                 entriesIn
-                    |> filter toLabel ""
+                    |> filter ""
                     |> Expect.equal entriesIn
         , test "return matching entries" <|
             \_ ->
                 entriesIn
-                    |> filter toLabel "foo"
+                    |> filter "foo"
                     |> Expect.equal entriesOut
         , test "no matching entires" <|
             \_ ->
                 entriesIn
-                    |> filter toLabel "not matching"
+                    |> filter "not matching"
                     |> Expect.equal []
         ]
 
@@ -63,8 +63,11 @@ testFirst =
             \count ->
                 let
                     entries =
-                        List.repeat count (divider "divider")
+                        List.repeat count (LDivider "divider")
                             ++ (trees1 |> List.map entry)
+
+                    entry tree =
+                        LEntry tree tree
 
                     heights =
                         List.repeat (List.length entries) 30
@@ -84,9 +87,12 @@ testNext =
                     entries =
                         (trees1 |> List.map entry)
                             ++ [ entry current ]
-                            ++ List.repeat count (divider "divider")
+                            ++ List.repeat count (LDivider "divider")
                             ++ [ entry next ]
                             ++ (trees2 |> List.map entry)
+
+                    entry tree =
+                        LEntry tree tree
 
                     heights =
                         List.repeat (List.length entries) 30
@@ -114,9 +120,12 @@ testPrevious =
                     entries =
                         (trees1 |> List.map entry)
                             ++ [ entry previous ]
-                            ++ List.repeat count (divider "divider")
+                            ++ List.repeat count (LDivider "divider")
                             ++ [ entry current ]
                             ++ (trees2 |> List.map entry)
+
+                    entry tree =
+                        LEntry tree tree
 
                     heights =
                         List.repeat (List.length entries) 30
@@ -144,7 +153,7 @@ testTopAndHeight =
             \entryHeights ->
                 let
                     entries =
-                        trees1 |> List.map entry
+                        trees1 |> List.map (\tree -> LEntry tree tree)
 
                     sum =
                         List.foldl (+) 0 entryHeights
