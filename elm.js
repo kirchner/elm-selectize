@@ -10293,8 +10293,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (zipList
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Selectize.Selectize',
 			{
-				start: {line: 910, column: 5},
-				end: {line: 917, column: 52}
+				start: {line: 908, column: 5},
+				end: {line: 915, column: 52}
 			},
 			_p9)('this should be impossible');
 	}
@@ -10678,21 +10678,17 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 				_0: _elm_lang$html$Html_Attributes$style(
 					{
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'pointer-events', _1: 'auto'},
+						_0: {ctor: '_Tuple2', _0: 'position', _1: 'absolute'},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'position', _1: 'absolute'},
+							_0: {ctor: '_Tuple2', _0: 'right', _1: '0'},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'right', _1: '0'},
+								_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-										_1: {ctor: '[]'}
-									}
+									_0: {ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+									_1: {ctor: '[]'}
 								}
 							}
 						}
@@ -10893,11 +10889,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$view = F4(
 													_0: {ctor: '_Tuple2', _0: 'position', _1: 'absolute'},
 													_1: {ctor: '[]'}
 												}),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$tabindex(-1),
-												_1: {ctor: '[]'}
-											}
+											_1: {ctor: '[]'}
 										}
 									}
 								}
