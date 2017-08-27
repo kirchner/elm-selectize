@@ -104,23 +104,6 @@ with the view configuration given by
             { placeholder = "Select a Tree"
             , container =
                 [ Attributes.class "selectize__container" ]
-            , toggle =
-                \open ->
-                    Html.div
-                        [ Attributes.class "selectize__menu-toggle"
-                        , Attributes.classList
-                            [ ( "selectize__menu-toggle--menu-open", open ) ]
-                        ]
-                        [ Html.i
-                            [ Attributes.class "material-icons"
-                            , Attributes.class "selectize__icon"
-                            ]
-                            [ if open then
-                                Html.text "arrow_drop_up"
-                              else
-                                Html.text "arrow_drop_down"
-                            ]
-                        ]
             , menu =
                 [ Attributes.class "selectize__menu" ]
             , ul =
@@ -155,15 +138,14 @@ and a selector given by, for example,
     selector : Selectize.selector Tree
     selector =
         Selectize.textfield <|
-            input =
-                \sthSelected open ->
-                    [ Attributes.class "selectize__textfield"
-                    , Attributes.classList
-                        [ ( "selectize__textfield--selection", sthSelected )
-                        , ( "selectize__textfield--no-selection", not sthSelected )
-                        , ( "selectize__textfield--menu-open", open )
-                        ]
+            \sthSelected open ->
+                [ Attributes.class "selectize__textfield"
+                , Attributes.classList
+                    [ ( "selectize__textfield--selection", sthSelected )
+                    , ( "selectize__textfield--no-selection", not sthSelected )
+                    , ( "selectize__textfield--menu-open", open )
                     ]
+                ]
 
 
 # Types
@@ -204,10 +186,9 @@ closed :
     String
     -> (a -> String)
     -> List (Entry a)
-    -> Maybe a
     -> State a
-closed id toLabel entries initialSelection =
-    Internal.closed id toLabel entries initialSelection
+closed id toLabel entries =
+    Internal.closed id toLabel entries
 
 
 {-| Each entry of the menu has to be wrapped in this type. We need this,
@@ -250,10 +231,6 @@ type ViewConfig a model
         Selectize.viewConfig
             { placeholder = "Select a Tree"
             , container = [ ... ]
-            , toggle =
-                \open ->
-                    Html.div
-                        ...
             , menu = [ ... ]
             , ul = [ ... ]
             , entry =
@@ -269,15 +246,13 @@ type ViewConfig a model
             }
 
   - tell us the `placeholder` if the selection is empty
-  - `container`, `toggle`, `menu`, `ul`, `entry` and `divider` can be
+  - `container`, `menu`, `ul`, `entry` and `divider` can be
     used to style the different parts of the dropdown view, c.f. the
     modul documentation for an example.
 
 -}
 viewConfig :
-    { placeholder : String
-    , container : List (Html.Attribute Never)
-    , toggle : Bool -> Html Never
+    { container : List (Html.Attribute Never)
     , menu : List (Html.Attribute Never)
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
@@ -286,9 +261,7 @@ viewConfig :
     -> ViewConfig a model
 viewConfig config =
     ViewConfig
-        { placeholder = config.placeholder
-        , container = config.container
-        , toggle = config.toggle
+        { container = config.container
         , menu = config.menu
         , ul = config.ul
         , entry = config.entry
@@ -319,11 +292,12 @@ what boilerplate is needed in your main update.
 -}
 update :
     (Maybe a -> msg)
+    -> Maybe a
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update select state msg =
-    Internal.update select state msg
+update select selection state msg =
+    Internal.update select selection state msg
 
 
 
@@ -332,9 +306,9 @@ update select state msg =
 
 {-| The dropdown's view function.
 -}
-view : ViewConfig a model -> Selector a -> State a -> Html (Msg a)
-view (ViewConfig viewConfig) selector state =
-    Internal.view viewConfig selector state
+view : ViewConfig a model -> Selector a -> Maybe a -> State a -> Html (Msg a)
+view (ViewConfig viewConfig) selector selection state =
+    Internal.view viewConfig selector selection state
 
 
 {-| -}
@@ -343,12 +317,24 @@ type alias Selector a =
 
 
 {-| -}
-button : (Bool -> Bool -> List (Html.Attribute Never)) -> Selector a
-button input =
-    Internal.viewButton input
+button :
+    { attrs : Bool -> Bool -> List (Html.Attribute Never)
+    , toggleButton : Maybe (Bool -> Html Never)
+    , clearButton : Maybe (Html Never)
+    , placeholder : String
+    }
+    -> Selector a
+button config =
+    Internal.button config
 
 
 {-| -}
-textfield : (Bool -> Bool -> List (Html.Attribute Never)) -> Selector a
-textfield input =
-    Internal.viewTextfield input
+textfield :
+    { attrs : Bool -> Bool -> List (Html.Attribute Never)
+    , toggleButton : Maybe (Bool -> Html Never)
+    , clearButton : Maybe (Html Never)
+    , placeholder : String
+    }
+    -> Selector a
+textfield config =
+    Internal.textfield config

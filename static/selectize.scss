@@ -7,11 +7,14 @@
   &__button {
     border: 1px solid #d0d0d0;
     padding: 6px 8px;
-    padding-right: 24px;
+    padding-right: 62px;
     width: 100%;
     height: 100%;
     z-index: 1;
     cursor: pointer;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 
     color: #303030;
     background-color: #ffffff;
@@ -39,11 +42,8 @@
       border-color: #66afe9;
     }
 
-    &--no-selection {
+    &--light {
       color: #808080;
-    }
-
-    &--menu-open {
       cursor: auto;
     }
   }
@@ -51,11 +51,12 @@
   &__textfield {
     border: 1px solid #d0d0d0;
     padding: 6px 8px;
-    padding-right: 24px;
+    padding-right: 62px;
     width: 100%;
     height: 100%;
     z-index: 1;
     cursor: pointer;
+    text-overflow: ellipsis;
 
     color: #303030;
 
@@ -122,15 +123,13 @@
   }
 
   &__menu-toggle {
-    position: absolute;
     z-index: 1000;
-    right: 0.5rem;
-    top: 0;
     color: #808080;
     display: flex;
     flex-flow: column;
     justify-content: center;
-    height: 100%;
+    height: 35px;
+    width: 1.8rem;
     cursor: pointer;
 
     -webkit-touch-callout: none;
@@ -145,13 +144,12 @@
   }
 
   &__menu {
-    position: absolute;
     z-index: 2000;
     width: 100%; 
     margin-top: 5px;
     background: white;
     color: black;
-    max-height: 10rem;
+    max-height: 20rem;
     overflow: scroll;
     padding: 0;
     margin: 2px 0 0 0;
@@ -186,13 +184,10 @@
       padding: 9px 8px;
       cursor: pointer;
       font-size: 16px;
-      line-height: 1;
+      line-height: 24px;
       color: #555555;
       font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
       font-weight: normal;
-      white-space: nowrap;
-      overflow-x: hidden;
-      text-overflow: ellipsis;
 
       &--mouse-selected {
         background-color: #fafafa;
@@ -221,36 +216,6 @@
       overflow-x: hidden;
       text-overflow: ellipsis;
     }
-
-  &__section-list {
-    list-style: none;
-    padding: 0;
-    margin: auto;
-    overflow-y: auto;
-  }
-
-
-  &__section-item {
-    display: block;
-    padding: 0;
-  }
-
-    &__section-box {
-      display: block;
-      padding: 0;
-      border-top: 1px solid;
-      border-color: #eeeeee;
-    }
-
-      &__section-text {
-        display: block;
-        padding: 5px 8px;
-        font-size: 12px;
-        line-height: 1.5rem;
-        color: #555555;
-        font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
-        font-weight: normal;
-      }
 
   &__icon {
     color: #808080;

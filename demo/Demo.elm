@@ -22,6 +22,10 @@ main =
         }
 
 
+
+---- MODEL
+
+
 type alias Model =
     { selection : Maybe String
     , textfieldMenu : Selectize.State String
@@ -37,20 +41,18 @@ init =
                 "textfield-menu"
                 identity
                 licenses
-                Nothing
       , buttonMenu =
             Selectize.closed
                 "button-menu"
                 identity
                 licenses
-                Nothing
       }
     , Cmd.none
     )
 
 
 
-{- update -}
+---- UPDATE
 
 
 type Msg
@@ -66,6 +68,7 @@ update msg model =
             let
                 ( newMenu, menuCmd, maybeMsg ) =
                     Selectize.update SelectLicense
+                        model.selection
                         model.textfieldMenu
                         selectizeMsg
 
@@ -87,6 +90,7 @@ update msg model =
             let
                 ( newMenu, menuCmd, maybeMsg ) =
                     Selectize.update SelectLicense
+                        model.selection
                         model.buttonMenu
                         selectizeMsg
 
@@ -115,55 +119,62 @@ andDo cmd ( model, cmds ) =
     )
 
 
-textfieldSelector : Selectize.Selector String
-textfieldSelector =
-    Selectize.textfield <|
-        \sthSelected open ->
-            [ Attributes.class "selectize__textfield"
-            , Attributes.classList
-                [ ( "selectize__textfield--selection", sthSelected )
-                , ( "selectize__textfield--no-selection", not sthSelected )
-                , ( "selectize__textfield--menu-open", open )
-                ]
-            ]
+
+---- SUBSCRIPTIONS
 
 
-buttonSelector : Selectize.Selector String
-buttonSelector =
-    Selectize.button <|
-        \sthSelected open ->
-            [ Attributes.class "selectize__button"
-            , Attributes.classList
-                [ ( "selectize__button--selection", sthSelected )
-                , ( "selectize__button--no-selection", not sthSelected )
-                , ( "selectize__button--menu-open", open )
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+
+---- VIEW
+
+
+view : Model -> Html Msg
+view model =
+    Html.div
+        [ Attributes.style
+            [ ( "display", "flex" )
+            , ( "flex-flow", "column" )
+            ]
+        ]
+        [ Html.div
+            [ Attributes.style
+                [ ( "width", "30rem" )
+                , ( "padding", "1rem" )
                 ]
             ]
+            [ Selectize.view viewConfig
+                textfieldSelector
+                model.selection
+                model.textfieldMenu
+                |> Html.map TextfieldMenuMsg
+            ]
+        , Html.div
+            [ Attributes.style
+                [ ( "width", "30rem" )
+                , ( "padding", "1rem" )
+                ]
+            ]
+            [ Selectize.view viewConfig
+                buttonSelector
+                model.selection
+                model.buttonMenu
+                |> Html.map ButtonMenuMsg
+            ]
+        ]
+
+
+
+---- CONFIGURATION
 
 
 viewConfig : Selectize.ViewConfig String Model
 viewConfig =
     Selectize.viewConfig
-        { placeholder = "Select a License"
-        , container =
-            [ Attributes.class "selectize__container" ]
-        , toggle =
-            \open ->
-                Html.div
-                    [ Attributes.class "selectize__menu-toggle"
-                    , Attributes.classList
-                        [ ( "selectize__menu-toggle--menu-open", open ) ]
-                    ]
-                    [ Html.i
-                        [ Attributes.class "material-icons"
-                        , Attributes.class "selectize__icon"
-                        ]
-                        [ if open then
-                            Html.text "arrow_drop_up"
-                          else
-                            Html.text "arrow_drop_down"
-                        ]
-                    ]
+        { container = []
         , menu =
             [ Attributes.class "selectize__menu" ]
         , ul =
@@ -194,48 +205,75 @@ viewConfig =
         }
 
 
-
-{- subscriptions -}
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
-
-{- view -}
-
-
-view : Model -> Html Msg
-view model =
-    Html.div
-        [ Attributes.style
-            [ ( "display", "flex" ) ]
-        ]
-        [ Html.div
-            [ Attributes.style
-                [ ( "width", "30rem" )
-                , ( "padding", "1rem" )
+textfieldSelector : Selectize.Selector String
+textfieldSelector =
+    Selectize.textfield <|
+        { attrs =
+            \sthSelected open ->
+                [ Attributes.class "selectize__textfield"
+                , Attributes.classList
+                    [ ( "selectize__textfield--selection", sthSelected )
+                    , ( "selectize__textfield--no-selection", not sthSelected )
+                    , ( "selectize__textfield--menu-open", open )
+                    ]
                 ]
-            ]
-            [ Selectize.view viewConfig textfieldSelector model.textfieldMenu
-                |> Html.map TextfieldMenuMsg
-            ]
-        , Html.div
-            [ Attributes.style
-                [ ( "width", "30rem" )
-                , ( "padding", "1rem" )
+        , toggleButton = toggleButton
+        , clearButton = clearButton
+        , placeholder = "Select a License"
+        }
+
+
+buttonSelector : Selectize.Selector String
+buttonSelector =
+    Selectize.button
+        { attrs =
+            \sthSelected open ->
+                [ Attributes.class "selectize__button"
+                , Attributes.classList
+                    [ ( "selectize__button--light", open && not sthSelected ) ]
                 ]
+        , toggleButton = toggleButton
+        , clearButton = clearButton
+        , placeholder = "Select a License"
+        }
+
+
+toggleButton : Maybe (Bool -> Html Never)
+toggleButton =
+    Just <|
+        \open ->
+            Html.div
+                [ Attributes.class "selectize__menu-toggle"
+                , Attributes.classList
+                    [ ( "selectize__menu-toggle--menu-open", open ) ]
+                ]
+                [ Html.i
+                    [ Attributes.class "material-icons"
+                    , Attributes.class "selectize__icon"
+                    ]
+                    [ if open then
+                        Html.text "arrow_drop_up"
+                      else
+                        Html.text "arrow_drop_down"
+                    ]
+                ]
+
+
+clearButton : Maybe (Html Never)
+clearButton =
+    Just <|
+        Html.div
+            [ Attributes.class "selectize__menu-toggle" ]
+            [ Html.i
+                [ Attributes.class "material-icons"
+                , Attributes.class "selectize__icon"
+                ]
+                [ Html.text "clear" ]
             ]
-            [ Selectize.view viewConfig buttonSelector model.buttonMenu
-                |> Html.map ButtonMenuMsg
-            ]
-        ]
 
 
 
-{- trees -}
+---- DATA
 
 
 toLabel : String -> String

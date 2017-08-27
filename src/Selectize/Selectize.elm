@@ -8,6 +8,7 @@ module Selectize.Selectize
         , State
         , ViewConfig
         , ZipList
+        , button
         , closed
         , currentEntry
         , divider
@@ -15,11 +16,10 @@ module Selectize.Selectize
         , filter
         , fromList
         , moveForwardTo
+        , textfield
         , update
         , view
-        , viewButton
         , viewConfig
-        , viewTextfield
         , zipCurrentHeight
         , zipCurrentScrollTop
         , zipNext
@@ -55,7 +55,6 @@ import Task
 type alias State a =
     { id : String
     , entries : List (LEntry a)
-    , initialSelection : Maybe ( a, String )
     , query : String
     , zipList : Maybe (ZipList a)
     , filteredEntries : Maybe (List (LEntry a))
@@ -91,8 +90,26 @@ removeLabel labeledEntry =
             Divider text
 
 
-closed : String -> (a -> String) -> List (Entry a) -> Maybe a -> State a
-closed id toLabel entries initialSelection =
+selectFirst : List (LEntry a) -> a -> Maybe ( a, String )
+selectFirst entries a =
+    case entries of
+        [] ->
+            Nothing
+
+        first :: rest ->
+            case first of
+                LEntry value label ->
+                    if a == value then
+                        Just ( a, label )
+                    else
+                        selectFirst rest a
+
+                _ ->
+                    selectFirst rest a
+
+
+closed : String -> (a -> String) -> List (Entry a) -> State a
+closed id toLabel entries =
     let
         addLabel entry =
             case entry of
@@ -107,16 +124,6 @@ closed id toLabel entries initialSelection =
     in
     { id = id
     , entries = labeledEntries
-    , initialSelection =
-        case initialSelection of
-            Just a ->
-                if entries |> List.member (Entry a) then
-                    Just ( a, toLabel a )
-                else
-                    Nothing
-
-            Nothing ->
-                Nothing
     , query = ""
     , zipList = Nothing
     , filteredEntries = Just labeledEntries
@@ -134,9 +141,7 @@ closed id toLabel entries initialSelection =
 
 
 type alias ViewConfig a =
-    { placeholder : String
-    , container : List (Html.Attribute Never)
-    , toggle : Bool -> Html Never
+    { container : List (Html.Attribute Never)
     , menu : List (Html.Attribute Never)
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
@@ -166,9 +171,7 @@ divider title =
 
 
 viewConfig :
-    { placeholder : String
-    , container : List (Html.Attribute Never)
-    , toggle : Bool -> Html Never
+    { container : List (Html.Attribute Never)
     , menu : List (Html.Attribute Never)
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
@@ -176,9 +179,7 @@ viewConfig :
     }
     -> ViewConfig a
 viewConfig config =
-    { placeholder = config.placeholder
-    , container = config.container
-    , toggle = config.toggle
+    { container = config.container
     , menu = config.menu
     , ul = config.ul
     , entry = config.entry
@@ -195,6 +196,7 @@ type Msg a
       -- open/close menu
     | OpenMenu Heights Float
     | CloseMenu
+    | FocusTextfield
     | BlurTextfield
     | PreventClosing Bool
       -- query
@@ -216,10 +218,11 @@ type Movement
 
 update :
     (Maybe a -> msg)
+    -> Maybe a
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update select state msg =
+update select selection state msg =
     case msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
@@ -229,8 +232,8 @@ update select state msg =
                 newZipList =
                     fromList state.entries heights.entries
                         |> Maybe.map
-                            (case state.initialSelection of
-                                Just ( a, _ ) ->
+                            (case selection of
+                                Just a ->
                                     moveForwardTo a
 
                                 Nothing ->
@@ -268,6 +271,12 @@ update select state msg =
                 , Cmd.none
                 , Nothing
                 )
+
+        FocusTextfield ->
+            ( state
+            , focus state.id
+            , Nothing
+            )
 
         BlurTextfield ->
             ( state
@@ -311,8 +320,7 @@ update select state msg =
                 selection =
                     a |> selectFirst state.entries
             in
-            ( { state | initialSelection = selection }
-                |> reset
+            ( state |> reset
             , Cmd.none
             , Just (select (Just a))
             )
@@ -331,35 +339,16 @@ update select state msg =
                     maybeA
                         |> Maybe.andThen (selectFirst state.entries)
             in
-            ( { state | initialSelection = selection }
-                |> reset
+            ( state |> reset
             , blur state.id
             , Just (select (state.zipList |> Maybe.map currentEntry))
             )
 
         ClearSelection ->
-            ( { state | initialSelection = Nothing }
+            ( state
             , Cmd.none
             , Just (select Nothing)
             )
-
-
-selectFirst : List (LEntry a) -> a -> Maybe ( a, String )
-selectFirst entries a =
-    case entries of
-        [] ->
-            Nothing
-
-        first :: rest ->
-            case first of
-                LEntry value label ->
-                    if a == value then
-                        Just ( a, label )
-                    else
-                        selectFirst rest a
-
-                _ ->
-                    selectFirst rest a
 
 
 type alias WithKeyboardFocus a r =
@@ -421,13 +410,13 @@ scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
                     zipCurrentHeight zipList
 
                 y =
-                    if (top - 2 * height / 3) < scrollTop then
-                        top - 2 * height / 3
+                    if top < scrollTop then
+                        top
                     else if
-                        (top + 5 * height / 3)
+                        (top + height)
                             > (scrollTop + state.menuHeight)
                     then
-                        top + 5 * height / 3 - state.menuHeight
+                        top + height - state.menuHeight
                     else
                         scrollTop
             in
@@ -450,9 +439,10 @@ scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
 view :
     ViewConfig a
     -> Selector a
+    -> Maybe a
     -> State a
     -> Html (Msg a)
-view config selector state =
+view config selector selection state =
     let
         actualEntries =
             state.filteredEntries
@@ -461,32 +451,32 @@ view config selector state =
         keyboardFocus =
             state.zipList |> Maybe.map currentEntry
 
-        -- attributes
-        containerAttrs attrs =
-            attrs ++ noOp config.container
-
-        text =
-            state.initialSelection
+        selectionText =
+            selection
+                |> Maybe.andThen (selectFirst actualEntries)
                 |> Maybe.map Tuple.second
-                |> Maybe.withDefault config.placeholder
     in
     Html.div
-        (containerAttrs <|
-            if state.open && not (actualEntries |> List.isEmpty) then
-                []
-            else
-                [ Attributes.style [ ( "overflow", "hidden" ) ] ]
-        )
+        [ if state.open && not (actualEntries |> List.isEmpty) then
+            Attributes.style
+                [ ( "position", "relative" ) ]
+          else
+            Attributes.style
+                [ ( "overflow", "hidden" )
+                , ( "position", "relative" )
+                ]
+        ]
         [ selector
             state.id
-            text
+            selectionText
             state.query
-            (state.initialSelection /= Nothing)
             state.open
         , Html.div
             ([ Attributes.id (menuId state.id)
              , Events.onMouseDown (PreventClosing True)
              , Events.onMouseUp (PreventClosing False)
+             , Attributes.style [ ( "position", "absolute" ) ]
+             , Attributes.tabindex -1
              ]
                 ++ noOp config.menu
             )
@@ -501,94 +491,172 @@ view config selector state =
                     )
                 |> Html.Keyed.ul (noOp config.ul)
             ]
-        , Html.div
-            [ Attributes.style
-                [ ( "pointer-events"
-                  , if state.open then
-                        "auto"
-                    else
-                        "none"
-                  )
-                ]
-            ]
-            [ config.toggle state.open |> mapToNoOp ]
         ]
 
 
 type alias Selector a =
     String
+    -> Maybe String
     -> String
-    -> String
-    -> Bool
     -> Bool
     -> Html (Msg a)
 
 
-viewButton :
-    (Bool -> Bool -> List (Html.Attribute Never))
+button :
+    { attrs : Bool -> Bool -> List (Html.Attribute Never)
+    , toggleButton : Maybe (Bool -> Html Never)
+    , clearButton : Maybe (Html Never)
+    , placeholder : String
+    }
     -> String
+    -> Maybe String
     -> String
-    -> String
-    -> Bool
     -> Bool
     -> Html (Msg a)
-viewButton attrs id text _ selected open =
+button config id selection _ open =
     let
-        inputAttrs attrs_ =
+        buttonAttrs attrs =
             [ [ Attributes.id (textfieldId id)
-              , Events.on "focus" focusDecoder
+              , Attributes.tabindex 0
+              , Attributes.style
+                    [ ( "-webkit-touch-callout", "none" )
+                    , ( "-webkit-user-select", "none" )
+                    , ( "-moz-user-select", "none" )
+                    , ( "-ms-user-select", "none" )
+                    , ( "user-select", "none" )
+                    ]
               ]
-            , attrs_
-            , noOp (attrs selected open)
+            , attrs
+            , noOp (config.attrs (selection /= Nothing) open)
+            ]
+                |> List.concat
+
+        actualText =
+            selection
+                |> Maybe.withDefault config.placeholder
+    in
+    Html.div []
+        [ Html.div
+            (buttonAttrs <|
+                if open then
+                    [ Events.onClick BlurTextfield
+                    , Events.onBlur CloseMenu
+                    , Events.on "keyup" keyupDecoder
+                    , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                    ]
+                else
+                    [ Events.on "focus" focusDecoder
+                    ]
+            )
+            [ Html.text actualText ]
+        , buttons
+            config.clearButton
+            config.toggleButton
+            (selection /= Nothing)
+            open
+        ]
+
+
+textfield :
+    { attrs : Bool -> Bool -> List (Html.Attribute Never)
+    , toggleButton : Maybe (Bool -> Html Never)
+    , clearButton : Maybe (Html Never)
+    , placeholder : String
+    }
+    -> String
+    -> Maybe String
+    -> String
+    -> Bool
+    -> Html (Msg a)
+textfield config id selection query open =
+    let
+        inputAttrs attrs =
+            [ if open then
+                [ Attributes.placeholder
+                    (selection |> Maybe.withDefault config.placeholder)
+                , Attributes.value query
+                , Attributes.id (textfieldId id)
+                , Events.on "focus" focusDecoder
+                ]
+              else
+                [ Attributes.value
+                    (selection |> Maybe.withDefault config.placeholder)
+                , Attributes.id (textfieldId id)
+                , Events.on "focus" focusDecoder
+                ]
+            , attrs
+            , noOp (config.attrs (selection /= Nothing) open)
             ]
                 |> List.concat
     in
-    Html.button
-        (inputAttrs <|
-            if open then
-                [ Events.onBlur CloseMenu
-                , Events.on "keyup" keyupDecoder
-                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
-                ]
-            else
-                []
-        )
-        [ Html.text text ]
+    Html.div []
+        [ Html.input
+            (inputAttrs <|
+                if open then
+                    [ Events.onBlur CloseMenu
+                    , Events.on "keyup" keyupDecoder
+                    , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                    , Events.onInput SetQuery
+                    ]
+                else
+                    []
+            )
+            []
+        , buttons
+            config.clearButton
+            config.toggleButton
+            (selection /= Nothing)
+            open
+        ]
 
 
-viewTextfield :
-    (Bool -> Bool -> List (Html.Attribute Never))
-    -> String
-    -> String
-    -> String
+buttons :
+    Maybe (Html Never)
+    -> Maybe (Bool -> Html Never)
     -> Bool
     -> Bool
     -> Html (Msg a)
-viewTextfield attrs id text query selected open =
-    let
-        inputAttrs attrs_ =
-            [ [ Attributes.placeholder text
-              , Attributes.value query
-              , Attributes.id (textfieldId id)
-              , Events.on "focus" focusDecoder
-              ]
-            , attrs_
-            , noOp (attrs selected open)
+buttons clearButton toggleButton sthSelected open =
+    Html.div
+        [ Attributes.style
+            [ ( "pointer-events", "auto" )
+            , ( "position", "absolute" )
+            , ( "right", "0" )
+            , ( "top", "0" )
+            , ( "display", "flex" )
             ]
-                |> List.concat
-    in
-    Html.input
-        (inputAttrs <|
-            if open then
-                [ Events.onBlur CloseMenu
-                , Events.on "keyup" keyupDecoder
-                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
-                , Events.onInput SetQuery
-                ]
-            else
-                []
-        )
-        []
+        ]
+        [ case ( clearButton, sthSelected ) of
+            ( Just clear, True ) ->
+                Html.div
+                    [ Events.onClick ClearSelection ]
+                    [ clear |> mapToNoOp ]
+
+            _ ->
+                Html.text ""
+        , case toggleButton of
+            Just toggle ->
+                Html.div
+                    [ case open of
+                        True ->
+                            Events.onWithOptions "click"
+                                { stopPropagation = True
+                                , preventDefault = False
+                                }
+                                (Decode.succeed BlurTextfield)
+
+                        False ->
+                            Events.onWithOptions "click"
+                                { stopPropagation = True
+                                , preventDefault = False
+                                }
+                                (Decode.succeed FocusTextfield)
+                    ]
+                    [ toggle open |> mapToNoOp ]
+
+            Nothing ->
+                Html.div [] []
+        ]
 
 
 focusDecoder : Decoder (Msg a)
@@ -768,6 +836,12 @@ scroll id y =
         Dom.Scroll.toY (menuId id) y
 
 
+focus : String -> Cmd (Msg a)
+focus id =
+    Task.attempt (\_ -> NoOp) <|
+        Dom.focus (textfieldId id)
+
+
 blur : String -> Cmd (Msg a)
 blur id =
     Task.attempt (\_ -> NoOp) <|
@@ -785,6 +859,7 @@ entryHeightsDecoder =
         |> DOM.childNode 0
         |> DOM.childNode 1
         |> DOM.parentElement
+        |> DOM.parentElement
         |> DOM.target
 
 
@@ -792,12 +867,14 @@ menuHeightDecoder : Decoder Float
 menuHeightDecoder =
     DOM.childNode 1 (Decode.field "clientHeight" Decode.float)
         |> DOM.parentElement
+        |> DOM.parentElement
         |> DOM.target
 
 
 scrollTopDecoder : Decoder Float
 scrollTopDecoder =
     DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
+        |> DOM.parentElement
         |> DOM.parentElement
         |> DOM.target
 
@@ -937,7 +1014,7 @@ zipReverseFirst zipList =
                         , back = zipList.current :: zipList.back
                         , currentTop =
                             zipList.currentTop
-                                - Tuple.second zipList.current
+                                - Tuple.second previous
                         }
 
         _ ->
@@ -974,7 +1051,7 @@ zipPrevious zipList =
             , back = zipList.current :: zipList.back
             , currentTop =
                 zipList.currentTop
-                    - Tuple.second zipList.current
+                    - Tuple.second previous
             }
                 |> zipReverseFirst
                 |> Maybe.withDefault zipList
