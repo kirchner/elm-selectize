@@ -10293,8 +10293,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (zipList
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Selectize.Selectize',
 			{
-				start: {line: 911, column: 5},
-				end: {line: 918, column: 52}
+				start: {line: 910, column: 5},
+				end: {line: 917, column: 52}
 			},
 			_p9)('this should be impossible');
 	}
@@ -11208,18 +11208,14 @@ var _kirchner$elm_selectize$Selectize_Selectize$button = F5(
 					buttonAttrs(
 						open ? {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_kirchner$elm_selectize$Selectize_Selectize$BlurTextfield),
+							_0: _elm_lang$html$Html_Events$onBlur(_kirchner$elm_selectize$Selectize_Selectize$CloseMenu),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onBlur(_kirchner$elm_selectize$Selectize_Selectize$CloseMenu),
+								_0: A2(_elm_lang$html$Html_Events$on, 'keyup', _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder),
 								_1: {
 									ctor: '::',
-									_0: A2(_elm_lang$html$Html_Events$on, 'keyup', _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder),
-									_1: {
-										ctor: '::',
-										_0: A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', _kirchner$elm_selectize$Selectize_Selectize$keydownOptions, _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder),
-										_1: {ctor: '[]'}
-									}
+									_0: A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', _kirchner$elm_selectize$Selectize_Selectize$keydownOptions, _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder),
+									_1: {ctor: '[]'}
 								}
 							}
 						} : {
