@@ -30,7 +30,6 @@ If you want to use it, your model should look something like this
     type alias Model =
         { selection : Maybe Tree
         , menu : Selectize.State Tree
-        , entries : List (Selectize.Entry Tree)
         }
 
     type alias Tree =
@@ -44,7 +43,6 @@ The state of the dropdown menu is instanciated via
         Selectize.closed "unique-menu-id"
             (\tree -> tree.name ++ " - " ++ tree.latinName)
             trees
-            Nothing
 
 with
 
@@ -62,7 +60,10 @@ And you have to hook it up in your update function like so
             MenuMsg selectizeMsg ->
                 let
                     ( newMenu, menuCmd, maybeMsg ) =
-                        Selectize.update SelectTree model.menu selectizeMsg
+                        Selectize.update SelectTree
+                            model.selection
+                            model.menu
+                            selectizeMsg
 
                     newModel =
                         { model | menu = newMenu }
@@ -92,7 +93,9 @@ Finally, the menu can be rendered like this
     view : Model -> Html Msg
     view model =
         Html.div []
-            [ Selectize.view viewConfig selector model.menu
+            [ Selectize.view viewConfig
+                model.selection
+                model.menu
                 |> Html.map MenuMsg
             ]
 
@@ -131,12 +134,13 @@ with the view configuration given by
                     , children =
                         [ Html.text title ]
                     }
+            , selector = styledSelector
             }
 
 and a selector given by, for example,
 
-    selector : Selectize.selector Tree
-    selector =
+    styledSelector : Selectize.selector Tree
+    styledSelector =
         Selectize.textfield <|
             \sthSelected open ->
                 [ Attributes.class "selectize__textfield"
@@ -165,8 +169,8 @@ and a selector given by, for example,
 -}
 
 import Html exposing (Html)
-import Selectize.Selectize as Internal
 import Html.Lazy as Lazy
+import Selectize.Selectize as Internal
 
 
 {- model -}
@@ -178,10 +182,17 @@ type alias State a =
     Internal.State a
 
 
-{-| Use this function to initialize your dropdown menu. It will have
-the provided entries, possibly a pre-selection and be closed. The
-provided id should be unique. If for some reason the entries change,
-just reinstantiate your dropdown state with this function.
+{-| Use this function to initialize your dropdown menu, for example by
+
+    menu =
+        Selectize.closed "unique-menu-id"
+            entryToLabel
+            entries
+
+It will have the provided entries and be closed. The provided id should
+be unique. If for some reason the entries change, just reinstantiate
+your dropdown state with this function.
+
 -}
 closed :
     String
@@ -207,8 +218,8 @@ entry a =
     Internal.entry a
 
 
-{-| Create a divider, which cannot neither be selected or get focus. It
-is therefore skipped while traversing the list via arrow up/down keys.
+{-| Create a divider, which can neither be selected nor focused. It
+is therefore skipped while traversing the list via up/down keys.
 -}
 divider : String -> Entry a
 divider title =
@@ -230,8 +241,7 @@ type ViewConfig a model
     viewConfig : Selectize.ViewConfig String Model
     viewConfig =
         Selectize.viewConfig
-            { placeholder = "Select a Tree"
-            , container = [ ... ]
+            { container = [ ... ]
             , menu = [ ... ]
             , ul = [ ... ]
             , entry =
@@ -244,12 +254,15 @@ type ViewConfig a model
                     { attributes = ...
                     , children = ...
                     }
+            , selector = someSelector
             }
 
-  - tell us the `placeholder` if the selection is empty
   - `container`, `menu`, `ul`, `entry` and `divider` can be
     used to style the different parts of the dropdown view, c.f. the
     modul documentation for an example.
+  - with `selector` you can choose if you want autocompletion or just
+    a simple dropdown menu, you can choose for example
+    `Selectize.textfield` or `Selectize.button`.
 
 -}
 viewConfig :
@@ -290,8 +303,9 @@ type alias Msg a =
     Internal.Msg a
 
 
-{-| The dropdown's update function. C.f. the module documentation to see
-what boilerplate is needed in your main update.
+{-| The dropdown's update function. Take a look at the beginning of this
+module documentation to see what boilerplate is needed in your main
+update.
 -}
 update :
     (Maybe a -> msg)
@@ -307,21 +321,30 @@ update select selection state msg =
 {- view -}
 
 
-{-| The dropdown's view function.
+{-| The dropdown's view function. You have to provide the current
+selection (along with the configuration and the its actual state).
 -}
 view : ViewConfig a model -> Maybe a -> State a -> Html (Msg a)
 view (ViewConfig viewConfig) selection state =
     Lazy.lazy3 Internal.view viewConfig selection state
 
 
-
-
-{-| -}
+{-| You have to choose a `Selector` in your view configuration. This
+decides if you have a simple dropdown or an autocompletion version.
+-}
 type alias Selector a =
     Internal.Selector a
 
 
-{-| -}
+{-| A selector for displaying a simple dropdown.
+
+  - `attrs = \sthSelected open -> [ ... ]` is used to style the actual
+    button
+  - you can style optional buttons via `toggleButton` and `clearButton`,
+    for example `toggleButton = Just (\open -> Html.div [ ... ] [ ... ])`
+  - tell us the `placeholder` if the selection is empty
+
+-}
 button :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
@@ -333,7 +356,16 @@ button config =
     Internal.button config
 
 
-{-| -}
+{-| A selector for an autocompletion dropdown.
+
+  - `attrs = \sthSelected open -> [ ... ]` is used to style the actual
+    textfield (You probably need to overwrite the placeholder styling,
+    see the source code of the demo for an example stylesheet.)
+  - you can style optional buttons via `toggleButton` and `clearButton`,
+    for example `toggleButton = Just (\open -> Html.div [ ... ] [ ... ])`
+  - tell us the `placeholder` if the selection is empty
+
+-}
 textfield :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
