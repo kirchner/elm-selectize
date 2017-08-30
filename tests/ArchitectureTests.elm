@@ -63,13 +63,25 @@ testUpdate =
             setQuery
           <|
             \_ _ _ _ finalModel ->
+                let
+                    filter entry =
+                        case entry of
+                            S.LEntry _ label ->
+                                if label |> S.contains finalModel.menu.query then
+                                    Just entry
+                                else
+                                    Nothing
+
+                            _ ->
+                                Just entry
+                in
                 if finalModel.menu.open then
                     finalModel.menu.zipList
                         |> Maybe.map S.currentEntry
                         |> Maybe.map entry
                         |> Expect.equal
                             (treesWithoutDivider
-                                |> S.filter finalModel.menu.query
+                                |> List.filterMap filter
                                 |> List.head
                             )
                 else
@@ -94,7 +106,6 @@ expectReset menu =
         |> Expect.all
             [ .query >> Expect.equal ""
             , .zipList >> Expect.equal Nothing
-            , .filteredEntries >> Expect.equal Nothing
             , .mouseFocus >> Expect.equal Nothing
             , .open >> Expect.false "Expected the menu to be closed"
             ]

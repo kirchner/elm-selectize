@@ -11,6 +11,7 @@ module Selectize.Selectize
         , ZipList
         , button
         , closed
+        , contains
         , currentEntry
         , divider
         , entry

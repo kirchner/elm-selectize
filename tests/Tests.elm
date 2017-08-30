@@ -10,49 +10,10 @@ import Test exposing (..)
 suite : Test
 suite =
     describe "unit tests"
-        [ testFilter
-        , testFirst
+        [ testFirst
         , testNext
         , testPrevious
         , testTopAndHeight
-        ]
-
-
-testFilter : Test
-testFilter =
-    let
-        entriesIn =
-            List.map entry
-                [ "foobar"
-                , "bar"
-                , "foofoo"
-                ]
-
-        entriesOut =
-            List.map entry
-                [ "foobar"
-                , "foofoo"
-                ]
-
-        entry tree =
-            LEntry tree tree
-    in
-    describe "filter"
-        [ test "empty query returns orginal list" <|
-            \_ ->
-                entriesIn
-                    |> filter ""
-                    |> Expect.equal entriesIn
-        , test "return matching entries" <|
-            \_ ->
-                entriesIn
-                    |> filter "foo"
-                    |> Expect.equal entriesOut
-        , test "no matching entires" <|
-            \_ ->
-                entriesIn
-                    |> filter "not matching"
-                    |> Expect.equal []
         ]
 
 
@@ -170,7 +131,7 @@ testTopAndHeight =
                     Just zipList ->
                         zipList
                             |> Expect.all
-                                [ zipCurrentScrollTop
+                                [ .currentTop
                                     >> Expect.all
                                         [ Expect.atLeast 0
                                         , Expect.atMost sum
