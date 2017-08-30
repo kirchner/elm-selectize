@@ -33,7 +33,6 @@ import Dom.Scroll
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
-import Html.Keyed
 import Html.Lazy
 import Json.Decode as Decode exposing (Decoder)
 import Keyboard.Extra
@@ -483,19 +482,137 @@ view config selection state =
              ]
                 ++ noOp config.menu
             )
-            [ actualEntries
-                |> List.map
-                    (Html.Lazy.lazy <|
-                        viewEntry
-                            state.open
-                            config.entry
-                            config.divider
-                            keyboardFocus
-                            state.mouseFocus
-                    )
-                |> Html.ul (noOp config.ul)
+            [ case state.zipList of
+                Nothing ->
+                    actualEntries
+                        |> List.map
+                            (removeLabel
+                                >> viewUnfocusedEntry
+                                    config
+                                    Nothing
+                            )
+                        |> Html.ul (noOp config.ul)
+
+                Just zipList ->
+                    [ zipList.front
+                        |> viewFrontEntries config state
+                    , [ zipList.current
+                            |> viewCurrentEntry config state
+                      ]
+                    , zipList.back
+                        |> viewBackEntries config state
+                    ]
+                        |> List.concat
+                        |> Html.ul (noOp config.ul)
             ]
         ]
+
+
+viewFrontEntries :
+    ViewConfig a
+    -> State a
+    -> List (EntryWithHeight a)
+    -> List (Html (Msg a))
+viewFrontEntries config state front =
+    front
+        |> List.map
+            (\( entry, _ ) ->
+                Html.Lazy.lazy3 viewUnfocusedEntry
+                    config
+                    state.mouseFocus
+                    entry
+            )
+        |> List.reverse
+
+
+viewCurrentEntry :
+    ViewConfig a
+    -> State a
+    -> EntryWithHeight a
+    -> Html (Msg a)
+viewCurrentEntry config state current =
+    current
+        |> Tuple.first
+        |> viewFocusedEntry config state.mouseFocus
+
+
+viewBackEntries :
+    ViewConfig a
+    -> State a
+    -> List (EntryWithHeight a)
+    -> List (Html (Msg a))
+viewBackEntries config state back =
+    back
+        |> List.map
+            (\( entry, _ ) ->
+                Html.Lazy.lazy3 viewUnfocusedEntry
+                    config
+                    state.mouseFocus
+                    entry
+            )
+
+
+viewUnfocusedEntry :
+    { r
+        | entry : a -> Bool -> Bool -> HtmlDetails Never
+        , divider : String -> HtmlDetails Never
+    }
+    -> Maybe a
+    -> Entry a
+    -> Html (Msg a)
+viewUnfocusedEntry config mouseFocus entry =
+    viewEntry config False mouseFocus entry
+
+
+viewFocusedEntry :
+    { r
+        | entry : a -> Bool -> Bool -> HtmlDetails Never
+        , divider : String -> HtmlDetails Never
+    }
+    -> Maybe a
+    -> Entry a
+    -> Html (Msg a)
+viewFocusedEntry config mouseFocus entry =
+    viewEntry config True mouseFocus entry
+
+
+viewEntry :
+    { r
+        | entry : a -> Bool -> Bool -> HtmlDetails Never
+        , divider : String -> HtmlDetails Never
+    }
+    -> Bool
+    -> Maybe a
+    -> Entry a
+    -> Html (Msg a)
+viewEntry config keyboardFocused mouseFocus entry =
+    let
+        { attributes, children } =
+            case entry of
+                Entry entry ->
+                    config.entry entry
+                        (mouseFocus == Just entry)
+                        keyboardFocused
+
+                Divider title ->
+                    config.divider title
+
+        liAttrs attrs =
+            attrs ++ noOp attributes
+    in
+    Html.li
+        (liAttrs <|
+            case entry of
+                Entry entry ->
+                    [ Events.onClick (Select entry)
+                    , Events.onMouseEnter (SetMouseFocus (Just entry))
+                    , Events.onMouseLeave (SetMouseFocus Nothing)
+                    ]
+
+                _ ->
+                    []
+        )
+        (children |> List.map mapToNoOp)
 
 
 type alias Selector a =
@@ -720,47 +837,6 @@ keyupDecoder =
                         Err "not handling that key here"
             )
         |> Decode.andThen fromResult
-
-
-viewEntry :
-    Bool
-    -> (a -> Bool -> Bool -> HtmlDetails Never)
-    -> (String -> HtmlDetails Never)
-    -> Maybe a
-    -> Maybe a
-    -> LEntry a
-    -> Html (Msg a)
-viewEntry open renderEntry renderDivider keyboardFocus mouseFocus entry =
-    let
-        { attributes, children } =
-            case entry of
-                LEntry entry label ->
-                    renderEntry entry
-                        (mouseFocus == Just entry)
-                        (keyboardFocus == Just entry)
-
-                LDivider title ->
-                    renderDivider title
-
-        liAttrs attrs =
-            attrs ++ noOp attributes
-    in
-    Html.li
-        (liAttrs <|
-            case entry of
-                LEntry entry _ ->
-                    if open then
-                        [ Events.onClick (Select entry)
-                        , Events.onMouseEnter (SetMouseFocus (Just entry))
-                        , Events.onMouseLeave (SetMouseFocus Nothing)
-                        ]
-                    else
-                        []
-
-                _ ->
-                    []
-        )
-        (children |> List.map mapToNoOp)
 
 
 
