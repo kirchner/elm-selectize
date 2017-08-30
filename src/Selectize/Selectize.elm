@@ -14,7 +14,6 @@ module Selectize.Selectize
         , currentEntry
         , divider
         , entry
-        , filter
         , fromList
         , moveForwardTo
         , textfield
@@ -58,10 +57,9 @@ type alias State a =
     , entries : List (LEntry a)
     , query : String
     , zipList : Maybe (ZipList a)
-    , filteredEntries : Maybe (List (LEntry a))
+    , open : Bool
     , mouseFocus : Maybe a
     , preventBlur : Bool
-    , open : Bool
 
     -- dom measurements
     , entryHeights : List Float
@@ -127,10 +125,9 @@ closed id toLabel entries =
     , entries = labeledEntries
     , query = ""
     , zipList = Nothing
-    , filteredEntries = Just labeledEntries
+    , open = False
     , mouseFocus = Nothing
     , preventBlur = False
-    , open = False
     , entryHeights = []
     , menuHeight = 0
     , scrollTop = 0
@@ -256,9 +253,9 @@ update select selection state msg =
             in
             ( { state
                 | zipList = newZipList
+                , open = True
                 , mouseFocus = Nothing
                 , query = ""
-                , open = True
                 , entryHeights = heights.entries
                 , menuHeight = heights.menu
                 , scrollTop = scrollTop
@@ -298,15 +295,10 @@ update select selection state msg =
             let
                 newZipList =
                     fromListWithFilter newQuery state.entries state.entryHeights
-
-                newFilteredEntries =
-                    state.entries
-                        |> filter newQuery
             in
             ( { state
                 | query = newQuery
                 , zipList = newZipList
-                , filteredEntries = Just newFilteredEntries
                 , mouseFocus = Nothing
               }
             , scroll state.id 0
@@ -364,7 +356,6 @@ reset state =
     { state
         | query = ""
         , zipList = Nothing
-        , filteredEntries = Nothing
         , open = False
         , mouseFocus = Nothing
     }
@@ -447,82 +438,78 @@ view :
     -> Html (Msg a)
 view config selection state =
     let
-        actualEntries =
-            state.filteredEntries
-                |> Maybe.withDefault state.entries
-
-        keyboardFocus =
-            state.zipList |> Maybe.map currentEntry
-
         selectionText =
             selection
-                |> Maybe.andThen (selectFirst actualEntries)
+                |> Maybe.andThen (selectFirst state.entries)
                 |> Maybe.map Tuple.second
-    in
-    Html.div
-        [ if state.open && not (actualEntries |> List.isEmpty) then
-            Attributes.style
-                [ ( "position", "relative" ) ]
-          else
-            Attributes.style
-                [ ( "overflow", "hidden" )
-                , ( "position", "relative" )
-                ]
-        ]
-        [ config.selector
-            state.id
-            selectionText
-            state.query
-            state.open
-        , Html.div
-            ([ Attributes.id (menuId state.id)
-             , Events.onMouseDown (PreventClosing True)
-             , Events.onMouseUp (PreventClosing False)
-             , Attributes.style [ ( "position", "absolute" ) ]
-             ]
-                ++ noOp config.menu
-            )
-            [ case state.zipList of
-                Nothing ->
-                    actualEntries
-                        |> List.map
-                            (removeLabel
-                                >> viewUnfocusedEntry
-                                    config
-                                    Nothing
-                            )
-                        |> Html.ul (noOp config.ul)
 
-                Just zipList ->
-                    [ zipList.front
-                        |> viewFrontEntries config state
-                    , [ zipList.current
-                            |> viewCurrentEntry config state
-                      ]
-                    , zipList.back
-                        |> viewBackEntries config state
+        menuAttrs =
+            [ Attributes.id (menuId state.id)
+            , Events.onMouseDown (PreventClosing True)
+            , Events.onMouseUp (PreventClosing False)
+            , Attributes.style [ "position" => "absolute" ]
+            ]
+                ++ noOp config.menu
+    in
+    case state.zipList of
+        Nothing ->
+            Html.div
+                [ Attributes.style
+                    [ "overflow" => "hidden"
+                    , "position" => "relative"
                     ]
+                ]
+                [ config.selector
+                    state.id
+                    selectionText
+                    state.query
+                    state.open
+                , Html.div menuAttrs
+                    [ state.entries
+                        |> List.map
+                            (removeLabel >> viewUnfocusedEntry config Nothing)
+                        |> Html.ul (noOp config.ul)
+                    ]
+                ]
+
+        Just zipList ->
+            Html.div
+                [ Attributes.style
+                    [ "position" => "relative" ]
+                ]
+                [ config.selector
+                    state.id
+                    selectionText
+                    state.query
+                    state.open
+                , Html.div menuAttrs
+                    [ [ zipList.front
+                            |> viewEntries config state
+                            |> List.reverse
+                      , [ zipList.current |> viewCurrentEntry config state ]
+                      , zipList.back
+                            |> viewEntries config state
+                      ]
                         |> List.concat
                         |> Html.ul (noOp config.ul)
-            ]
-        ]
+                    ]
+                ]
 
 
-viewFrontEntries :
+viewEntries :
     ViewConfig a
     -> State a
     -> List (EntryWithHeight a)
     -> List (Html (Msg a))
-viewFrontEntries config state front =
-    front
-        |> List.map
-            (\( entry, _ ) ->
-                Html.Lazy.lazy3 viewUnfocusedEntry
-                    config
-                    state.mouseFocus
-                    entry
-            )
-        |> List.reverse
+viewEntries config state front =
+    let
+        viewEntry ( entry, _ ) =
+            Html.Lazy.lazy3 viewUnfocusedEntry
+                config
+                state.mouseFocus
+                entry
+    in
+    front |> List.map viewEntry
 
 
 viewCurrentEntry :
@@ -534,22 +521,6 @@ viewCurrentEntry config state current =
     current
         |> Tuple.first
         |> viewFocusedEntry config state.mouseFocus
-
-
-viewBackEntries :
-    ViewConfig a
-    -> State a
-    -> List (EntryWithHeight a)
-    -> List (Html (Msg a))
-viewBackEntries config state back =
-    back
-        |> List.map
-            (\( entry, _ ) ->
-                Html.Lazy.lazy3 viewUnfocusedEntry
-                    config
-                    state.mouseFocus
-                    entry
-            )
 
 
 viewUnfocusedEntry :
@@ -640,11 +611,11 @@ button config id selection _ open =
             [ [ Attributes.id (textfieldId id)
               , Attributes.tabindex 0
               , Attributes.style
-                    [ ( "-webkit-touch-callout", "none" )
-                    , ( "-webkit-user-select", "none" )
-                    , ( "-moz-user-select", "none" )
-                    , ( "-ms-user-select", "none" )
-                    , ( "user-select", "none" )
+                    [ "-webkit-touch-callout" => "none"
+                    , "-webkit-user-select" => "none"
+                    , "-moz-user-select" => "none"
+                    , "-ms-user-select" => "none"
+                    , "user-select" => "none"
                     ]
               ]
             , attrs
@@ -739,10 +710,10 @@ buttons :
 buttons clearButton toggleButton sthSelected open =
     Html.div
         [ Attributes.style
-            [ ( "position", "absolute" )
-            , ( "right", "0" )
-            , ( "top", "0" )
-            , ( "display", "flex" )
+            [ "position" => "absolute"
+            , "right" => "0"
+            , "top" => "0"
+            , "display" => "flex"
             ]
         ]
         [ case ( clearButton, sthSelected ) of
@@ -843,34 +814,16 @@ keyupDecoder =
 ---- HELPER
 
 
-{-| Return all entries which contain the given query. Return the whole
-list if the query equals `""`.
--}
-filter :
-    String
-    -> List (LEntry a)
-    -> List (LEntry a)
-filter query entries =
-    let
-        containsQuery entry =
-            case entry of
-                LEntry a label ->
-                    if label |> contains query then
-                        Just entry
-                    else
-                        Nothing
-
-                _ ->
-                    Just entry
-    in
-    entries |> List.filterMap containsQuery
-
-
 contains : String -> String -> Bool
 contains query label =
     label
         |> String.toLower
         |> String.contains (String.toLower query)
+
+
+(=>) : name -> value -> ( name, value )
+(=>) name value =
+    ( name, value )
 
 
 
