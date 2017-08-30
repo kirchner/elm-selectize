@@ -21,7 +21,6 @@ module Selectize.Selectize
         , view
         , viewConfig
         , zipCurrentHeight
-        , zipCurrentScrollTop
         , zipNext
         , zipPrevious
         )
@@ -243,7 +242,7 @@ update select selection state msg =
 
                 top =
                     newZipList
-                        |> Maybe.map zipCurrentScrollTop
+                        |> Maybe.map .currentTop
                         |> Maybe.withDefault 0
 
                 height =
@@ -399,7 +398,7 @@ scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
         Just zipList ->
             let
                 top =
-                    zipCurrentScrollTop zipList
+                    zipList.currentTop
 
                 height =
                     zipCurrentHeight zipList
@@ -486,7 +485,9 @@ view config selection state =
                     [ [ zipList.front
                             |> viewEntries config state
                             |> List.reverse
-                      , [ zipList.current |> viewCurrentEntry config state ]
+                      , [ zipList.current
+                            |> viewCurrentEntry config state
+                        ]
                       , zipList.back
                             |> viewEntries config state
                       ]
@@ -929,26 +930,19 @@ type alias EntryWithHeight a =
     ( Entry a, Float )
 
 
-currentEntry : ZipList a -> a
-currentEntry zipList =
-    case zipList.current of
+currentEntry : { r | current : EntryWithHeight a } -> a
+currentEntry { current } =
+    case current of
         ( Entry a, _ ) ->
             a
 
         _ ->
-            -- TODO: remove this! (we need to fix previous and next if
-            -- at the beginning or end of the list)
             Debug.crash "this should be impossible"
 
 
-zipCurrentScrollTop : ZipList a -> Float
-zipCurrentScrollTop zipList =
-    zipList.currentTop
-
-
-zipCurrentHeight : ZipList a -> Float
-zipCurrentHeight zipList =
-    zipList.current |> Tuple.second
+zipCurrentHeight : { r | current : EntryWithHeight a } -> Float
+zipCurrentHeight { current } =
+    current |> Tuple.second
 
 
 fromList : List (LEntry a) -> List Float -> Maybe (ZipList a)
@@ -1002,80 +996,72 @@ fromListWithFilter query entries entryHeights =
 
 
 zipFirst : ZipList a -> Maybe (ZipList a)
-zipFirst zipList =
-    case zipList.current of
+zipFirst ({ front, current, back, currentTop } as zipList) =
+    case current of
         ( Divider _, _ ) ->
-            case zipList.back of
+            case back of
                 [] ->
                     Nothing
 
                 next :: rest ->
-                    zipFirst
-                        { front = zipList.current :: zipList.front
-                        , current = next
-                        , back = rest
-                        , currentTop =
-                            zipList.currentTop
-                                + Tuple.second zipList.current
-                        }
+                    { front = current :: front
+                    , current = next
+                    , back = rest
+                    , currentTop = currentTop + Tuple.second current
+                    }
+                        |> zipFirst
 
         _ ->
             Just zipList
 
 
 zipReverseFirst : ZipList a -> Maybe (ZipList a)
-zipReverseFirst zipList =
-    case zipList.current of
+zipReverseFirst ({ front, current, back, currentTop } as zipList) =
+    case current of
         ( Divider _, _ ) ->
-            case zipList.front of
+            case front of
                 [] ->
                     Nothing
 
                 previous :: rest ->
-                    zipReverseFirst
-                        { front = rest
-                        , current = previous
-                        , back = zipList.current :: zipList.back
-                        , currentTop =
-                            zipList.currentTop
-                                - Tuple.second previous
-                        }
+                    { front = rest
+                    , current = previous
+                    , back = current :: back
+                    , currentTop = currentTop - Tuple.second previous
+                    }
+                        |> zipReverseFirst
 
         _ ->
             Just zipList
 
 
 zipNext : ZipList a -> ZipList a
-zipNext zipList =
-    case zipList.back of
+zipNext ({ front, current, back, currentTop } as zipList) =
+    case back of
         [] ->
             zipList
 
         next :: rest ->
-            { front = zipList.current :: zipList.front
+            { front = current :: front
             , current = next
             , back = rest
-            , currentTop =
-                zipList.currentTop
-                    + Tuple.second zipList.current
+            , currentTop = currentTop + Tuple.second current
             }
                 |> zipFirst
                 |> Maybe.withDefault zipList
 
 
 zipPrevious : ZipList a -> ZipList a
-zipPrevious zipList =
-    case zipList.front of
+zipPrevious ({ front, current, back, currentTop } as zipList) =
+    case front of
         [] ->
             zipList
 
         previous :: rest ->
             { front = rest
             , current = previous
-            , back = zipList.current :: zipList.back
-            , currentTop =
-                zipList.currentTop
-                    - Tuple.second previous
+            , back = current :: back
+            , currentTop = currentTop - Tuple.second previous
             }
                 |> zipReverseFirst
                 |> Maybe.withDefault zipList
@@ -1087,7 +1073,10 @@ moveForwardTo a zipList =
         |> Maybe.withDefault zipList
 
 
-moveForwardToHelper : a -> ZipList a -> Maybe (ZipList a)
+moveForwardToHelper :
+    a
+    -> ZipList a
+    -> Maybe (ZipList a)
 moveForwardToHelper a zipList =
     if (zipList.current |> Tuple.first) == Entry a then
         Just zipList
