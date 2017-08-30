@@ -166,6 +166,7 @@ and a selector given by, for example,
 
 import Html exposing (Html)
 import Selectize.Selectize as Internal
+import Html.Lazy as Lazy
 
 
 {- model -}
@@ -257,6 +258,7 @@ viewConfig :
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
+    , selector : Selector a
     }
     -> ViewConfig a model
 viewConfig config =
@@ -266,6 +268,7 @@ viewConfig config =
         , ul = config.ul
         , entry = config.entry
         , divider = config.divider
+        , selector = config.selector
         }
 
 
@@ -306,9 +309,11 @@ update select selection state msg =
 
 {-| The dropdown's view function.
 -}
-view : ViewConfig a model -> Selector a -> Maybe a -> State a -> Html (Msg a)
-view (ViewConfig viewConfig) selector selection state =
-    Internal.view viewConfig selector selection state
+view : ViewConfig a model -> Maybe a -> State a -> Html (Msg a)
+view (ViewConfig viewConfig) selection state =
+    Lazy.lazy3 Internal.view viewConfig selection state
+
+
 
 
 {-| -}

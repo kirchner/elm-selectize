@@ -27,20 +27,22 @@ main =
 
 
 type alias Model =
-    { selection : Maybe String
+    { textfieldSelection : Maybe String
     , textfieldMenu : Selectize.State String
+    , buttonSelection : Maybe String
     , buttonMenu : Selectize.State String
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { selection = Nothing
+    ( { textfieldSelection = Nothing
       , textfieldMenu =
             Selectize.closed
                 "textfield-menu"
                 identity
                 licenses
+      , buttonSelection = Nothing
       , buttonMenu =
             Selectize.closed
                 "button-menu"
@@ -58,7 +60,8 @@ init =
 type Msg
     = TextfieldMenuMsg (Selectize.Msg String)
     | ButtonMenuMsg (Selectize.Msg String)
-    | SelectLicense (Maybe String)
+    | SelectTextfieldLicense (Maybe String)
+    | SelectButtonLicense (Maybe String)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -67,8 +70,8 @@ update msg model =
         TextfieldMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectLicense
-                        model.selection
+                    Selectize.update SelectTextfieldLicense
+                        model.textfieldSelection
                         model.textfieldMenu
                         selectizeMsg
 
@@ -89,8 +92,8 @@ update msg model =
         ButtonMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectLicense
-                        model.selection
+                    Selectize.update SelectButtonLicense
+                        model.buttonSelection
                         model.buttonMenu
                         selectizeMsg
 
@@ -108,8 +111,11 @@ update msg model =
                 Nothing ->
                     ( newModel, cmd )
 
-        SelectLicense newSelection ->
-            ( { model | selection = newSelection }, Cmd.none )
+        SelectTextfieldLicense newSelection ->
+            ( { model | textfieldSelection = newSelection }, Cmd.none )
+
+        SelectButtonLicense newSelection ->
+            ( { model | buttonSelection = newSelection }, Cmd.none )
 
 
 andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
@@ -150,9 +156,9 @@ view model =
                     [ Html.text "with autocompletion: " ]
                 , Html.div
                     [ Attributes.style [ ( "width", "30rem" ) ] ]
-                    [ Selectize.view viewConfig
-                        textfieldSelector
-                        model.selection
+                    [ Selectize.view
+                        viewConfigTextfield
+                        model.textfieldSelection
                         model.textfieldMenu
                         |> Html.map TextfieldMenuMsg
                     ]
@@ -164,9 +170,9 @@ view model =
                     [ Html.text "without autocompletion: " ]
                 , Html.div
                     [ Attributes.style [ ( "width", "30rem" ) ] ]
-                    [ Selectize.view viewConfig
-                        buttonSelector
-                        model.selection
+                    [ Selectize.view
+                        viewConfigButton
+                        model.buttonSelection
                         model.buttonMenu
                         |> Html.map ButtonMenuMsg
                     ]
@@ -179,8 +185,18 @@ view model =
 ---- CONFIGURATION
 
 
-viewConfig : Selectize.ViewConfig String Model
-viewConfig =
+viewConfigTextfield : Selectize.ViewConfig String Model
+viewConfigTextfield =
+    viewConfig textfieldSelector
+
+
+viewConfigButton : Selectize.ViewConfig String Model
+viewConfigButton =
+    viewConfig buttonSelector
+
+
+viewConfig : Selectize.Selector String -> Selectize.ViewConfig String Model
+viewConfig selector =
     Selectize.viewConfig
         { container = []
         , menu =
@@ -210,6 +226,7 @@ viewConfig =
                 , children =
                     [ Html.text title ]
                 }
+        , selector = selector
         }
 
 

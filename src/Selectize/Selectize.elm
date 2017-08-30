@@ -1,8 +1,8 @@
 module Selectize.Selectize
     exposing
         ( Entry
-        , LEntry(..)
         , Heights
+        , LEntry(..)
         , Movement(..)
         , Msg(..)
         , Selector
@@ -34,6 +34,7 @@ import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
 import Html.Keyed
+import Html.Lazy
 import Json.Decode as Decode exposing (Decoder)
 import Keyboard.Extra
     exposing
@@ -147,6 +148,7 @@ type alias ViewConfig a =
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
+    , selector : Selector a
     }
 
 
@@ -177,6 +179,7 @@ viewConfig :
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
+    , selector : Selector a
     }
     -> ViewConfig a
 viewConfig config =
@@ -185,6 +188,7 @@ viewConfig config =
     , ul = config.ul
     , entry = config.entry
     , divider = config.divider
+    , selector = config.selector
     }
 
 
@@ -439,11 +443,10 @@ scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
 
 view :
     ViewConfig a
-    -> Selector a
     -> Maybe a
     -> State a
     -> Html (Msg a)
-view config selector selection state =
+view config selection state =
     let
         actualEntries =
             state.filteredEntries
@@ -467,7 +470,7 @@ view config selector selection state =
                 , ( "position", "relative" )
                 ]
         ]
-        [ selector
+        [ config.selector
             state.id
             selectionText
             state.query
@@ -482,14 +485,15 @@ view config selector selection state =
             )
             [ actualEntries
                 |> List.map
-                    (viewEntry
-                        state.open
-                        config.entry
-                        config.divider
-                        keyboardFocus
-                        state.mouseFocus
+                    (Html.Lazy.lazy <|
+                        viewEntry
+                            state.open
+                            config.entry
+                            config.divider
+                            keyboardFocus
+                            state.mouseFocus
                     )
-                |> Html.Keyed.ul (noOp config.ul)
+                |> Html.ul (noOp config.ul)
             ]
         ]
 
@@ -725,7 +729,7 @@ viewEntry :
     -> Maybe a
     -> Maybe a
     -> LEntry a
-    -> ( String, Html (Msg a) )
+    -> Html (Msg a)
 viewEntry open renderEntry renderDivider keyboardFocus mouseFocus entry =
     let
         { attributes, children } =
@@ -741,13 +745,7 @@ viewEntry open renderEntry renderDivider keyboardFocus mouseFocus entry =
         liAttrs attrs =
             attrs ++ noOp attributes
     in
-    ( case entry of
-        LEntry entry label ->
-            label
-
-        LDivider title ->
-            title
-    , Html.li
+    Html.li
         (liAttrs <|
             case entry of
                 LEntry entry _ ->
@@ -763,7 +761,6 @@ viewEntry open renderEntry renderDivider keyboardFocus mouseFocus entry =
                     []
         )
         (children |> List.map mapToNoOp)
-    )
 
 
 
