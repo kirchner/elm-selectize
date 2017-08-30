@@ -9017,9 +9017,9 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
-var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
-var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
-var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
+var _elm_lang$html$Html_Lazy$lazy3 = _elm_lang$virtual_dom$VirtualDom$lazy3;
+var _elm_lang$html$Html_Lazy$lazy2 = _elm_lang$virtual_dom$VirtualDom$lazy2;
+var _elm_lang$html$Html_Lazy$lazy = _elm_lang$virtual_dom$VirtualDom$lazy;
 
 var _elm_lang$keyboard$Keyboard$onSelfMsg = F3(
 	function (router, _p0, state) {
@@ -10197,114 +10197,122 @@ var _kirchner$elm_selectize$Selectize_Selectize$zip = F2(
 				listB,
 				{ctor: '[]'}));
 	});
-var _kirchner$elm_selectize$Selectize_Selectize$zipReverseFirst = function (zipList) {
+var _kirchner$elm_selectize$Selectize_Selectize$zipReverseFirst = function (_p1) {
 	zipReverseFirst:
 	while (true) {
-		var _p1 = zipList.current;
-		if ((_p1.ctor === '_Tuple2') && (_p1._0.ctor === 'Divider')) {
-			var _p2 = zipList.front;
-			if (_p2.ctor === '[]') {
+		var _p2 = _p1;
+		var _p6 = _p2.current;
+		var _p3 = _p6;
+		if ((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Divider')) {
+			var _p4 = _p2.front;
+			if (_p4.ctor === '[]') {
 				return _elm_lang$core$Maybe$Nothing;
 			} else {
-				var _p3 = _p2._0;
-				var _v6 = {
-					front: _p2._1,
-					current: _p3,
-					back: {ctor: '::', _0: zipList.current, _1: zipList.back},
-					currentTop: zipList.currentTop - _elm_lang$core$Tuple$second(_p3)
+				var _p5 = _p4._0;
+				var _v7 = {
+					front: _p4._1,
+					current: _p5,
+					back: {ctor: '::', _0: _p6, _1: _p2.back},
+					currentTop: _p2.currentTop - _elm_lang$core$Tuple$second(_p5)
 				};
-				zipList = _v6;
+				_p1 = _v7;
 				continue zipReverseFirst;
 			}
 		} else {
-			return _elm_lang$core$Maybe$Just(zipList);
+			return _elm_lang$core$Maybe$Just(_p2);
 		}
 	}
 };
-var _kirchner$elm_selectize$Selectize_Selectize$zipPrevious = function (zipList) {
-	var _p4 = zipList.front;
-	if (_p4.ctor === '[]') {
-		return zipList;
+var _kirchner$elm_selectize$Selectize_Selectize$zipPrevious = function (_p7) {
+	var _p8 = _p7;
+	var _p11 = _p8;
+	var _p9 = _p8.front;
+	if (_p9.ctor === '[]') {
+		return _p11;
 	} else {
-		var _p5 = _p4._0;
+		var _p10 = _p9._0;
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
-			zipList,
+			_p11,
 			_kirchner$elm_selectize$Selectize_Selectize$zipReverseFirst(
 				{
-					front: _p4._1,
-					current: _p5,
-					back: {ctor: '::', _0: zipList.current, _1: zipList.back},
-					currentTop: zipList.currentTop - _elm_lang$core$Tuple$second(_p5)
+					front: _p9._1,
+					current: _p10,
+					back: {ctor: '::', _0: _p8.current, _1: _p8.back},
+					currentTop: _p8.currentTop - _elm_lang$core$Tuple$second(_p10)
 				}));
 	}
 };
-var _kirchner$elm_selectize$Selectize_Selectize$zipFirst = function (zipList) {
+var _kirchner$elm_selectize$Selectize_Selectize$zipFirst = function (_p12) {
 	zipFirst:
 	while (true) {
-		var _p6 = zipList.current;
-		if ((_p6.ctor === '_Tuple2') && (_p6._0.ctor === 'Divider')) {
-			var _p7 = zipList.back;
-			if (_p7.ctor === '[]') {
+		var _p13 = _p12;
+		var _p16 = _p13.current;
+		var _p14 = _p16;
+		if ((_p14.ctor === '_Tuple2') && (_p14._0.ctor === 'Divider')) {
+			var _p15 = _p13.back;
+			if (_p15.ctor === '[]') {
 				return _elm_lang$core$Maybe$Nothing;
 			} else {
-				var _v10 = {
-					front: {ctor: '::', _0: zipList.current, _1: zipList.front},
-					current: _p7._0,
-					back: _p7._1,
-					currentTop: zipList.currentTop + _elm_lang$core$Tuple$second(zipList.current)
+				var _v13 = {
+					front: {ctor: '::', _0: _p16, _1: _p13.front},
+					current: _p15._0,
+					back: _p15._1,
+					currentTop: _p13.currentTop + _elm_lang$core$Tuple$second(_p16)
 				};
-				zipList = _v10;
+				_p12 = _v13;
 				continue zipFirst;
 			}
 		} else {
-			return _elm_lang$core$Maybe$Just(zipList);
+			return _elm_lang$core$Maybe$Just(_p13);
 		}
 	}
 };
-var _kirchner$elm_selectize$Selectize_Selectize$zipNext = function (zipList) {
-	var _p8 = zipList.back;
-	if (_p8.ctor === '[]') {
-		return zipList;
+var _kirchner$elm_selectize$Selectize_Selectize$zipNext = function (_p17) {
+	var _p18 = _p17;
+	var _p21 = _p18;
+	var _p20 = _p18.current;
+	var _p19 = _p18.back;
+	if (_p19.ctor === '[]') {
+		return _p21;
 	} else {
 		return A2(
 			_elm_lang$core$Maybe$withDefault,
-			zipList,
+			_p21,
 			_kirchner$elm_selectize$Selectize_Selectize$zipFirst(
 				{
-					front: {ctor: '::', _0: zipList.current, _1: zipList.front},
-					current: _p8._0,
-					back: _p8._1,
-					currentTop: zipList.currentTop + _elm_lang$core$Tuple$second(zipList.current)
+					front: {ctor: '::', _0: _p20, _1: _p18.front},
+					current: _p19._0,
+					back: _p19._1,
+					currentTop: _p18.currentTop + _elm_lang$core$Tuple$second(_p20)
 				}));
 	}
 };
-var _kirchner$elm_selectize$Selectize_Selectize$zipCurrentHeight = function (zipList) {
-	return _elm_lang$core$Tuple$second(zipList.current);
+var _kirchner$elm_selectize$Selectize_Selectize$zipCurrentHeight = function (_p22) {
+	var _p23 = _p22;
+	return _elm_lang$core$Tuple$second(_p23.current);
 };
-var _kirchner$elm_selectize$Selectize_Selectize$zipCurrentScrollTop = function (zipList) {
-	return zipList.currentTop;
-};
-var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (zipList) {
-	var _p9 = zipList.current;
-	if ((_p9.ctor === '_Tuple2') && (_p9._0.ctor === 'Entry')) {
-		return _p9._0._0;
+var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (_p24) {
+	var _p25 = _p24;
+	var _p26 = _p25.current;
+	if ((_p26.ctor === '_Tuple2') && (_p26._0.ctor === 'Entry')) {
+		return _p26._0._0;
 	} else {
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Selectize.Selectize',
 			{
-				start: {line: 908, column: 5},
-				end: {line: 915, column: 52}
+				start: {line: 935, column: 5},
+				end: {line: 940, column: 52}
 			},
-			_p9)('this should be impossible');
+			_p26)('this should be impossible');
 	}
 };
 var _kirchner$elm_selectize$Selectize_Selectize$fromResult = function (result) {
-	var _p11 = result;
-	if (_p11.ctor === 'Ok') {
-		return _elm_lang$core$Json_Decode$succeed(_p11._0);
+	var _p28 = result;
+	if (_p28.ctor === 'Ok') {
+		return _elm_lang$core$Json_Decode$succeed(_p28._0);
 	} else {
-		return _elm_lang$core$Json_Decode$fail(_p11._0);
+		return _elm_lang$core$Json_Decode$fail(_p28._0);
 	}
 };
 var _kirchner$elm_selectize$Selectize_Selectize$scrollTopDecoder = _debois$elm_dom$DOM$target(
@@ -10338,6 +10346,11 @@ var _kirchner$elm_selectize$Selectize_Selectize$textfieldId = function (id) {
 var _kirchner$elm_selectize$Selectize_Selectize$menuId = function (id) {
 	return A2(_elm_lang$core$Basics_ops['++'], id, '__menu');
 };
+var _kirchner$elm_selectize$Selectize_Selectize_ops = _kirchner$elm_selectize$Selectize_Selectize_ops || {};
+_kirchner$elm_selectize$Selectize_Selectize_ops['=>'] = F2(
+	function (name, value) {
+		return {ctor: '_Tuple2', _0: name, _1: value};
+	});
 var _kirchner$elm_selectize$Selectize_Selectize$contains = F2(
 	function (query, label) {
 		return A2(
@@ -10345,24 +10358,12 @@ var _kirchner$elm_selectize$Selectize_Selectize$contains = F2(
 			_elm_lang$core$String$toLower(query),
 			_elm_lang$core$String$toLower(label));
 	});
-var _kirchner$elm_selectize$Selectize_Selectize$filter = F2(
-	function (query, entries) {
-		var containsQuery = function (entry) {
-			var _p12 = entry;
-			if (_p12.ctor === 'LEntry') {
-				return A2(_kirchner$elm_selectize$Selectize_Selectize$contains, query, _p12._1) ? _elm_lang$core$Maybe$Just(entry) : _elm_lang$core$Maybe$Nothing;
-			} else {
-				return _elm_lang$core$Maybe$Just(entry);
-			}
-		};
-		return A2(_elm_lang$core$List$filterMap, containsQuery, entries);
-	});
 var _kirchner$elm_selectize$Selectize_Selectize$keydownOptions = {preventDefault: true, stopPropagation: false};
 var _kirchner$elm_selectize$Selectize_Selectize$updateKeyboardFocus = F3(
 	function (select, movement, state) {
 		var newZipList = function () {
-			var _p13 = movement;
-			switch (_p13.ctor) {
+			var _p29 = movement;
+			switch (_p29.ctor) {
 				case 'Up':
 					return A2(_elm_lang$core$Maybe$map, _kirchner$elm_selectize$Selectize_Selectize$zipPrevious, state.zipList);
 				case 'Down':
@@ -10384,37 +10385,37 @@ var _kirchner$elm_selectize$Selectize_Selectize$updateKeyboardFocus = F3(
 var _kirchner$elm_selectize$Selectize_Selectize$reset = function (state) {
 	return _elm_lang$core$Native_Utils.update(
 		state,
-		{query: '', zipList: _elm_lang$core$Maybe$Nothing, filteredEntries: _elm_lang$core$Maybe$Nothing, open: false, mouseFocus: _elm_lang$core$Maybe$Nothing});
+		{query: '', zipList: _elm_lang$core$Maybe$Nothing, open: false, mouseFocus: _elm_lang$core$Maybe$Nothing});
 };
 var _kirchner$elm_selectize$Selectize_Selectize$viewConfig = function (config) {
-	return {container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider};
+	return {container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider, selector: config.selector};
 };
 var _kirchner$elm_selectize$Selectize_Selectize$selectFirst = F2(
 	function (entries, a) {
 		selectFirst:
 		while (true) {
-			var _p14 = entries;
-			if (_p14.ctor === '[]') {
+			var _p30 = entries;
+			if (_p30.ctor === '[]') {
 				return _elm_lang$core$Maybe$Nothing;
 			} else {
-				var _p16 = _p14._1;
-				var _p15 = _p14._0;
-				if (_p15.ctor === 'LEntry') {
-					if (_elm_lang$core$Native_Utils.eq(a, _p15._0)) {
+				var _p32 = _p30._1;
+				var _p31 = _p30._0;
+				if (_p31.ctor === 'LEntry') {
+					if (_elm_lang$core$Native_Utils.eq(a, _p31._0)) {
 						return _elm_lang$core$Maybe$Just(
-							{ctor: '_Tuple2', _0: a, _1: _p15._1});
+							{ctor: '_Tuple2', _0: a, _1: _p31._1});
 					} else {
-						var _v18 = _p16,
-							_v19 = a;
-						entries = _v18;
-						a = _v19;
+						var _v23 = _p32,
+							_v24 = a;
+						entries = _v23;
+						a = _v24;
 						continue selectFirst;
 					}
 				} else {
-					var _v20 = _p16,
-						_v21 = a;
-					entries = _v20;
-					a = _v21;
+					var _v25 = _p32,
+						_v26 = a;
+					entries = _v25;
+					a = _v26;
 					continue selectFirst;
 				}
 			}
@@ -10430,9 +10431,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$State = function (a) {
 							return function (h) {
 								return function (i) {
 									return function (j) {
-										return function (k) {
-											return {id: a, entries: b, query: c, zipList: d, filteredEntries: e, mouseFocus: f, preventBlur: g, open: h, entryHeights: i, menuHeight: j, scrollTop: k};
-										};
+										return {id: a, entries: b, query: c, zipList: d, open: e, mouseFocus: f, preventBlur: g, entryHeights: h, menuHeight: i, scrollTop: j};
 									};
 								};
 							};
@@ -10447,9 +10446,9 @@ var _kirchner$elm_selectize$Selectize_Selectize$Heights = F2(
 	function (a, b) {
 		return {entries: a, menu: b};
 	});
-var _kirchner$elm_selectize$Selectize_Selectize$ViewConfig = F5(
-	function (a, b, c, d, e) {
-		return {container: a, menu: b, ul: c, entry: d, divider: e};
+var _kirchner$elm_selectize$Selectize_Selectize$ViewConfig = F6(
+	function (a, b, c, d, e, f) {
+		return {container: a, menu: b, ul: c, entry: d, divider: e, selector: f};
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$HtmlDetails = F2(
 	function (a, b) {
@@ -10469,15 +10468,15 @@ var _kirchner$elm_selectize$Selectize_Selectize$LEntry = F2(
 var _kirchner$elm_selectize$Selectize_Selectize$closed = F3(
 	function (id, toLabel, entries) {
 		var addLabel = function (entry) {
-			var _p17 = entry;
-			if (_p17.ctor === 'Entry') {
-				var _p18 = _p17._0;
+			var _p33 = entry;
+			if (_p33.ctor === 'Entry') {
+				var _p34 = _p33._0;
 				return A2(
 					_kirchner$elm_selectize$Selectize_Selectize$LEntry,
-					_p18,
-					toLabel(_p18));
+					_p34,
+					toLabel(_p34));
 			} else {
-				return _kirchner$elm_selectize$Selectize_Selectize$LDivider(_p17._0);
+				return _kirchner$elm_selectize$Selectize_Selectize$LDivider(_p33._0);
 			}
 		};
 		var labeledEntries = A2(_elm_lang$core$List$map, addLabel, entries);
@@ -10486,10 +10485,9 @@ var _kirchner$elm_selectize$Selectize_Selectize$closed = F3(
 			entries: labeledEntries,
 			query: '',
 			zipList: _elm_lang$core$Maybe$Nothing,
-			filteredEntries: _elm_lang$core$Maybe$Just(labeledEntries),
+			open: false,
 			mouseFocus: _elm_lang$core$Maybe$Nothing,
 			preventBlur: false,
-			open: false,
 			entryHeights: {ctor: '[]'},
 			menuHeight: 0,
 			scrollTop: 0
@@ -10505,26 +10503,26 @@ var _kirchner$elm_selectize$Selectize_Selectize$Entry = function (a) {
 	return {ctor: 'Entry', _0: a};
 };
 var _kirchner$elm_selectize$Selectize_Selectize$removeLabel = function (labeledEntry) {
-	var _p19 = labeledEntry;
-	if (_p19.ctor === 'LEntry') {
-		return _kirchner$elm_selectize$Selectize_Selectize$Entry(_p19._0);
+	var _p35 = labeledEntry;
+	if (_p35.ctor === 'LEntry') {
+		return _kirchner$elm_selectize$Selectize_Selectize$Entry(_p35._0);
 	} else {
-		return _kirchner$elm_selectize$Selectize_Selectize$Divider(_p19._0);
+		return _kirchner$elm_selectize$Selectize_Selectize$Divider(_p35._0);
 	}
 };
 var _kirchner$elm_selectize$Selectize_Selectize$fromList = F2(
 	function (entries, entryHeights) {
-		var _p20 = {
+		var _p36 = {
 			ctor: '_Tuple2',
 			_0: A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize_Selectize$removeLabel, entries),
 			_1: entryHeights
 		};
-		if (((_p20.ctor === '_Tuple2') && (_p20._0.ctor === '::')) && (_p20._1.ctor === '::')) {
+		if (((_p36.ctor === '_Tuple2') && (_p36._0.ctor === '::')) && (_p36._1.ctor === '::')) {
 			return _kirchner$elm_selectize$Selectize_Selectize$zipFirst(
 				{
 					front: {ctor: '[]'},
-					current: {ctor: '_Tuple2', _0: _p20._0._0, _1: _p20._1._0},
-					back: A2(_kirchner$elm_selectize$Selectize_Selectize$zip, _p20._0._1, _p20._1._1),
+					current: {ctor: '_Tuple2', _0: _p36._0._0, _1: _p36._1._0},
+					back: A2(_kirchner$elm_selectize$Selectize_Selectize$zip, _p36._0._1, _p36._1._1),
 					currentTop: 0
 				});
 		} else {
@@ -10538,34 +10536,34 @@ var _kirchner$elm_selectize$Selectize_Selectize$fromListWithFilter = F3(
 	function (query, entries, entryHeights) {
 		var filtered = A2(
 			_elm_lang$core$List$filterMap,
-			function (_p21) {
-				var _p22 = _p21;
-				var _p24 = _p22._1;
-				var _p23 = _p22._0;
-				if (_p23.ctor === 'LEntry') {
-					return A2(_kirchner$elm_selectize$Selectize_Selectize$contains, query, _p23._1) ? _elm_lang$core$Maybe$Just(
+			function (_p37) {
+				var _p38 = _p37;
+				var _p40 = _p38._1;
+				var _p39 = _p38._0;
+				if (_p39.ctor === 'LEntry') {
+					return A2(_kirchner$elm_selectize$Selectize_Selectize$contains, query, _p39._1) ? _elm_lang$core$Maybe$Just(
 						{
 							ctor: '_Tuple2',
-							_0: _kirchner$elm_selectize$Selectize_Selectize$Entry(_p23._0),
-							_1: _p24
+							_0: _kirchner$elm_selectize$Selectize_Selectize$Entry(_p39._0),
+							_1: _p40
 						}) : _elm_lang$core$Maybe$Nothing;
 				} else {
 					return _elm_lang$core$Maybe$Just(
 						{
 							ctor: '_Tuple2',
-							_0: _kirchner$elm_selectize$Selectize_Selectize$Divider(_p23._0),
-							_1: _p24
+							_0: _kirchner$elm_selectize$Selectize_Selectize$Divider(_p39._0),
+							_1: _p40
 						});
 				}
 			},
 			A2(_kirchner$elm_selectize$Selectize_Selectize$zip, entries, entryHeights));
-		var _p25 = filtered;
-		if (_p25.ctor === '::') {
+		var _p41 = filtered;
+		if (_p41.ctor === '::') {
 			return _kirchner$elm_selectize$Selectize_Selectize$zipFirst(
 				{
 					front: {ctor: '[]'},
-					current: _p25._0,
-					back: _p25._1,
+					current: _p41._0,
+					back: _p41._1,
 					currentTop: 0
 				});
 		} else {
@@ -10581,14 +10579,14 @@ var _kirchner$elm_selectize$Selectize_Selectize$moveForwardToHelper = F2(
 				_kirchner$elm_selectize$Selectize_Selectize$Entry(a))) {
 				return _elm_lang$core$Maybe$Just(zipList);
 			} else {
-				var _p26 = zipList.back;
-				if (_p26.ctor === '[]') {
+				var _p42 = zipList.back;
+				if (_p42.ctor === '[]') {
 					return _elm_lang$core$Maybe$Nothing;
 				} else {
-					var _v29 = a,
-						_v30 = _kirchner$elm_selectize$Selectize_Selectize$zipNext(zipList);
-					a = _v29;
-					zipList = _v30;
+					var _v34 = a,
+						_v35 = _kirchner$elm_selectize$Selectize_Selectize$zipNext(zipList);
+					a = _v34;
+					zipList = _v35;
 					continue moveForwardToHelper;
 				}
 			}
@@ -10608,8 +10606,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder = A2(
 	A2(
 		_elm_lang$core$Json_Decode$map,
 		function (code) {
-			var _p27 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
-			switch (_p27.ctor) {
+			var _p43 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
+			switch (_p43.ctor) {
 				case 'BackSpace':
 					return _elm_lang$core$Result$Ok(_kirchner$elm_selectize$Selectize_Selectize$ClearSelection);
 				case 'Delete':
@@ -10660,14 +10658,229 @@ var _kirchner$elm_selectize$Selectize_Selectize$noOp = function (attrs) {
 	return A2(
 		_elm_lang$core$List$map,
 		_elm_lang$html$Html_Attributes$map(
-			function (_p28) {
+			function (_p44) {
 				return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 			}),
 		attrs);
 };
 var _kirchner$elm_selectize$Selectize_Selectize$mapToNoOp = _elm_lang$html$Html$map(
-	function (_p29) {
+	function (_p45) {
 		return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$viewEntry = F4(
+	function (config, keyboardFocused, mouseFocus, entry) {
+		var _p46 = function () {
+			var _p47 = entry;
+			if (_p47.ctor === 'Entry') {
+				var _p48 = _p47._0;
+				return A3(
+					config.entry,
+					_p48,
+					_elm_lang$core$Native_Utils.eq(
+						mouseFocus,
+						_elm_lang$core$Maybe$Just(_p48)),
+					keyboardFocused);
+			} else {
+				return config.divider(_p47._0);
+			}
+		}();
+		var attributes = _p46.attributes;
+		var children = _p46.children;
+		var liAttrs = function (attrs) {
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				attrs,
+				_kirchner$elm_selectize$Selectize_Selectize$noOp(attributes));
+		};
+		return A2(
+			_elm_lang$html$Html$li,
+			liAttrs(
+				function () {
+					var _p49 = entry;
+					if (_p49.ctor === 'Entry') {
+						var _p50 = _p49._0;
+						return {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								_kirchner$elm_selectize$Selectize_Selectize$Select(_p50)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onMouseEnter(
+									_kirchner$elm_selectize$Selectize_Selectize$SetMouseFocus(
+										_elm_lang$core$Maybe$Just(_p50))),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onMouseLeave(
+										_kirchner$elm_selectize$Selectize_Selectize$SetMouseFocus(_elm_lang$core$Maybe$Nothing)),
+									_1: {ctor: '[]'}
+								}
+							}
+						};
+					} else {
+						return {ctor: '[]'};
+					}
+				}()),
+			A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize_Selectize$mapToNoOp, children));
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$viewUnfocusedEntry = F3(
+	function (config, mouseFocus, entry) {
+		return A4(_kirchner$elm_selectize$Selectize_Selectize$viewEntry, config, false, mouseFocus, entry);
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$viewEntries = F3(
+	function (config, state, front) {
+		var viewEntry = function (_p51) {
+			var _p52 = _p51;
+			return A4(_elm_lang$html$Html_Lazy$lazy3, _kirchner$elm_selectize$Selectize_Selectize$viewUnfocusedEntry, config, state.mouseFocus, _p52._0);
+		};
+		return A2(_elm_lang$core$List$map, viewEntry, front);
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$viewFocusedEntry = F3(
+	function (config, mouseFocus, entry) {
+		return A4(_kirchner$elm_selectize$Selectize_Selectize$viewEntry, config, true, mouseFocus, entry);
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$viewCurrentEntry = F3(
+	function (config, state, current) {
+		return A3(
+			_kirchner$elm_selectize$Selectize_Selectize$viewFocusedEntry,
+			config,
+			state.mouseFocus,
+			_elm_lang$core$Tuple$first(current));
+	});
+var _kirchner$elm_selectize$Selectize_Selectize$view = F3(
+	function (config, selection, state) {
+		var menuAttrs = A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$id(
+					_kirchner$elm_selectize$Selectize_Selectize$menuId(state.id)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onMouseDown(
+						_kirchner$elm_selectize$Selectize_Selectize$PreventClosing(true)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onMouseUp(
+							_kirchner$elm_selectize$Selectize_Selectize$PreventClosing(false)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'position', 'absolute'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			_kirchner$elm_selectize$Selectize_Selectize$noOp(config.menu));
+		var selectionText = A2(
+			_elm_lang$core$Maybe$map,
+			_elm_lang$core$Tuple$second,
+			A2(
+				_elm_lang$core$Maybe$andThen,
+				_kirchner$elm_selectize$Selectize_Selectize$selectFirst(state.entries),
+				selection));
+		var _p53 = state.zipList;
+		if (_p53.ctor === 'Nothing') {
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'overflow', 'hidden'),
+							_1: {
+								ctor: '::',
+								_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'position', 'relative'),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A4(config.selector, state.id, selectionText, state.query, state.open),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							menuAttrs,
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$ul,
+									_kirchner$elm_selectize$Selectize_Selectize$noOp(config.ul),
+									A2(
+										_elm_lang$core$List$map,
+										function (_p54) {
+											return A3(
+												_kirchner$elm_selectize$Selectize_Selectize$viewUnfocusedEntry,
+												config,
+												_elm_lang$core$Maybe$Nothing,
+												_kirchner$elm_selectize$Selectize_Selectize$removeLabel(_p54));
+										},
+										state.entries)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				});
+		} else {
+			var _p55 = _p53._0;
+			return A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'position', 'relative'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A4(config.selector, state.id, selectionText, state.query, state.open),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							menuAttrs,
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$ul,
+									_kirchner$elm_selectize$Selectize_Selectize$noOp(config.ul),
+									_elm_lang$core$List$concat(
+										{
+											ctor: '::',
+											_0: _elm_lang$core$List$reverse(
+												A3(_kirchner$elm_selectize$Selectize_Selectize$viewEntries, config, state, _p55.front)),
+											_1: {
+												ctor: '::',
+												_0: {
+													ctor: '::',
+													_0: A3(_kirchner$elm_selectize$Selectize_Selectize$viewCurrentEntry, config, state, _p55.current),
+													_1: {ctor: '[]'}
+												},
+												_1: {
+													ctor: '::',
+													_0: A3(_kirchner$elm_selectize$Selectize_Selectize$viewEntries, config, state, _p55.back),
+													_1: {ctor: '[]'}
+												}
+											}
+										})),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				});
+		}
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 	function (clearButton, toggleButton, sthSelected, open) {
@@ -10678,16 +10891,16 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 				_0: _elm_lang$html$Html_Attributes$style(
 					{
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'position', _1: 'absolute'},
+						_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'position', 'absolute'),
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'right', _1: '0'},
+							_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'right', '0'),
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
+								_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'top', '0'),
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+									_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'display', 'flex'),
 									_1: {ctor: '[]'}
 								}
 							}
@@ -10698,8 +10911,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 			{
 				ctor: '::',
 				_0: function () {
-					var _p30 = {ctor: '_Tuple2', _0: clearButton, _1: sthSelected};
-					if (((_p30.ctor === '_Tuple2') && (_p30._0.ctor === 'Just')) && (_p30._1 === true)) {
+					var _p56 = {ctor: '_Tuple2', _0: clearButton, _1: sthSelected};
+					if (((_p56.ctor === '_Tuple2') && (_p56._0.ctor === 'Just')) && (_p56._1 === true)) {
 						return A2(
 							_elm_lang$html$Html$div,
 							{
@@ -10709,7 +10922,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 							},
 							{
 								ctor: '::',
-								_0: _kirchner$elm_selectize$Selectize_Selectize$mapToNoOp(_p30._0._0),
+								_0: _kirchner$elm_selectize$Selectize_Selectize$mapToNoOp(_p56._0._0),
 								_1: {ctor: '[]'}
 							});
 					} else {
@@ -10719,15 +10932,15 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 				_1: {
 					ctor: '::',
 					_0: function () {
-						var _p31 = toggleButton;
-						if (_p31.ctor === 'Just') {
+						var _p57 = toggleButton;
+						if (_p57.ctor === 'Just') {
 							return A2(
 								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
 									_0: function () {
-										var _p32 = open;
-										if (_p32 === true) {
+										var _p58 = open;
+										if (_p58 === true) {
 											return A3(
 												_elm_lang$html$Html_Events$onWithOptions,
 												'click',
@@ -10746,7 +10959,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 								{
 									ctor: '::',
 									_0: _kirchner$elm_selectize$Selectize_Selectize$mapToNoOp(
-										_p31._0(open)),
+										_p57._0(open)),
 									_1: {ctor: '[]'}
 								});
 						} else {
@@ -10760,161 +10973,11 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 				}
 			});
 	});
-var _kirchner$elm_selectize$Selectize_Selectize$viewEntry = F6(
-	function (open, renderEntry, renderDivider, keyboardFocus, mouseFocus, entry) {
-		var _p33 = function () {
-			var _p34 = entry;
-			if (_p34.ctor === 'LEntry') {
-				var _p35 = _p34._0;
-				return A3(
-					renderEntry,
-					_p35,
-					_elm_lang$core$Native_Utils.eq(
-						mouseFocus,
-						_elm_lang$core$Maybe$Just(_p35)),
-					_elm_lang$core$Native_Utils.eq(
-						keyboardFocus,
-						_elm_lang$core$Maybe$Just(_p35)));
-			} else {
-				return renderDivider(_p34._0);
-			}
-		}();
-		var attributes = _p33.attributes;
-		var children = _p33.children;
-		var liAttrs = function (attrs) {
-			return A2(
-				_elm_lang$core$Basics_ops['++'],
-				attrs,
-				_kirchner$elm_selectize$Selectize_Selectize$noOp(attributes));
-		};
-		return {
-			ctor: '_Tuple2',
-			_0: function () {
-				var _p36 = entry;
-				if (_p36.ctor === 'LEntry') {
-					return _p36._1;
-				} else {
-					return _p36._0;
-				}
-			}(),
-			_1: A2(
-				_elm_lang$html$Html$li,
-				liAttrs(
-					function () {
-						var _p37 = entry;
-						if (_p37.ctor === 'LEntry') {
-							var _p38 = _p37._0;
-							return open ? {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(
-									_kirchner$elm_selectize$Selectize_Selectize$Select(_p38)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onMouseEnter(
-										_kirchner$elm_selectize$Selectize_Selectize$SetMouseFocus(
-											_elm_lang$core$Maybe$Just(_p38))),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onMouseLeave(
-											_kirchner$elm_selectize$Selectize_Selectize$SetMouseFocus(_elm_lang$core$Maybe$Nothing)),
-										_1: {ctor: '[]'}
-									}
-								}
-							} : {ctor: '[]'};
-						} else {
-							return {ctor: '[]'};
-						}
-					}()),
-				A2(_elm_lang$core$List$map, _kirchner$elm_selectize$Selectize_Selectize$mapToNoOp, children))
-		};
-	});
-var _kirchner$elm_selectize$Selectize_Selectize$view = F4(
-	function (config, selector, selection, state) {
-		var keyboardFocus = A2(_elm_lang$core$Maybe$map, _kirchner$elm_selectize$Selectize_Selectize$currentEntry, state.zipList);
-		var actualEntries = A2(_elm_lang$core$Maybe$withDefault, state.entries, state.filteredEntries);
-		var selectionText = A2(
-			_elm_lang$core$Maybe$map,
-			_elm_lang$core$Tuple$second,
-			A2(
-				_elm_lang$core$Maybe$andThen,
-				_kirchner$elm_selectize$Selectize_Selectize$selectFirst(actualEntries),
-				selection));
-		return A2(
-			_elm_lang$html$Html$div,
-			{
-				ctor: '::',
-				_0: (state.open && (!_elm_lang$core$List$isEmpty(actualEntries))) ? _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'position', _1: 'relative'},
-						_1: {ctor: '[]'}
-					}) : _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'position', _1: 'relative'},
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A4(selector, state.id, selectionText, state.query, state.open),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$id(
-									_kirchner$elm_selectize$Selectize_Selectize$menuId(state.id)),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onMouseDown(
-										_kirchner$elm_selectize$Selectize_Selectize$PreventClosing(true)),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onMouseUp(
-											_kirchner$elm_selectize$Selectize_Selectize$PreventClosing(false)),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$style(
-												{
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'position', _1: 'absolute'},
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							},
-							_kirchner$elm_selectize$Selectize_Selectize$noOp(config.menu)),
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html_Keyed$ul,
-								_kirchner$elm_selectize$Selectize_Selectize$noOp(config.ul),
-								A2(
-									_elm_lang$core$List$map,
-									A5(_kirchner$elm_selectize$Selectize_Selectize$viewEntry, state.open, config.entry, config.divider, keyboardFocus, state.mouseFocus),
-									actualEntries)),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
 var _kirchner$elm_selectize$Selectize_Selectize$scroll = F2(
 	function (id, y) {
 		return A2(
 			_elm_lang$core$Task$attempt,
-			function (_p39) {
+			function (_p59) {
 				return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 			},
 			A2(
@@ -10923,40 +10986,40 @@ var _kirchner$elm_selectize$Selectize_Selectize$scroll = F2(
 				y));
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$scrollToKeyboardFocus = F3(
-	function (id, scrollTop, _p40) {
-		var _p41 = _p40;
-		var _p46 = _p41._0;
-		var _p45 = _p41._2;
-		var _p44 = _p41._1;
-		var _p42 = _p46.zipList;
-		if (_p42.ctor === 'Just') {
-			var _p43 = _p42._0;
-			var height = _kirchner$elm_selectize$Selectize_Selectize$zipCurrentHeight(_p43);
-			var top = _kirchner$elm_selectize$Selectize_Selectize$zipCurrentScrollTop(_p43);
-			var y = (_elm_lang$core$Native_Utils.cmp(top, scrollTop) < 0) ? top : ((_elm_lang$core$Native_Utils.cmp(top + height, scrollTop + _p46.menuHeight) > 0) ? ((top + height) - _p46.menuHeight) : scrollTop);
+	function (id, scrollTop, _p60) {
+		var _p61 = _p60;
+		var _p66 = _p61._0;
+		var _p65 = _p61._2;
+		var _p64 = _p61._1;
+		var _p62 = _p66.zipList;
+		if (_p62.ctor === 'Just') {
+			var _p63 = _p62._0;
+			var height = _kirchner$elm_selectize$Selectize_Selectize$zipCurrentHeight(_p63);
+			var top = _p63.currentTop;
+			var y = (_elm_lang$core$Native_Utils.cmp(top, scrollTop) < 0) ? top : ((_elm_lang$core$Native_Utils.cmp(top + height, scrollTop + _p66.menuHeight) > 0) ? ((top + height) - _p66.menuHeight) : scrollTop);
 			return {
 				ctor: '_Tuple3',
-				_0: _p46,
+				_0: _p66,
 				_1: _elm_lang$core$Platform_Cmd$batch(
 					{
 						ctor: '::',
 						_0: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, id, y),
 						_1: {
 							ctor: '::',
-							_0: _p44,
+							_0: _p64,
 							_1: {ctor: '[]'}
 						}
 					}),
-				_2: _p45
+				_2: _p65
 			};
 		} else {
-			return {ctor: '_Tuple3', _0: _p46, _1: _p44, _2: _p45};
+			return {ctor: '_Tuple3', _0: _p66, _1: _p64, _2: _p65};
 		}
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$focus = function (id) {
 	return A2(
 		_elm_lang$core$Task$attempt,
-		function (_p47) {
+		function (_p67) {
 			return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 		},
 		_elm_lang$dom$Dom$focus(
@@ -10965,7 +11028,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$focus = function (id) {
 var _kirchner$elm_selectize$Selectize_Selectize$blur = function (id) {
 	return A2(
 		_elm_lang$core$Task$attempt,
-		function (_p48) {
+		function (_p68) {
 			return _kirchner$elm_selectize$Selectize_Selectize$NoOp;
 		},
 		_elm_lang$dom$Dom$blur(
@@ -10973,27 +11036,32 @@ var _kirchner$elm_selectize$Selectize_Selectize$blur = function (id) {
 };
 var _kirchner$elm_selectize$Selectize_Selectize$update = F4(
 	function (select, selection, state, msg) {
-		var _p49 = msg;
-		switch (_p49.ctor) {
+		var _p69 = msg;
+		switch (_p69.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple3', _0: state, _1: _elm_lang$core$Platform_Cmd$none, _2: _elm_lang$core$Maybe$Nothing};
 			case 'OpenMenu':
-				var _p51 = _p49._0;
+				var _p71 = _p69._0;
 				var newZipList = A2(
 					_elm_lang$core$Maybe$map,
 					function () {
-						var _p50 = selection;
-						if (_p50.ctor === 'Just') {
-							return _kirchner$elm_selectize$Selectize_Selectize$moveForwardTo(_p50._0);
+						var _p70 = selection;
+						if (_p70.ctor === 'Just') {
+							return _kirchner$elm_selectize$Selectize_Selectize$moveForwardTo(_p70._0);
 						} else {
 							return _elm_lang$core$Basics$identity;
 						}
 					}(),
-					A2(_kirchner$elm_selectize$Selectize_Selectize$fromList, state.entries, _p51.entries));
+					A2(_kirchner$elm_selectize$Selectize_Selectize$fromList, state.entries, _p71.entries));
 				var top = A2(
 					_elm_lang$core$Maybe$withDefault,
 					0,
-					A2(_elm_lang$core$Maybe$map, _kirchner$elm_selectize$Selectize_Selectize$zipCurrentScrollTop, newZipList));
+					A2(
+						_elm_lang$core$Maybe$map,
+						function (_) {
+							return _.currentTop;
+						},
+						newZipList));
 				var height = A2(
 					_elm_lang$core$Maybe$withDefault,
 					0,
@@ -11002,8 +11070,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F4(
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						state,
-						{zipList: newZipList, mouseFocus: _elm_lang$core$Maybe$Nothing, query: '', open: true, entryHeights: _p51.entries, menuHeight: _p51.menu, scrollTop: _p49._1}),
-					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, state.id, top - ((_p51.menu - height) / 2)),
+						{zipList: newZipList, open: true, mouseFocus: _elm_lang$core$Maybe$Nothing, query: '', entryHeights: _p71.entries, menuHeight: _p71.menu, scrollTop: _p69._1}),
+					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, state.id, top - ((_p71.menu - height) / 2)),
 					_2: _elm_lang$core$Maybe$Nothing
 				};
 			case 'CloseMenu':
@@ -11032,24 +11100,18 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F4(
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						state,
-						{preventBlur: _p49._0}),
+						{preventBlur: _p69._0}),
 					_1: _elm_lang$core$Platform_Cmd$none,
 					_2: _elm_lang$core$Maybe$Nothing
 				};
 			case 'SetQuery':
-				var _p52 = _p49._0;
-				var newFilteredEntries = A2(_kirchner$elm_selectize$Selectize_Selectize$filter, _p52, state.entries);
-				var newZipList = A3(_kirchner$elm_selectize$Selectize_Selectize$fromListWithFilter, _p52, state.entries, state.entryHeights);
+				var _p72 = _p69._0;
+				var newZipList = A3(_kirchner$elm_selectize$Selectize_Selectize$fromListWithFilter, _p72, state.entries, state.entryHeights);
 				return {
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						state,
-						{
-							query: _p52,
-							zipList: newZipList,
-							filteredEntries: _elm_lang$core$Maybe$Just(newFilteredEntries),
-							mouseFocus: _elm_lang$core$Maybe$Nothing
-						}),
+						{query: _p72, zipList: newZipList, mouseFocus: _elm_lang$core$Maybe$Nothing}),
 					_1: A2(_kirchner$elm_selectize$Selectize_Selectize$scroll, state.id, 0),
 					_2: _elm_lang$core$Maybe$Just(
 						select(_elm_lang$core$Maybe$Nothing))
@@ -11059,27 +11121,27 @@ var _kirchner$elm_selectize$Selectize_Selectize$update = F4(
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						state,
-						{mouseFocus: _p49._0}),
+						{mouseFocus: _p69._0}),
 					_1: _elm_lang$core$Platform_Cmd$none,
 					_2: _elm_lang$core$Maybe$Nothing
 				};
 			case 'Select':
-				var _p53 = _p49._0;
-				var selection = A2(_kirchner$elm_selectize$Selectize_Selectize$selectFirst, state.entries, _p53);
+				var _p73 = _p69._0;
+				var selection = A2(_kirchner$elm_selectize$Selectize_Selectize$selectFirst, state.entries, _p73);
 				return {
 					ctor: '_Tuple3',
 					_0: _kirchner$elm_selectize$Selectize_Selectize$reset(state),
 					_1: _elm_lang$core$Platform_Cmd$none,
 					_2: _elm_lang$core$Maybe$Just(
 						select(
-							_elm_lang$core$Maybe$Just(_p53)))
+							_elm_lang$core$Maybe$Just(_p73)))
 				};
 			case 'SetKeyboardFocus':
 				return A3(
 					_kirchner$elm_selectize$Selectize_Selectize$scrollToKeyboardFocus,
 					state.id,
-					_p49._1,
-					A3(_kirchner$elm_selectize$Selectize_Selectize$updateKeyboardFocus, select, _p49._0, state));
+					_p69._1,
+					A3(_kirchner$elm_selectize$Selectize_Selectize$updateKeyboardFocus, select, _p69._0, state));
 			case 'SelectKeyboardFocusAndBlur':
 				var maybeA = A2(_elm_lang$core$Maybe$map, _kirchner$elm_selectize$Selectize_Selectize$currentEntry, state.zipList);
 				var selection = A2(
@@ -11115,8 +11177,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder = A2(
 		_elm_lang$core$Json_Decode$map2,
 		F2(
 			function (code, scrollTop) {
-				var _p54 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
-				switch (_p54.ctor) {
+				var _p74 = _ohanhi$keyboard_extra$Keyboard_Extra$fromCode(code);
+				switch (_p74.ctor) {
 					case 'ArrowUp':
 						return _elm_lang$core$Result$Ok(
 							A2(_kirchner$elm_selectize$Selectize_Selectize$SetKeyboardFocus, _kirchner$elm_selectize$Selectize_Selectize$Up, scrollTop));
@@ -11134,7 +11196,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder = A2(
 		_elm_lang$html$Html_Events$keyCode,
 		_kirchner$elm_selectize$Selectize_Selectize$scrollTopDecoder));
 var _kirchner$elm_selectize$Selectize_Selectize$button = F5(
-	function (config, id, selection, _p55, open) {
+	function (config, id, selection, _p75, open) {
 		var actualText = A2(_elm_lang$core$Maybe$withDefault, config.placeholder, selection);
 		var buttonAttrs = function (attrs) {
 			return _elm_lang$core$List$concat(
@@ -11152,19 +11214,19 @@ var _kirchner$elm_selectize$Selectize_Selectize$button = F5(
 								_0: _elm_lang$html$Html_Attributes$style(
 									{
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: '-webkit-touch-callout', _1: 'none'},
+										_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-webkit-touch-callout', 'none'),
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '-webkit-user-select', _1: 'none'},
+											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-webkit-user-select', 'none'),
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: '-moz-user-select', _1: 'none'},
+												_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-moz-user-select', 'none'),
 												_1: {
 													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: '-ms-user-select', _1: 'none'},
+													_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-ms-user-select', 'none'),
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'user-select', _1: 'none'},
+														_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'user-select', 'none'),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -11331,10 +11393,10 @@ var _kirchner$elm_selectize$Selectize$textfield = function (config) {
 var _kirchner$elm_selectize$Selectize$button = function (config) {
 	return _kirchner$elm_selectize$Selectize_Selectize$button(config);
 };
-var _kirchner$elm_selectize$Selectize$view = F4(
-	function (_p0, selector, selection, state) {
+var _kirchner$elm_selectize$Selectize$view = F3(
+	function (_p0, selection, state) {
 		var _p1 = _p0;
-		return A4(_kirchner$elm_selectize$Selectize_Selectize$view, _p1._0, selector, selection, state);
+		return A4(_elm_lang$html$Html_Lazy$lazy3, _kirchner$elm_selectize$Selectize_Selectize$view, _p1._0, selection, state);
 	});
 var _kirchner$elm_selectize$Selectize$update = F4(
 	function (select, selection, state, msg) {
@@ -11359,7 +11421,7 @@ var _kirchner$elm_selectize$Selectize$ViewConfig = function (a) {
 };
 var _kirchner$elm_selectize$Selectize$viewConfig = function (config) {
 	return _kirchner$elm_selectize$Selectize$ViewConfig(
-		{container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider});
+		{container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider, selector: config.selector});
 };
 
 var _kirchner$elm_selectize$Demo$nonfree = {
@@ -12015,62 +12077,67 @@ var _kirchner$elm_selectize$Demo$textfieldSelector = _kirchner$elm_selectize$Sel
 		clearButton: _kirchner$elm_selectize$Demo$clearButton,
 		placeholder: 'Select a License'
 	});
-var _kirchner$elm_selectize$Demo$viewConfig = _kirchner$elm_selectize$Selectize$viewConfig(
-	{
-		container: {ctor: '[]'},
-		menu: {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('selectize__menu'),
-			_1: {ctor: '[]'}
-		},
-		ul: {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('selectize__list'),
-			_1: {ctor: '[]'}
-		},
-		entry: F3(
-			function (tree, mouseFocused, keyboardFocused) {
+var _kirchner$elm_selectize$Demo$viewConfig = function (selector) {
+	return _kirchner$elm_selectize$Selectize$viewConfig(
+		{
+			container: {ctor: '[]'},
+			menu: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('selectize__menu'),
+				_1: {ctor: '[]'}
+			},
+			ul: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('selectize__list'),
+				_1: {ctor: '[]'}
+			},
+			entry: F3(
+				function (tree, mouseFocused, keyboardFocused) {
+					return {
+						attributes: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('selectize__item'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$classList(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'selectize__item--mouse-selected', _1: mouseFocused},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'selectize__item--key-selected', _1: keyboardFocused},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						},
+						children: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(tree),
+							_1: {ctor: '[]'}
+						}
+					};
+				}),
+			divider: function (title) {
 				return {
 					attributes: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('selectize__item'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$classList(
-								{
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'selectize__item--mouse-selected', _1: mouseFocused},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'selectize__item--key-selected', _1: keyboardFocused},
-										_1: {ctor: '[]'}
-									}
-								}),
-							_1: {ctor: '[]'}
-						}
+						_0: _elm_lang$html$Html_Attributes$class('selectize__divider'),
+						_1: {ctor: '[]'}
 					},
 					children: {
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(tree),
+						_0: _elm_lang$html$Html$text(title),
 						_1: {ctor: '[]'}
 					}
 				};
-			}),
-		divider: function (title) {
-			return {
-				attributes: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('selectize__divider'),
-					_1: {ctor: '[]'}
-				},
-				children: {
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(title),
-					_1: {ctor: '[]'}
-				}
-			};
-		}
-	});
+			},
+			selector: selector
+		});
+};
+var _kirchner$elm_selectize$Demo$viewConfigButton = _kirchner$elm_selectize$Demo$viewConfig(_kirchner$elm_selectize$Demo$buttonSelector);
+var _kirchner$elm_selectize$Demo$viewConfigTextfield = _kirchner$elm_selectize$Demo$viewConfig(_kirchner$elm_selectize$Demo$textfieldSelector);
 var _kirchner$elm_selectize$Demo$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$none;
 };
@@ -12095,18 +12162,22 @@ var _kirchner$elm_selectize$Demo$andDo = F2(
 var _kirchner$elm_selectize$Demo$init = {
 	ctor: '_Tuple2',
 	_0: {
-		selection: _elm_lang$core$Maybe$Nothing,
+		textfieldSelection: _elm_lang$core$Maybe$Nothing,
 		textfieldMenu: A3(_kirchner$elm_selectize$Selectize$closed, 'textfield-menu', _elm_lang$core$Basics$identity, _kirchner$elm_selectize$Demo$licenses),
+		buttonSelection: _elm_lang$core$Maybe$Nothing,
 		buttonMenu: A3(_kirchner$elm_selectize$Selectize$closed, 'button-menu', _elm_lang$core$Basics$identity, _kirchner$elm_selectize$Demo$licenses)
 	},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
-var _kirchner$elm_selectize$Demo$Model = F3(
-	function (a, b, c) {
-		return {selection: a, textfieldMenu: b, buttonMenu: c};
+var _kirchner$elm_selectize$Demo$Model = F4(
+	function (a, b, c, d) {
+		return {textfieldSelection: a, textfieldMenu: b, buttonSelection: c, buttonMenu: d};
 	});
-var _kirchner$elm_selectize$Demo$SelectLicense = function (a) {
-	return {ctor: 'SelectLicense', _0: a};
+var _kirchner$elm_selectize$Demo$SelectButtonLicense = function (a) {
+	return {ctor: 'SelectButtonLicense', _0: a};
+};
+var _kirchner$elm_selectize$Demo$SelectTextfieldLicense = function (a) {
+	return {ctor: 'SelectTextfieldLicense', _0: a};
 };
 var _kirchner$elm_selectize$Demo$ButtonMenuMsg = function (a) {
 	return {ctor: 'ButtonMenuMsg', _0: a};
@@ -12119,7 +12190,7 @@ var _kirchner$elm_selectize$Demo$update = F2(
 		var _p2 = msg;
 		switch (_p2.ctor) {
 			case 'TextfieldMenuMsg':
-				var _p3 = A4(_kirchner$elm_selectize$Selectize$update, _kirchner$elm_selectize$Demo$SelectLicense, model.selection, model.textfieldMenu, _p2._0);
+				var _p3 = A4(_kirchner$elm_selectize$Selectize$update, _kirchner$elm_selectize$Demo$SelectTextfieldLicense, model.textfieldSelection, model.textfieldMenu, _p2._0);
 				var newMenu = _p3._0;
 				var menuCmd = _p3._1;
 				var maybeMsg = _p3._2;
@@ -12137,7 +12208,7 @@ var _kirchner$elm_selectize$Demo$update = F2(
 					return {ctor: '_Tuple2', _0: newModel, _1: cmd};
 				}
 			case 'ButtonMenuMsg':
-				var _p5 = A4(_kirchner$elm_selectize$Selectize$update, _kirchner$elm_selectize$Demo$SelectLicense, model.selection, model.buttonMenu, _p2._0);
+				var _p5 = A4(_kirchner$elm_selectize$Selectize$update, _kirchner$elm_selectize$Demo$SelectButtonLicense, model.buttonSelection, model.buttonMenu, _p2._0);
 				var newMenu = _p5._0;
 				var menuCmd = _p5._1;
 				var maybeMsg = _p5._2;
@@ -12154,12 +12225,20 @@ var _kirchner$elm_selectize$Demo$update = F2(
 				} else {
 					return {ctor: '_Tuple2', _0: newModel, _1: cmd};
 				}
+			case 'SelectTextfieldLicense':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{textfieldSelection: _p2._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{selection: _p2._0}),
+						{buttonSelection: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
@@ -12238,7 +12317,7 @@ var _kirchner$elm_selectize$Demo$view = function (model) {
 											_0: A2(
 												_elm_lang$html$Html$map,
 												_kirchner$elm_selectize$Demo$TextfieldMenuMsg,
-												A4(_kirchner$elm_selectize$Selectize$view, _kirchner$elm_selectize$Demo$viewConfig, _kirchner$elm_selectize$Demo$textfieldSelector, model.selection, model.textfieldMenu)),
+												A3(_kirchner$elm_selectize$Selectize$view, _kirchner$elm_selectize$Demo$viewConfigTextfield, model.textfieldSelection, model.textfieldMenu)),
 											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
@@ -12286,7 +12365,7 @@ var _kirchner$elm_selectize$Demo$view = function (model) {
 												_0: A2(
 													_elm_lang$html$Html$map,
 													_kirchner$elm_selectize$Demo$ButtonMenuMsg,
-													A4(_kirchner$elm_selectize$Selectize$view, _kirchner$elm_selectize$Demo$viewConfig, _kirchner$elm_selectize$Demo$buttonSelector, model.selection, model.buttonMenu)),
+													A3(_kirchner$elm_selectize$Selectize$view, _kirchner$elm_selectize$Demo$viewConfigButton, model.buttonSelection, model.buttonMenu)),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
