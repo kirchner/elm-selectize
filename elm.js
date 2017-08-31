@@ -10301,8 +10301,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (_p24) {
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Selectize.Selectize',
 			{
-				start: {line: 935, column: 5},
-				end: {line: 940, column: 52}
+				start: {line: 936, column: 5},
+				end: {line: 941, column: 52}
 			},
 			_p26)('this should be impossible');
 	}
@@ -10388,7 +10388,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$reset = function (state) {
 		{query: '', zipList: _elm_lang$core$Maybe$Nothing, open: false, mouseFocus: _elm_lang$core$Maybe$Nothing});
 };
 var _kirchner$elm_selectize$Selectize_Selectize$viewConfig = function (config) {
-	return {container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider, selector: config.selector};
+	return {container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider, input: config.input};
 };
 var _kirchner$elm_selectize$Selectize_Selectize$selectFirst = F2(
 	function (entries, a) {
@@ -10448,7 +10448,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$Heights = F2(
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$ViewConfig = F6(
 	function (a, b, c, d, e, f) {
-		return {container: a, menu: b, ul: c, entry: d, divider: e, selector: f};
+		return {container: a, menu: b, ul: c, entry: d, divider: e, input: f};
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$HtmlDetails = F2(
 	function (a, b) {
@@ -10803,7 +10803,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$view = F3(
 				},
 				{
 					ctor: '::',
-					_0: A4(config.selector, state.id, selectionText, state.query, state.open),
+					_0: A4(config.input, state.id, selectionText, state.query, state.open),
 					_1: {
 						ctor: '::',
 						_0: A2(
@@ -10845,7 +10845,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$view = F3(
 				},
 				{
 					ctor: '::',
-					_0: A4(config.selector, state.id, selectionText, state.query, state.open),
+					_0: A4(config.input, state.id, selectionText, state.query, state.open),
 					_1: {
 						ctor: '::',
 						_0: A2(
@@ -11195,7 +11195,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder = A2(
 			}),
 		_elm_lang$html$Html_Events$keyCode,
 		_kirchner$elm_selectize$Selectize_Selectize$scrollTopDecoder));
-var _kirchner$elm_selectize$Selectize_Selectize$button = F5(
+var _kirchner$elm_selectize$Selectize_Selectize$simple = F5(
 	function (config, id, selection, _p75, open) {
 		var actualText = A2(_elm_lang$core$Maybe$withDefault, config.placeholder, selection);
 		var buttonAttrs = function (attrs) {
@@ -11294,7 +11294,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$button = F5(
 				}
 			});
 	});
-var _kirchner$elm_selectize$Selectize_Selectize$textfield = F5(
+var _kirchner$elm_selectize$Selectize_Selectize$autocomplete = F5(
 	function (config, id, selection, query, open) {
 		var inputAttrs = function (attrs) {
 			return _elm_lang$core$List$concat(
@@ -11387,21 +11387,23 @@ var _kirchner$elm_selectize$Selectize_Selectize$textfield = F5(
 			});
 	});
 
-var _kirchner$elm_selectize$Selectize$textfield = function (config) {
-	return _kirchner$elm_selectize$Selectize_Selectize$textfield(config);
+var _kirchner$elm_selectize$Selectize$autocomplete = function (config) {
+	return _kirchner$elm_selectize$Selectize_Selectize$autocomplete(config);
 };
-var _kirchner$elm_selectize$Selectize$button = function (config) {
-	return _kirchner$elm_selectize$Selectize_Selectize$button(config);
+var _kirchner$elm_selectize$Selectize$simple = function (config) {
+	return _kirchner$elm_selectize$Selectize_Selectize$simple(config);
 };
 var _kirchner$elm_selectize$Selectize$view = F3(
-	function (_p0, selection, state) {
-		var _p1 = _p0;
-		return A4(_elm_lang$html$Html_Lazy$lazy3, _kirchner$elm_selectize$Selectize_Selectize$view, _p1._0, selection, state);
+	function (viewConfig, selection, state) {
+		return A4(_elm_lang$html$Html_Lazy$lazy3, _kirchner$elm_selectize$Selectize_Selectize$view, viewConfig, selection, state);
 	});
 var _kirchner$elm_selectize$Selectize$update = F4(
 	function (select, selection, state, msg) {
 		return A4(_kirchner$elm_selectize$Selectize_Selectize$update, select, selection, state, msg);
 	});
+var _kirchner$elm_selectize$Selectize$viewConfig = function (config) {
+	return {container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider, input: config.input};
+};
 var _kirchner$elm_selectize$Selectize$divider = function (title) {
 	return _kirchner$elm_selectize$Selectize_Selectize$divider(title);
 };
@@ -11416,13 +11418,6 @@ var _kirchner$elm_selectize$Selectize$HtmlDetails = F2(
 	function (a, b) {
 		return {attributes: a, children: b};
 	});
-var _kirchner$elm_selectize$Selectize$ViewConfig = function (a) {
-	return {ctor: 'ViewConfig', _0: a};
-};
-var _kirchner$elm_selectize$Selectize$viewConfig = function (config) {
-	return _kirchner$elm_selectize$Selectize$ViewConfig(
-		{container: config.container, menu: config.menu, ul: config.ul, entry: config.entry, divider: config.divider, selector: config.selector});
-};
 
 var _kirchner$elm_selectize$Demo$nonfree = {
 	ctor: '::',
@@ -12023,7 +12018,7 @@ var _kirchner$elm_selectize$Demo$toggleButton = _elm_lang$core$Maybe$Just(
 				_1: {ctor: '[]'}
 			});
 	});
-var _kirchner$elm_selectize$Demo$buttonSelector = _kirchner$elm_selectize$Selectize$button(
+var _kirchner$elm_selectize$Demo$buttonSelector = _kirchner$elm_selectize$Selectize$simple(
 	{
 		attrs: F2(
 			function (sthSelected, open) {
@@ -12046,7 +12041,7 @@ var _kirchner$elm_selectize$Demo$buttonSelector = _kirchner$elm_selectize$Select
 		clearButton: _kirchner$elm_selectize$Demo$clearButton,
 		placeholder: 'Select a License'
 	});
-var _kirchner$elm_selectize$Demo$textfieldSelector = _kirchner$elm_selectize$Selectize$textfield(
+var _kirchner$elm_selectize$Demo$textfieldSelector = _kirchner$elm_selectize$Selectize$autocomplete(
 	{
 		attrs: F2(
 			function (sthSelected, open) {
@@ -12133,7 +12128,7 @@ var _kirchner$elm_selectize$Demo$viewConfig = function (selector) {
 					}
 				};
 			},
-			selector: selector
+			input: selector
 		});
 };
 var _kirchner$elm_selectize$Demo$viewConfigButton = _kirchner$elm_selectize$Demo$viewConfig(_kirchner$elm_selectize$Demo$buttonSelector);
