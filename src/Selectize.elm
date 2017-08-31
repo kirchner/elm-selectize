@@ -42,7 +42,7 @@ The state of the dropdown menu is instanciated via
     menu =
         Selectize.closed "unique-menu-id"
             (\tree -> tree.name ++ " - " ++ tree.latinName)
-            trees
+            (trees |> List.map Selectize.entry)
 
 with
 
