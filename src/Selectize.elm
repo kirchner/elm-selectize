@@ -101,7 +101,7 @@ Finally, the menu can be rendered like this
 
 with the view configuration given by
 
-    viewConfig : Selectize.ViewConfig String Model
+    viewConfig : Selectize.ViewConfig String
     viewConfig =
         Selectize.viewConfig
             { placeholder = "Select a Tree"
@@ -238,7 +238,7 @@ type alias ViewConfig a =
 
 {-| Create the view configuration, for example
 
-    viewConfig : Selectize.ViewConfig String Model
+    viewConfig : Selectize.ViewConfig String
     viewConfig =
         Selectize.viewConfig
             { container = [ ... ]
