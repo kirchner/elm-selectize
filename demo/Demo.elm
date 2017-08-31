@@ -185,17 +185,17 @@ view model =
 ---- CONFIGURATION
 
 
-viewConfigTextfield : Selectize.ViewConfig String Model
+viewConfigTextfield : Selectize.ViewConfig String
 viewConfigTextfield =
     viewConfig textfieldSelector
 
 
-viewConfigButton : Selectize.ViewConfig String Model
+viewConfigButton : Selectize.ViewConfig String
 viewConfigButton =
     viewConfig buttonSelector
 
 
-viewConfig : Selectize.Selector String -> Selectize.ViewConfig String Model
+viewConfig : Selectize.Input String -> Selectize.ViewConfig String
 viewConfig selector =
     Selectize.viewConfig
         { container = []
@@ -226,13 +226,13 @@ viewConfig selector =
                 , children =
                     [ Html.text title ]
                 }
-        , selector = selector
+        , input = selector
         }
 
 
-textfieldSelector : Selectize.Selector String
+textfieldSelector : Selectize.Input String
 textfieldSelector =
-    Selectize.textfield <|
+    Selectize.autocomplete <|
         { attrs =
             \sthSelected open ->
                 [ Attributes.class "selectize__textfield"
@@ -248,9 +248,9 @@ textfieldSelector =
         }
 
 
-buttonSelector : Selectize.Selector String
+buttonSelector : Selectize.Input String
 buttonSelector =
-    Selectize.button
+    Selectize.simple
         { attrs =
             \sthSelected open ->
                 [ Attributes.class "selectize__button"

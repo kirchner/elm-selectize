@@ -2,15 +2,15 @@ module Selectize
     exposing
         ( Entry
         , HtmlDetails
+        , Input
         , Msg
-        , Selector
         , State
         , ViewConfig
-        , button
+        , autocomplete
         , closed
         , divider
         , entry
-        , textfield
+        , simple
         , update
         , view
         , viewConfig
@@ -134,14 +134,14 @@ with the view configuration given by
                     , children =
                         [ Html.text title ]
                     }
-            , selector = styledSelector
+            , input = styledInput
             }
 
 and a selector given by, for example,
 
-    styledSelector : Selectize.selector Tree
-    styledSelector =
-        Selectize.textfield <|
+    styledInput : Selectize.selector Tree
+    styledInput =
+        Selectize.autocomplete <|
             \sthSelected open ->
                 [ Attributes.class "selectize__textfield"
                 , Attributes.classList
@@ -164,7 +164,7 @@ and a selector given by, for example,
 
 # View
 
-@docs view, ViewConfig, viewConfig, HtmlDetails, Selector, button, textfield
+@docs view, ViewConfig, viewConfig, HtmlDetails, Input, simple, autocomplete
 
 -}
 
@@ -232,8 +232,8 @@ divider title =
 
 {-| The configuration for `Selectize.view`.
 -}
-type ViewConfig a model
-    = ViewConfig (Internal.ViewConfig a)
+type alias ViewConfig a =
+    Internal.ViewConfig a
 
 
 {-| Create the view configuration, for example
@@ -254,15 +254,15 @@ type ViewConfig a model
                     { attributes = ...
                     , children = ...
                     }
-            , selector = someSelector
+            , input = someInput
             }
 
   - `container`, `menu`, `ul`, `entry` and `divider` can be
     used to style the different parts of the dropdown view, c.f. the
     modul documentation for an example.
-  - with `selector` you can choose if you want autocompletion or just
+  - with `input` you can choose if you want autocompletion or just
     a simple dropdown menu, you can choose for example
-    `Selectize.textfield` or `Selectize.button`.
+    `Selectize.simple` or `Selectize.autocomplete`.
 
 -}
 viewConfig :
@@ -271,18 +271,17 @@ viewConfig :
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
-    , selector : Selector a
+    , input : Input a
     }
-    -> ViewConfig a model
+    -> ViewConfig a
 viewConfig config =
-    ViewConfig
-        { container = config.container
-        , menu = config.menu
-        , ul = config.ul
-        , entry = config.entry
-        , divider = config.divider
-        , selector = config.selector
-        }
+    { container = config.container
+    , menu = config.menu
+    , ul = config.ul
+    , entry = config.entry
+    , divider = config.divider
+    , input = config.input
+    }
 
 
 {-| `entry` and `divider` should return this.
@@ -324,19 +323,19 @@ update select selection state msg =
 {-| The dropdown's view function. You have to provide the current
 selection (along with the configuration and the its actual state).
 -}
-view : ViewConfig a model -> Maybe a -> State a -> Html (Msg a)
-view (ViewConfig viewConfig) selection state =
+view : ViewConfig a -> Maybe a -> State a -> Html (Msg a)
+view viewConfig selection state =
     Lazy.lazy3 Internal.view viewConfig selection state
 
 
 {-| You have to choose a `Selector` in your view configuration. This
 decides if you have a simple dropdown or an autocompletion version.
 -}
-type alias Selector a =
-    Internal.Selector a
+type alias Input a =
+    Internal.Input a
 
 
-{-| A selector for displaying a simple dropdown.
+{-| An input for displaying a simple dropdown.
 
   - `attrs = \sthSelected open -> [ ... ]` is used to style the actual
     button
@@ -345,18 +344,18 @@ type alias Selector a =
   - tell us the `placeholder` if the selection is empty
 
 -}
-button :
+simple :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
     , placeholder : String
     }
-    -> Selector a
-button config =
-    Internal.button config
+    -> Input a
+simple config =
+    Internal.simple config
 
 
-{-| A selector for an autocompletion dropdown.
+{-| An input for an autocompletion dropdown.
 
   - `attrs = \sthSelected open -> [ ... ]` is used to style the actual
     textfield (You probably need to overwrite the placeholder styling,
@@ -366,12 +365,12 @@ button config =
   - tell us the `placeholder` if the selection is empty
 
 -}
-textfield :
+autocomplete :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
     , placeholder : String
     }
-    -> Selector a
-textfield config =
-    Internal.textfield config
+    -> Input a
+autocomplete config =
+    Internal.autocomplete config

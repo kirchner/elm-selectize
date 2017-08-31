@@ -5,11 +5,11 @@ module Selectize.Selectize
         , LEntry(..)
         , Movement(..)
         , Msg(..)
-        , Selector
+        , Input
         , State
         , ViewConfig
         , ZipList
-        , button
+        , simple
         , closed
         , contains
         , currentEntry
@@ -17,7 +17,7 @@ module Selectize.Selectize
         , entry
         , fromList
         , moveForwardTo
-        , textfield
+        , autocomplete
         , update
         , view
         , viewConfig
@@ -144,7 +144,7 @@ type alias ViewConfig a =
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
-    , selector : Selector a
+    , input : Input a
     }
 
 
@@ -175,7 +175,7 @@ viewConfig :
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
-    , selector : Selector a
+    , input : Input a
     }
     -> ViewConfig a
 viewConfig config =
@@ -184,7 +184,7 @@ viewConfig config =
     , ul = config.ul
     , entry = config.entry
     , divider = config.divider
-    , selector = config.selector
+    , input = config.input
     }
 
 
@@ -459,7 +459,7 @@ view config selection state =
                     , "position" => "relative"
                     ]
                 ]
-                [ config.selector
+                [ config.input
                     state.id
                     selectionText
                     state.query
@@ -477,7 +477,7 @@ view config selection state =
                 [ Attributes.style
                     [ "position" => "relative" ]
                 ]
-                [ config.selector
+                [ config.input
                     state.id
                     selectionText
                     state.query
@@ -588,7 +588,7 @@ viewEntry config keyboardFocused mouseFocus entry =
         (children |> List.map mapToNoOp)
 
 
-type alias Selector a =
+type alias Input a =
     String
     -> Maybe String
     -> String
@@ -596,7 +596,7 @@ type alias Selector a =
     -> Html (Msg a)
 
 
-button :
+simple :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
@@ -607,7 +607,7 @@ button :
     -> String
     -> Bool
     -> Html (Msg a)
-button config id selection _ open =
+simple config id selection _ open =
     let
         buttonAttrs attrs =
             [ [ Attributes.id (textfieldId id)
@@ -650,7 +650,7 @@ button config id selection _ open =
         ]
 
 
-textfield :
+autocomplete :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
@@ -661,7 +661,7 @@ textfield :
     -> String
     -> Bool
     -> Html (Msg a)
-textfield config id selection query open =
+autocomplete config id selection query open =
     let
         inputAttrs attrs =
             [ if open then
