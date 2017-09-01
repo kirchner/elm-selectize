@@ -7,12 +7,10 @@ This is a customizable dropdown menu with the following features:
 * auto scrolling if the menu is styled with a maximum height and `overflow-y:
   scroll`
 * you can insert non-selectable dividers between entries
+* the styling and rendering of the entries can be fully customized
 
 Check out the [demo](https://kirchner.github.io/elm-selectize) or run it
 locally by executing `./elm-live.sh`
-
-The list of menu entries and the actual selection live in your model.  The
-styling and rendering of the entries can be fully customized.
 
 
 ## Nix Support

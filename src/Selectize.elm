@@ -101,11 +101,10 @@ Finally, the menu can be rendered like this
 
 with the view configuration given by
 
-    viewConfig : Selectize.ViewConfig String
+    viewConfig : Selectize.ViewConfig Tree
     viewConfig =
         Selectize.viewConfig
-            { placeholder = "Select a Tree"
-            , container =
+            { container =
                 [ Attributes.class "selectize__container" ]
             , menu =
                 [ Attributes.class "selectize__menu" ]
@@ -125,7 +124,9 @@ with the view configuration given by
                             ]
                         ]
                     , children =
-                        [ Html.text tree ]
+                        [ Html.text
+                            (tree.name ++ " - " ++ tree.latinName)
+                        ]
                     }
             , divider =
                 \title ->
@@ -137,19 +138,35 @@ with the view configuration given by
             , input = styledInput
             }
 
-and a selector given by, for example,
+and an input given by, for example,
 
-    styledInput : Selectize.selector Tree
+    styledInput : Selectize.Input Tree
     styledInput =
         Selectize.autocomplete <|
-            \sthSelected open ->
-                [ Attributes.class "selectize__textfield"
-                , Attributes.classList
-                    [ ( "selectize__textfield--selection", sthSelected )
-                    , ( "selectize__textfield--no-selection", not sthSelected )
-                    , ( "selectize__textfield--menu-open", open )
+            { attrs =
+                \sthSelected open ->
+                    [ Attributes.class "selectize__textfield"
+                    , Attributes.classList
+                        [ ( "selectize__textfield--selection", sthSelected )
+                        , ( "selectize__textfield--no-selection", not sthSelected )
+                        , ( "selectize__textfield--menu-open", open )
+                        ]
                     ]
-                ]
+            , toggleButton =
+                Just <|
+                    \open ->
+                        Html.i
+                            [ Attributes.class "material-icons"
+                            , Attributes.class "selectize__icon"
+                            ]
+                            [ if open then
+                                Html.text "arrow_drop_up"
+                              else
+                                Html.text "arrow_drop_down"
+                            ]
+            , clearButton = Nothing
+            , placeholder = "Select a Tree"
+            }
 
 
 # Types
@@ -245,7 +262,7 @@ type alias ViewConfig a =
             , menu = [ ... ]
             , ul = [ ... ]
             , entry =
-                \tree mouseFocused keyboardFocused ->
+                \entry mouseFocused keyboardFocused ->
                     { attributes = ...
                     , children = ...
                     }
@@ -328,7 +345,7 @@ view viewConfig selection state =
     Lazy.lazy3 Internal.view viewConfig selection state
 
 
-{-| You have to choose a `Selector` in your view configuration. This
+{-| You have to choose an `Input` in your view configuration. This
 decides if you have a simple dropdown or an autocompletion version.
 -}
 type alias Input a =
