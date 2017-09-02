@@ -311,8 +311,8 @@ module documentation to see what boilerplate is needed in your main
 update.
 -}
 update :
-    { select : a -> msg
-    , unselect : a -> msg
+    { select : Int -> a -> msg
+    , unselect : Int -> msg
     , clearSelection : msg
     }
     -> List a

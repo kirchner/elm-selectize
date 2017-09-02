@@ -55,9 +55,7 @@ init =
             MultiSelectize.closed
                 "multi-menu"
                 identity
-                ([ "foo", "bar", "baz" ]
-                    |> List.map MultiSelectize.entry
-                )
+                muppets
       , selections = []
       }
     , Cmd.none
@@ -75,7 +73,8 @@ type Msg
     | ButtonMenuMsg (Selectize.Msg String)
     | SelectButtonLicense (Maybe String)
     | MultiMenuMsg (MultiSelectize.Msg String)
-    | Select String
+    | Select Int String
+    | Unselect Int
     | ClearSelection
 
 
@@ -140,7 +139,7 @@ update msg model =
                 ( newMenu, menuCmd, maybeMsg ) =
                     MultiSelectize.update
                         { select = Select
-                        , unselect = \_ -> NoOp
+                        , unselect = Unselect
                         , clearSelection = ClearSelection
                         }
                         model.selections
@@ -161,8 +160,26 @@ update msg model =
                 Nothing ->
                     ( newModel, cmd )
 
-        Select newSelection ->
-            ( { model | selections = newSelection :: model.selections }
+        Select position newSelection ->
+            ( { model
+                | selections =
+                    [ model.selections |> List.take position
+                    , [ newSelection ]
+                    , model.selections |> List.drop position
+                    ]
+                        |> List.concat
+              }
+            , Cmd.none
+            )
+
+        Unselect position ->
+            ( { model
+                | selections =
+                    [ model.selections |> List.take position
+                    , model.selections |> List.drop (position + 1)
+                    ]
+                        |> List.concat
+              }
             , Cmd.none
             )
 
@@ -414,6 +431,55 @@ clearButton =
 
 
 ---- DATA
+
+
+muppets : List (MultiSelectize.Entry String)
+muppets =
+    List.concat
+        [ [ MultiSelectize.divider "Main character" ]
+        , [ "Kermit the Frog"
+          , "Miss Piggy"
+          , "Fozzie Bear"
+          , "Gonzo"
+          , "Rowlf the Dog"
+          , "Scooter"
+          , "Pepe the King Prawn"
+          , "Rizzo the Rat"
+          , "Animal"
+          , "Walter"
+          ]
+            |> List.map MultiSelectize.entry
+        , [ MultiSelectize.divider "Supporting characters" ]
+        , [ "Bunsen Honeydew"
+          , "Beaker"
+          , "Sam Eagle"
+          , "The Swedish Chef"
+          , "Dr. Teeth and The Electric Mayhem"
+          , "Statler and Waldorf"
+          , "Camilla the Chicken"
+          , "Bobo the Bear"
+          , "Clifford"
+          ]
+            |> List.map MultiSelectize.entry
+        , [ MultiSelectize.divider "Minor characters" ]
+        , [ "'80s Robot"
+          , "Andy and Randy Pig"
+          , "Bean Bunny"
+          , "Beauregard"
+          , "Constantine"
+          , "Crazy Harry"
+          , "Johnny Fiama and Sal Minella"
+          , "Lew Zealand"
+          , "Link Hogthrob"
+          , "Marvin Suggs"
+          , "The Muppet Newsman"
+          , "Pops"
+          , "Robin the Frog"
+          , "Sweetums"
+          , "Uncle Deadly"
+          ]
+            |> List.map MultiSelectize.entry
+        ]
 
 
 toLabel : String -> String

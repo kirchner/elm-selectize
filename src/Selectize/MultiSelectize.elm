@@ -37,6 +37,8 @@ import Keyboard.Extra
     exposing
         ( Key
             ( ArrowDown
+            , ArrowLeft
+            , ArrowRight
             , ArrowUp
             , BackSpace
             , Delete
@@ -56,7 +58,9 @@ type alias State a =
     , entries : List (LEntry a)
     , query : String
     , queryWidth : Float
+    , queryPosition : Int
     , zipList : Maybe (ZipList a)
+    , unfilteredZipList : Maybe (ZipList a)
     , open : Bool
     , mouseFocus : Maybe a
     , preventBlur : Bool
@@ -125,7 +129,9 @@ closed id toLabel entries =
     , entries = labeledEntries
     , query = ""
     , queryWidth = 0
+    , queryPosition = 0
     , zipList = Nothing
+    , unfilteredZipList = Nothing
     , open = False
     , mouseFocus = Nothing
     , preventBlur = False
@@ -204,12 +210,15 @@ type Msg a
       -- query
     | SetQuery String
     | SetQueryWidth Float
+    | MoveQueryLeft
+    | MoveQueryRight
       -- handle focus and selection
     | SetMouseFocus (Maybe a)
     | Select a
     | SetKeyboardFocus Movement Float
-    | SelectKeyboardFocusAndBlur
+    | SelectKeyboardFocus
     | ClearSelection
+    | ClearPreviousSelection
 
 
 type Movement
@@ -220,8 +229,8 @@ type Movement
 
 
 update :
-    { select : a -> msg
-    , unselect : a -> msg
+    { select : Int -> a -> msg
+    , unselect : Int -> msg
     , clearSelection : msg
     }
     -> List a
@@ -229,14 +238,18 @@ update :
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
 update { select, unselect, clearSelection } selections state msg =
-    case msg of
+    case Debug.log "msg" msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
 
         OpenMenu heights scrollTop ->
             let
+                entries =
+                    state.entries
+                        |> filterOut selections
+
                 newZipList =
-                    fromList state.entries heights.entries
+                    fromList entries heights.entries
 
                 top =
                     newZipList
@@ -250,6 +263,7 @@ update { select, unselect, clearSelection } selections state msg =
             in
             ( { state
                 | zipList = newZipList
+                , unfilteredZipList = newZipList
                 , open = True
                 , mouseFocus = Nothing
                 , query = ""
@@ -259,8 +273,7 @@ update { select, unselect, clearSelection } selections state msg =
               }
             , Cmd.batch
                 [ scroll state.id (top - (heights.menu - height) / 2)
-                , Task.attempt (\_ -> NoOp) <|
-                    Dom.focus (multiTextfieldId state.id)
+                , focus state.id
                 ]
             , Nothing
             )
@@ -269,7 +282,11 @@ update { select, unselect, clearSelection } selections state msg =
             if state.preventBlur then
                 ( state, Cmd.none, Nothing )
             else
-                ( state |> reset
+                ( { state
+                    | query = ""
+                    , zipList = Nothing
+                    , open = False
+                  }
                 , Cmd.none
                 , Nothing
                 )
@@ -294,8 +311,12 @@ update { select, unselect, clearSelection } selections state msg =
 
         SetQuery newQuery ->
             let
+                entries =
+                    state.entries
+                        |> filterOut selections
+
                 newZipList =
-                    fromListWithFilter newQuery state.entries state.entryHeights
+                    fromListWithFilter newQuery entries state.entryHeights
             in
             ( { state
                 | query = newQuery
@@ -307,8 +328,30 @@ update { select, unselect, clearSelection } selections state msg =
             )
 
         SetQueryWidth newWidth ->
-            ( { state | queryWidth = Debug.log "queryWidth" newWidth }
+            ( { state | queryWidth = newWidth }
             , Cmd.none
+            , Nothing
+            )
+
+        MoveQueryLeft ->
+            ( { state
+                | queryPosition =
+                    (state.queryPosition + 1)
+                        |> Basics.clamp 0 (List.length selections)
+                , preventBlur = True
+              }
+            , focus state.id
+            , Nothing
+            )
+
+        MoveQueryRight ->
+            ( { state
+                | queryPosition =
+                    (state.queryPosition - 1)
+                        |> Basics.clamp 0 (List.length selections)
+                , preventBlur = True
+              }
+            , focus state.id
             , Nothing
             )
 
@@ -319,9 +362,20 @@ update { select, unselect, clearSelection } selections state msg =
             )
 
         Select a ->
-            ( state |> reset
-            , Cmd.none
-            , Just (select a)
+            let
+                entries =
+                    state.entries
+                        |> filterOut (a :: selections)
+
+                newZipList =
+                    fromList entries state.entryHeights
+            in
+            ( { state
+                | query = ""
+                , zipList = newZipList
+              }
+            , focus state.id
+            , Just (select state.queryPosition a)
             )
 
         SetKeyboardFocus movement scrollTop ->
@@ -329,13 +383,31 @@ update { select, unselect, clearSelection } selections state msg =
                 |> updateKeyboardFocus movement
                 |> scrollToKeyboardFocus state.id scrollTop
 
-        SelectKeyboardFocusAndBlur ->
-            ( state |> reset
-            , blur state.id
-            , state.zipList
-                |> Maybe.map currentEntry
-                |> Maybe.map select
-            )
+        SelectKeyboardFocus ->
+            case state.zipList |> Maybe.map currentEntry of
+                Just a ->
+                    let
+                        entries =
+                            state.entries
+                                |> filterOut (a :: selections)
+
+                        newZipList =
+                            fromList entries state.entryHeights
+                    in
+                    ( { state
+                        | query = ""
+                        , zipList = newZipList
+                        , preventBlur = True
+                      }
+                    , focus state.id
+                    , Just (select state.queryPosition a)
+                    )
+
+                Nothing ->
+                    ( state
+                    , Cmd.none
+                    , Nothing
+                    )
 
         ClearSelection ->
             ( state
@@ -343,14 +415,35 @@ update { select, unselect, clearSelection } selections state msg =
             , Just clearSelection
             )
 
+        ClearPreviousSelection ->
+            let
+                actualSelections =
+                    [ selections |> List.take state.queryPosition
+                    , selections |> List.drop (state.queryPosition + 1)
+                    ]
+                        |> List.concat
+
+                entries =
+                    state.entries
+                        |> filterOut actualSelections
+
+                newZipList =
+                    fromList entries state.entryHeights
+            in
+            ( { state
+                | zipList = newZipList
+                , preventBlur = True
+              }
+            , focus state.id
+            , Just (unselect state.queryPosition)
+            )
+
 
 reset : State a -> State a
 reset state =
     { state
         | query = ""
-        , zipList = Nothing
-        , open = False
-        , mouseFocus = Nothing
+        , zipList = state.unfilteredZipList
     }
 
 
@@ -438,6 +531,15 @@ view config selections state =
             , Attributes.style [ "position" => "absolute" ]
             ]
                 ++ noOp config.menu
+
+        input =
+            config.input
+                state.id
+                selectionTexts
+                state.query
+                state.queryWidth
+                state.queryPosition
+                state.open
     in
     case state.zipList of
         Nothing ->
@@ -447,12 +549,7 @@ view config selections state =
                     , "position" => "relative"
                     ]
                 ]
-                [ config.input
-                    state.id
-                    selectionTexts
-                    state.query
-                    state.queryWidth
-                    state.open
+                [ input
                 , Html.div menuAttrs
                     [ state.entries
                         |> List.map
@@ -466,12 +563,7 @@ view config selections state =
                 [ Attributes.style
                     [ "position" => "relative" ]
                 ]
-                [ config.input
-                    state.id
-                    selectionTexts
-                    state.query
-                    state.queryWidth
-                    state.open
+                [ input
                 , Html.div menuAttrs
                     [ [ zipList.front
                             |> viewEntries config state
@@ -589,6 +681,7 @@ type alias Input a =
     -> List String
     -> String
     -> Float
+    -> Int
     -> Bool
     -> Html (Msg a)
 
@@ -602,67 +695,140 @@ simple :
     -> List String
     -> String
     -> Float
+    -> Int
     -> Bool
     -> Html (Msg a)
-simple config id selections query queryWidth open =
+simple config id selections query queryWidth queryPosition open =
     let
-        selectionDivs =
+        rightSelections =
             selections
+                |> List.take queryPosition
+                |> List.map config.selection
+                |> List.map mapToNoOp
+
+        leftSelections =
+            selections
+                |> List.drop queryPosition
                 |> List.map config.selection
                 |> List.map mapToNoOp
     in
     Html.div []
-        [ Html.div
-            ([ Events.on "click" focusDecoder ]
-                ++ noOp (config.attrs open)
-            )
-            (Html.div
-                [ Attributes.style
-                    [ "width" => "0"
-                    , "overflow" => "hidden"
-                    ]
-                ]
-                [ Html.span
-                    [ Attributes.class "selectize__multi-textfield-copy" ]
-                    [ Html.text query ]
-                ]
-                :: (case selectionDivs of
-                        [] ->
-                            [ config.placeholder |> mapToNoOp ]
-
-                        _ ->
-                            selectionDivs
-                   )
-                ++ [ Html.input
-                        [ Attributes.id (multiTextfieldId id)
-                        , Attributes.class "selectize__multi-textfield"
-                        , Attributes.style
-                            [ "width" => (toString (queryWidth + 10) ++ "px") ]
-                        , Events.onInput SetQuery
-                        , Events.on "keyup" decodeLength
-                        , Events.onBlur CloseMenu
-                        ]
-                        []
-                   ]
-            )
+        [ [ rightSelections
+          , [ textfield id query queryWidth ]
+          , leftSelections
+          ]
+            |> List.concat
+            |> List.reverse
+            |> Html.div
+                ([ Events.on "click" focusDecoder ]
+                    ++ noOp (config.attrs open)
+                )
         ]
 
 
-decodeLength =
-    Decode.map
-        (\width -> Ok (SetQueryWidth width))
-        (Decode.field "offsetWidth" Decode.float
-            |> DOM.childNode 0
-            |> DOM.childNode 0
-            |> DOM.parentElement
-            |> DOM.target
-        )
-        |> Decode.andThen fromResult
+textfield : String -> String -> Float -> Html (Msg a)
+textfield id query queryWidth =
+    let
+        decodeQueryWidth callback =
+            Decode.map
+                (\width -> Ok (callback width))
+                (Decode.field "offsetWidth" Decode.float
+                    |> DOM.childNode 0
+                    |> DOM.childNode 0
+                    |> DOM.parentElement
+                    |> DOM.target
+                )
+                |> Decode.andThen fromResult
 
+        decodeKey =
+            Decode.map2
+                (\code scrollTop ->
+                    case code |> fromCode of
+                        ArrowUp ->
+                            Ok (SetKeyboardFocus Up scrollTop)
 
-multiTextfieldId : String -> String
-multiTextfieldId id =
-    id ++ "__multi-textfield"
+                        ArrowDown ->
+                            Ok (SetKeyboardFocus Down scrollTop)
+
+                        Enter ->
+                            Ok SelectKeyboardFocus
+
+                        Escape ->
+                            Ok BlurTextfield
+
+                        BackSpace ->
+                            case query of
+                                "" ->
+                                    Ok ClearPreviousSelection
+
+                                _ ->
+                                    Err "not handling that key here"
+
+                        ArrowLeft ->
+                            case query of
+                                "" ->
+                                    Ok MoveQueryLeft
+
+                                _ ->
+                                    Err "not handling that key here"
+
+                        ArrowRight ->
+                            case query of
+                                "" ->
+                                    Ok MoveQueryRight
+
+                                _ ->
+                                    Err "not handling that key here"
+
+                        _ ->
+                            Err "not handling that key here"
+                )
+                Events.keyCode
+                scrollTopDecoder
+                |> Decode.andThen fromResult
+
+        scrollTopDecoder =
+            DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
+                |> DOM.parentElement
+                |> DOM.parentElement
+                |> DOM.parentElement
+                |> DOM.parentElement
+                |> DOM.target
+    in
+    Html.div
+        [ Attributes.style
+            [ "display" => "flex" ]
+        ]
+        [ Html.div
+            [ Attributes.style
+                [ "width" => "0"
+                , "overflow" => "hidden"
+                ]
+            ]
+            [ Html.span
+                [ Attributes.class "selectize__multi-textfield-copy"
+                , Attributes.style
+                    [ "border" => "0"
+                    , "padding" => "0"
+                    , "margin" => "0"
+                    , "white-space" => "nowrap"
+                    ]
+                ]
+                [ Html.text query ]
+            ]
+        , Html.input
+            [ Attributes.id (textfieldId id)
+            , Attributes.class "selectize__multi-textfield"
+            , Attributes.style
+                [ "width" => (toString (queryWidth + 10) ++ "px") ]
+            , Events.onInput SetQuery
+            , Events.on "keydown" decodeKey
+            , Events.on "keyup" (decodeQueryWidth SetQueryWidth)
+            , Events.onBlur CloseMenu
+            , Events.onFocus (PreventClosing False)
+            ]
+            []
+        ]
 
 
 buttons :
@@ -743,7 +909,7 @@ keydownDecoder =
                     Ok (SetKeyboardFocus Down scrollTop)
 
                 Enter ->
-                    Ok SelectKeyboardFocusAndBlur
+                    Ok SelectKeyboardFocus
 
                 Escape ->
                     Ok BlurTextfield
@@ -776,6 +942,23 @@ keyupDecoder =
 
 
 ---- HELPER
+
+
+filterOut : List a -> List (LEntry a) -> List (LEntry a)
+filterOut selections entries =
+    let
+        isNotSelected entry =
+            case entry of
+                LEntry a _ ->
+                    selections
+                        |> List.any (\selection -> selection == a)
+                        |> not
+
+                _ ->
+                    True
+    in
+    entries
+        |> List.filter isNotSelected
 
 
 contains : String -> String -> Bool
