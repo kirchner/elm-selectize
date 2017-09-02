@@ -9,6 +9,7 @@ module Demo
 
 import Html exposing (Html)
 import Html.Attributes as Attributes
+import MultiSelectize
 import Selectize
 
 
@@ -31,6 +32,8 @@ type alias Model =
     , textfieldMenu : Selectize.State String
     , buttonSelection : Maybe String
     , buttonMenu : Selectize.State String
+    , multiMenu : MultiSelectize.State String
+    , selections : List String
     }
 
 
@@ -48,6 +51,14 @@ init =
                 "button-menu"
                 identity
                 licenses
+      , multiMenu =
+            MultiSelectize.closed
+                "multi-menu"
+                identity
+                ([ "foo", "bar", "baz" ]
+                    |> List.map MultiSelectize.entry
+                )
+      , selections = []
       }
     , Cmd.none
     )
@@ -58,15 +69,22 @@ init =
 
 
 type Msg
-    = TextfieldMenuMsg (Selectize.Msg String)
-    | ButtonMenuMsg (Selectize.Msg String)
+    = NoOp
+    | TextfieldMenuMsg (Selectize.Msg String)
     | SelectTextfieldLicense (Maybe String)
+    | ButtonMenuMsg (Selectize.Msg String)
     | SelectButtonLicense (Maybe String)
+    | MultiMenuMsg (MultiSelectize.Msg String)
+    | Select String
+    | ClearSelection
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NoOp ->
+            ( model, Cmd.none )
+
         TextfieldMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
@@ -116,6 +134,40 @@ update msg model =
 
         SelectButtonLicense newSelection ->
             ( { model | buttonSelection = newSelection }, Cmd.none )
+
+        MultiMenuMsg selectizeMsg ->
+            let
+                ( newMenu, menuCmd, maybeMsg ) =
+                    MultiSelectize.update
+                        { select = Select
+                        , unselect = \_ -> NoOp
+                        , clearSelection = ClearSelection
+                        }
+                        model.selections
+                        model.multiMenu
+                        selectizeMsg
+
+                newModel =
+                    { model | multiMenu = newMenu }
+
+                cmd =
+                    menuCmd |> Cmd.map MultiMenuMsg
+            in
+            case maybeMsg of
+                Just nextMsg ->
+                    update nextMsg newModel
+                        |> andDo cmd
+
+                Nothing ->
+                    ( newModel, cmd )
+
+        Select newSelection ->
+            ( { model | selections = newSelection :: model.selections }
+            , Cmd.none
+            )
+
+        ClearSelection ->
+            ( { model | selections = [] }, Cmd.none )
 
 
 andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
@@ -177,6 +229,20 @@ view model =
                         |> Html.map ButtonMenuMsg
                     ]
                 ]
+            , Html.div
+                [ Attributes.class "container" ]
+                [ Html.div
+                    [ Attributes.class "caption" ]
+                    [ Html.text "multi-selection: " ]
+                , Html.div
+                    [ Attributes.style [ ( "width", "30rem" ) ] ]
+                    [ MultiSelectize.view
+                        viewConfigMulti
+                        model.selections
+                        model.multiMenu
+                        |> Html.map MultiMenuMsg
+                    ]
+                ]
             ]
         ]
 
@@ -227,6 +293,55 @@ viewConfig selector =
                     [ Html.text title ]
                 }
         , input = selector
+        }
+
+
+viewConfigMulti : MultiSelectize.ViewConfig String
+viewConfigMulti =
+    MultiSelectize.viewConfig
+        { container = []
+        , menu =
+            [ Attributes.class "selectize__menu" ]
+        , ul =
+            [ Attributes.class "selectize__list" ]
+        , entry =
+            \tree mouseFocused keyboardFocused ->
+                { attributes =
+                    [ Attributes.class "selectize__item"
+                    , Attributes.classList
+                        [ ( "selectize__item--mouse-selected"
+                          , mouseFocused
+                          )
+                        , ( "selectize__item--key-selected"
+                          , keyboardFocused
+                          )
+                        ]
+                    ]
+                , children =
+                    [ Html.text tree ]
+                }
+        , divider =
+            \title ->
+                { attributes =
+                    [ Attributes.class "selectize__divider" ]
+                , children =
+                    [ Html.text title ]
+                }
+        , input =
+            MultiSelectize.simple
+                { attrs =
+                    \open ->
+                        [ Attributes.class "selectize__multi-container"
+                        , Attributes.classList
+                            [ ( "selectize__multi-container--open", open ) ]
+                        ]
+                , selection =
+                    \license ->
+                        Html.div
+                            [ Attributes.class "selectize__multi-entry" ]
+                            [ Html.text license ]
+                , placeholder = Html.div [] [ Html.text "select licenses" ]
+                }
         }
 
 
