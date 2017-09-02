@@ -284,6 +284,8 @@ update { select, unselect, clearSelection } selections state msg =
             else
                 ( { state
                     | query = ""
+                    , queryWidth = 0
+                    , queryPosition = 0
                     , zipList = Nothing
                     , open = False
                   }
