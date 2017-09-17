@@ -10301,8 +10301,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (_p24) {
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Selectize.Selectize',
 			{
-				start: {line: 936, column: 5},
-				end: {line: 941, column: 52}
+				start: {line: 949, column: 5},
+				end: {line: 954, column: 52}
 			},
 			_p26)('this should be impossible');
 	}
@@ -10938,23 +10938,37 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: function () {
-										var _p58 = open;
-										if (_p58 === true) {
-											return A3(
-												_elm_lang$html$Html_Events$onWithOptions,
-												'click',
-												{stopPropagation: true, preventDefault: false},
-												_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$BlurTextfield));
-										} else {
-											return A3(
-												_elm_lang$html$Html_Events$onWithOptions,
-												'click',
-												{stopPropagation: true, preventDefault: false},
-												_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$FocusTextfield));
-										}
-									}(),
-									_1: {ctor: '[]'}
+									_0: open ? _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'pointer-events', 'auto'),
+											_1: {ctor: '[]'}
+										}) : _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'pointer-events', 'initial'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: function () {
+											var _p58 = open;
+											if (_p58 === true) {
+												return A3(
+													_elm_lang$html$Html_Events$onWithOptions,
+													'click',
+													{stopPropagation: true, preventDefault: false},
+													_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$BlurTextfield));
+											} else {
+												return A3(
+													_elm_lang$html$Html_Events$onWithOptions,
+													'click',
+													{stopPropagation: true, preventDefault: false},
+													_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$FocusTextfield));
+											}
+										}(),
+										_1: {ctor: '[]'}
+									}
 								},
 								{
 									ctor: '::',
@@ -11198,60 +11212,74 @@ var _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder = A2(
 var _kirchner$elm_selectize$Selectize_Selectize$simple = F5(
 	function (config, id, selection, _p75, open) {
 		var actualText = A2(_elm_lang$core$Maybe$withDefault, config.placeholder, selection);
-		var buttonAttrs = function (attrs) {
-			return _elm_lang$core$List$concat(
-				{
+		var buttonAttrs = _elm_lang$core$List$concat(
+			{
+				ctor: '::',
+				_0: {
 					ctor: '::',
-					_0: {
+					_0: _elm_lang$html$Html_Attributes$id(
+						_kirchner$elm_selectize$Selectize_Selectize$textfieldId(id)),
+					_1: {
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$id(
-							_kirchner$elm_selectize$Selectize_Selectize$textfieldId(id)),
+						_0: _elm_lang$html$Html_Attributes$tabindex(0),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$tabindex(0),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$style(
-									{
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-webkit-touch-callout', 'none'),
+									_1: {
 										ctor: '::',
-										_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-webkit-touch-callout', 'none'),
+										_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-webkit-user-select', 'none'),
 										_1: {
 											ctor: '::',
-											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-webkit-user-select', 'none'),
+											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-moz-user-select', 'none'),
 											_1: {
 												ctor: '::',
-												_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-moz-user-select', 'none'),
+												_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-ms-user-select', 'none'),
 												_1: {
 													ctor: '::',
-													_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], '-ms-user-select', 'none'),
-													_1: {
-														ctor: '::',
-														_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'user-select', 'none'),
-														_1: {ctor: '[]'}
-													}
+													_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'user-select', 'none'),
+													_1: {ctor: '[]'}
 												}
 											}
 										}
-									}),
-								_1: {ctor: '[]'}
-							}
-						}
-					},
-					_1: {
-						ctor: '::',
-						_0: attrs,
-						_1: {
-							ctor: '::',
-							_0: _kirchner$elm_selectize$Selectize_Selectize$noOp(
-								A2(
-									config.attrs,
-									!_elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing),
-									open)),
+									}
+								}),
 							_1: {ctor: '[]'}
 						}
 					}
-				});
-		};
+				},
+				_1: {
+					ctor: '::',
+					_0: open ? {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onBlur(_kirchner$elm_selectize$Selectize_Selectize$CloseMenu),
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$html$Html_Events$on, 'keyup', _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder),
+							_1: {
+								ctor: '::',
+								_0: A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', _kirchner$elm_selectize$Selectize_Selectize$keydownOptions, _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder),
+								_1: {ctor: '[]'}
+							}
+						}
+					} : {
+						ctor: '::',
+						_0: A2(_elm_lang$html$Html_Events$on, 'focus', _kirchner$elm_selectize$Selectize_Selectize$focusDecoder),
+						_1: {ctor: '[]'}
+					},
+					_1: {
+						ctor: '::',
+						_0: _kirchner$elm_selectize$Selectize_Selectize$noOp(
+							A2(
+								config.attrs,
+								!_elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing),
+								open)),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
@@ -11259,24 +11287,7 @@ var _kirchner$elm_selectize$Selectize_Selectize$simple = F5(
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
-					buttonAttrs(
-						open ? {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onBlur(_kirchner$elm_selectize$Selectize_Selectize$CloseMenu),
-							_1: {
-								ctor: '::',
-								_0: A2(_elm_lang$html$Html_Events$on, 'keyup', _kirchner$elm_selectize$Selectize_Selectize$keyupDecoder),
-								_1: {
-									ctor: '::',
-									_0: A3(_elm_lang$html$Html_Events$onWithOptions, 'keydown', _kirchner$elm_selectize$Selectize_Selectize$keydownOptions, _kirchner$elm_selectize$Selectize_Selectize$keydownDecoder),
-									_1: {ctor: '[]'}
-								}
-							}
-						} : {
-							ctor: '::',
-							_0: A2(_elm_lang$html$Html_Events$on, 'focus', _kirchner$elm_selectize$Selectize_Selectize$focusDecoder),
-							_1: {ctor: '[]'}
-						}),
+					buttonAttrs,
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(actualText),
@@ -11296,67 +11307,46 @@ var _kirchner$elm_selectize$Selectize_Selectize$simple = F5(
 	});
 var _kirchner$elm_selectize$Selectize_Selectize$autocomplete = F5(
 	function (config, id, selection, query, open) {
-		var inputAttrs = function (attrs) {
-			return _elm_lang$core$List$concat(
-				{
+		var inputAttrs = _elm_lang$core$List$concat(
+			{
+				ctor: '::',
+				_0: {
 					ctor: '::',
-					_0: open ? {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$placeholder(
-							A2(_elm_lang$core$Maybe$withDefault, config.placeholder, selection)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$value(query),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$id(
-									_kirchner$elm_selectize$Selectize_Selectize$textfieldId(id)),
-								_1: {
-									ctor: '::',
-									_0: A2(_elm_lang$html$Html_Events$on, 'focus', _kirchner$elm_selectize$Selectize_Selectize$focusDecoder),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					} : {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$value(
-							A2(_elm_lang$core$Maybe$withDefault, config.placeholder, selection)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$id(
-								_kirchner$elm_selectize$Selectize_Selectize$textfieldId(id)),
-							_1: {
-								ctor: '::',
-								_0: A2(_elm_lang$html$Html_Events$on, 'focus', _kirchner$elm_selectize$Selectize_Selectize$focusDecoder),
-								_1: {ctor: '[]'}
-							}
-						}
-					},
+					_0: _elm_lang$html$Html_Attributes$value(query),
 					_1: {
 						ctor: '::',
-						_0: attrs,
+						_0: _elm_lang$html$Html_Attributes$id(
+							_kirchner$elm_selectize$Selectize_Selectize$textfieldId(id)),
 						_1: {
 							ctor: '::',
-							_0: _kirchner$elm_selectize$Selectize_Selectize$noOp(
-								A2(
-									config.attrs,
-									!_elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing),
-									open)),
+							_0: A2(_elm_lang$html$Html_Events$on, 'focus', _kirchner$elm_selectize$Selectize_Selectize$focusDecoder),
 							_1: {ctor: '[]'}
 						}
 					}
-				});
-		};
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$input,
-					inputAttrs(
-						open ? {
+				},
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing) ? (open ? {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$placeholder(config.placeholder),
+						_1: {ctor: '[]'}
+					} : {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$value(config.placeholder),
+						_1: {ctor: '[]'}
+					}) : {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'color', 'transparent'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					_1: {
+						ctor: '::',
+						_0: open ? {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onBlur(_kirchner$elm_selectize$Selectize_Selectize$CloseMenu),
 							_1: {
@@ -11372,17 +11362,93 @@ var _kirchner$elm_selectize$Selectize_Selectize$autocomplete = F5(
 									}
 								}
 							}
-						} : {ctor: '[]'}),
+						} : {ctor: '[]'},
+						_1: {
+							ctor: '::',
+							_0: _kirchner$elm_selectize$Selectize_Selectize$noOp(
+								A2(
+									config.attrs,
+									!_elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing),
+									open)),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			});
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					inputAttrs,
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: A4(
-						_kirchner$elm_selectize$Selectize_Selectize$buttons,
-						config.clearButton,
-						config.toggleButton,
-						!_elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing),
-						open),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$div,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'position', 'absolute'),
+										_1: {
+											ctor: '::',
+											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'width', '100%'),
+											_1: {
+												ctor: '::',
+												_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'height', '100%'),
+												_1: {
+													ctor: '::',
+													_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'left', '0'),
+													_1: {
+														ctor: '::',
+														_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'top', '0'),
+														_1: {
+															ctor: '::',
+															_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'pointer-events', 'none'),
+															_1: {
+																ctor: '::',
+																_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'border-color', 'transparent'),
+																_1: {
+																	ctor: '::',
+																	_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'box-shadow', 'none'),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							_kirchner$elm_selectize$Selectize_Selectize$noOp(
+								A2(
+									config.attrs,
+									!_elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing),
+									open))),
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(_elm_lang$core$Maybe$withDefault, '', selection)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A4(
+							_kirchner$elm_selectize$Selectize_Selectize$buttons,
+							config.clearButton,
+							config.toggleButton,
+							!_elm_lang$core$Native_Utils.eq(selection, _elm_lang$core$Maybe$Nothing),
+							open),
+						_1: {ctor: '[]'}
+					}
 				}
 			});
 	});

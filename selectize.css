@@ -55,6 +55,8 @@ h3 {
   z-index: 1;
   cursor: pointer;
   text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
   color: #303030;
   font-family: "Source Sans Pro","Helvetica Neue",Arial,sans-serif;
   font-size: 15px;
