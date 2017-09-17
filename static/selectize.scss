@@ -73,6 +73,8 @@ h3 {
     z-index: 1;
     cursor: pointer;
     text-overflow: ellipsis;
+    overflow-x: hidden;
+    white-space: nowrap;
 
     color: #303030;
 

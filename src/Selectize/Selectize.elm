@@ -2,14 +2,14 @@ module Selectize.Selectize
     exposing
         ( Entry
         , Heights
+        , Input
         , LEntry(..)
         , Movement(..)
         , Msg(..)
-        , Input
         , State
         , ViewConfig
         , ZipList
-        , simple
+        , autocomplete
         , closed
         , contains
         , currentEntry
@@ -17,7 +17,7 @@ module Selectize.Selectize
         , entry
         , fromList
         , moveForwardTo
-        , autocomplete
+        , simple
         , update
         , view
         , viewConfig
@@ -609,7 +609,7 @@ simple :
     -> Html (Msg a)
 simple config id selection _ open =
     let
-        buttonAttrs attrs =
+        buttonAttrs =
             [ [ Attributes.id (textfieldId id)
               , Attributes.tabindex 0
               , Attributes.style
@@ -620,7 +620,13 @@ simple config id selection _ open =
                     , "user-select" => "none"
                     ]
               ]
-            , attrs
+            , if open then
+                [ Events.onBlur CloseMenu
+                , Events.on "keyup" keyupDecoder
+                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                ]
+              else
+                [ Events.on "focus" focusDecoder ]
             , noOp (config.attrs (selection /= Nothing) open)
             ]
                 |> List.concat
@@ -630,17 +636,7 @@ simple config id selection _ open =
                 |> Maybe.withDefault config.placeholder
     in
     Html.div []
-        [ Html.div
-            (buttonAttrs <|
-                if open then
-                    [ Events.onBlur CloseMenu
-                    , Events.on "keyup" keyupDecoder
-                    , Events.onWithOptions "keydown" keydownOptions keydownDecoder
-                    ]
-                else
-                    [ Events.on "focus" focusDecoder
-                    ]
-            )
+        [ Html.div buttonAttrs
             [ Html.text actualText ]
         , buttons
             config.clearButton
@@ -663,38 +659,49 @@ autocomplete :
     -> Html (Msg a)
 autocomplete config id selection query open =
     let
-        inputAttrs attrs =
-            [ if open then
-                [ Attributes.placeholder
-                    (selection |> Maybe.withDefault config.placeholder)
-                , Attributes.value query
-                , Attributes.id (textfieldId id)
-                , Events.on "focus" focusDecoder
+        inputAttrs =
+            [ [ Attributes.value query
+              , Attributes.id (textfieldId id)
+              , Events.on "focus" focusDecoder
+              ]
+            , if selection == Nothing then
+                if open then
+                    [ Attributes.placeholder config.placeholder ]
+                else
+                    [ Attributes.value config.placeholder ]
+              else
+                [ Attributes.style
+                    [ "color" => "transparent" ]
+                ]
+            , if open then
+                [ Events.onBlur CloseMenu
+                , Events.on "keyup" keyupDecoder
+                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                , Events.onInput SetQuery
                 ]
               else
-                [ Attributes.value
-                    (selection |> Maybe.withDefault config.placeholder)
-                , Attributes.id (textfieldId id)
-                , Events.on "focus" focusDecoder
-                ]
-            , attrs
+                []
             , noOp (config.attrs (selection /= Nothing) open)
             ]
                 |> List.concat
     in
     Html.div []
-        [ Html.input
-            (inputAttrs <|
-                if open then
-                    [ Events.onBlur CloseMenu
-                    , Events.on "keyup" keyupDecoder
-                    , Events.onWithOptions "keydown" keydownOptions keydownDecoder
-                    , Events.onInput SetQuery
-                    ]
-                else
-                    []
+        [ Html.input inputAttrs []
+        , Html.div
+            ([ Attributes.style
+                [ "position" => "absolute"
+                , "width" => "100%"
+                , "height" => "100%"
+                , "left" => "0"
+                , "top" => "0"
+                , "pointer-events" => "none"
+                , "border-color" => "transparent"
+                , "box-shadow" => "none"
+                ]
+             ]
+                ++ noOp (config.attrs (selection /= Nothing) open)
             )
-            []
+            [ Html.text (selection |> Maybe.withDefault "") ]
         , buttons
             config.clearButton
             config.toggleButton
