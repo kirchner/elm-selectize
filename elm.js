@@ -10301,8 +10301,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (_p24) {
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Selectize.Selectize',
 			{
-				start: {line: 949, column: 5},
-				end: {line: 954, column: 52}
+				start: {line: 943, column: 5},
+				end: {line: 948, column: 52}
 			},
 			_p26)('this should be impossible');
 	}
@@ -10938,37 +10938,23 @@ var _kirchner$elm_selectize$Selectize_Selectize$buttons = F4(
 								_elm_lang$html$Html$div,
 								{
 									ctor: '::',
-									_0: open ? _elm_lang$html$Html_Attributes$style(
-										{
-											ctor: '::',
-											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'pointer-events', 'auto'),
-											_1: {ctor: '[]'}
-										}) : _elm_lang$html$Html_Attributes$style(
-										{
-											ctor: '::',
-											_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'pointer-events', 'initial'),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: function () {
-											var _p58 = open;
-											if (_p58 === true) {
-												return A3(
-													_elm_lang$html$Html_Events$onWithOptions,
-													'click',
-													{stopPropagation: true, preventDefault: false},
-													_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$BlurTextfield));
-											} else {
-												return A3(
-													_elm_lang$html$Html_Events$onWithOptions,
-													'click',
-													{stopPropagation: true, preventDefault: false},
-													_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$FocusTextfield));
-											}
-										}(),
-										_1: {ctor: '[]'}
-									}
+									_0: function () {
+										var _p58 = open;
+										if (_p58 === true) {
+											return A3(
+												_elm_lang$html$Html_Events$onWithOptions,
+												'click',
+												{stopPropagation: true, preventDefault: false},
+												_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$BlurTextfield));
+										} else {
+											return A3(
+												_elm_lang$html$Html_Events$onWithOptions,
+												'click',
+												{stopPropagation: true, preventDefault: false},
+												_elm_lang$core$Json_Decode$succeed(_kirchner$elm_selectize$Selectize_Selectize$FocusTextfield));
+										}
+									}(),
+									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
