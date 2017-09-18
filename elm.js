@@ -10301,8 +10301,8 @@ var _kirchner$elm_selectize$Selectize_Selectize$currentEntry = function (_p24) {
 		return _elm_lang$core$Native_Utils.crashCase(
 			'Selectize.Selectize',
 			{
-				start: {line: 943, column: 5},
-				end: {line: 948, column: 52}
+				start: {line: 944, column: 5},
+				end: {line: 949, column: 52}
 			},
 			_p26)('this should be impossible');
 	}
@@ -11402,8 +11402,12 @@ var _kirchner$elm_selectize$Selectize_Selectize$autocomplete = F5(
 																_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'border-color', 'transparent'),
 																_1: {
 																	ctor: '::',
-																	_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'box-shadow', 'none'),
-																	_1: {ctor: '[]'}
+																	_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'background-color', 'transparent'),
+																	_1: {
+																		ctor: '::',
+																		_0: A2(_kirchner$elm_selectize$Selectize_Selectize_ops['=>'], 'box-shadow', 'none'),
+																		_1: {ctor: '[]'}
+																	}
 																}
 															}
 														}
