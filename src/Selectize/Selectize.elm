@@ -696,6 +696,7 @@ autocomplete config id selection query open =
                 , "top" => "0"
                 , "pointer-events" => "none"
                 , "border-color" => "transparent"
+                , "background-color" => "transparent"
                 , "box-shadow" => "none"
                 ]
              ]
