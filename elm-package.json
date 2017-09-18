@@ -1,5 +1,5 @@
 {
-    "version": "2.0.3",
+    "version": "2.0.4",
     "summary": "selectize-like dropdown menu with autocompletion",
     "repository": "https://github.com/kirchner/elm-selectize.git",
     "license": "Apache License, version 2.0",
