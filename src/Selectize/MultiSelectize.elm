@@ -204,7 +204,6 @@ type Msg a
       -- open/close menu
     | OpenMenu Heights Float
     | CloseMenu
-    | FocusTextfield
     | BlurTextfield
     | PreventClosing Bool
       -- query
@@ -232,13 +231,14 @@ update :
     { select : Int -> a -> msg
     , unselect : Int -> msg
     , clearSelection : msg
+    , keepQuery : Bool
     }
     -> List a
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update { select, unselect, clearSelection } selections state msg =
-    case Debug.log "msg" msg of
+update { select, unselect, clearSelection, keepQuery } selections state msg =
+    case msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
 
@@ -292,12 +292,6 @@ update { select, unselect, clearSelection } selections state msg =
                 , Cmd.none
                 , Nothing
                 )
-
-        FocusTextfield ->
-            ( state
-            , Cmd.none
-            , Nothing
-            )
 
         BlurTextfield ->
             ( state
@@ -394,10 +388,17 @@ update { select, unselect, clearSelection } selections state msg =
                                 |> filterOut (a :: selections)
 
                         newZipList =
-                            fromList entries state.entryHeights
+                            if keepQuery then
+                                state.zipList |> Maybe.andThen removeCurrentEntry
+                            else
+                                fromList entries state.entryHeights
                     in
                     ( { state
-                        | query = ""
+                        | query =
+                            if keepQuery then
+                                state.query
+                            else
+                                ""
                         , zipList = newZipList
                         , preventBlur = True
                       }
@@ -692,6 +693,7 @@ simple :
     { attrs : Bool -> List (Html.Attribute Never)
     , selection : String -> Html Never
     , placeholder : Html Never
+    , textfieldClass : String
     }
     -> String
     -> List String
@@ -713,89 +715,72 @@ simple config id selections query queryWidth queryPosition open =
                 |> List.drop queryPosition
                 |> List.map config.selection
                 |> List.map mapToNoOp
+
+        content =
+            if open then
+                [ rightSelections
+                , [ textfield id config.textfieldClass query queryWidth ]
+                , leftSelections
+                ]
+                    |> List.concat
+                    |> List.reverse
+            else if
+                (rightSelections |> List.isEmpty)
+                    && (leftSelections |> List.isEmpty)
+            then
+                [ config.placeholder |> mapToNoOp ]
+            else
+                [ rightSelections
+                , leftSelections
+                ]
+                    |> List.concat
+                    |> List.reverse
     in
     Html.div []
-        [ [ rightSelections
-          , [ textfield id query queryWidth ]
-          , leftSelections
-          ]
-            |> List.concat
-            |> List.reverse
-            |> Html.div
-                ([ Events.on "click" focusDecoder ]
-                    ++ noOp (config.attrs open)
-                )
+        [ Html.div
+            ([ Events.on "click" (measurementsDecoder OpenMenu) ]
+                ++ noOp (config.attrs open)
+            )
+            content
         ]
 
 
-textfield : String -> String -> Float -> Html (Msg a)
-textfield id query queryWidth =
+textfield : String -> String -> String -> Float -> Html (Msg a)
+textfield id textfieldClass query queryWidth =
     let
-        decodeQueryWidth callback =
-            Decode.map
-                (\width -> Ok (callback width))
-                (Decode.field "offsetWidth" Decode.float
-                    |> DOM.childNode 0
-                    |> DOM.childNode 0
-                    |> DOM.parentElement
-                    |> DOM.target
-                )
-                |> Decode.andThen fromResult
+        queryWidthDecoder callback =
+            Decode.field "offsetWidth" Decode.float
+                |> DOM.childNode 0
+                |> DOM.childNode 0
+                |> DOM.parentElement
+                |> DOM.target
+                |> Decode.map callback
 
-        decodeKey =
-            Decode.map2
-                (\code scrollTop ->
-                    case code |> fromCode of
-                        ArrowUp ->
-                            Ok (SetKeyboardFocus Up scrollTop)
-
-                        ArrowDown ->
-                            Ok (SetKeyboardFocus Down scrollTop)
-
-                        Enter ->
-                            Ok SelectKeyboardFocus
-
-                        Escape ->
-                            Ok BlurTextfield
-
-                        BackSpace ->
-                            case query of
-                                "" ->
-                                    Ok ClearPreviousSelection
-
-                                _ ->
-                                    Err "not handling that key here"
-
-                        ArrowLeft ->
-                            case query of
-                                "" ->
-                                    Ok MoveQueryLeft
-
-                                _ ->
-                                    Err "not handling that key here"
-
-                        ArrowRight ->
-                            case query of
-                                "" ->
-                                    Ok MoveQueryRight
-
-                                _ ->
-                                    Err "not handling that key here"
-
-                        _ ->
-                            Err "not handling that key here"
-                )
-                Events.keyCode
-                scrollTopDecoder
-                |> Decode.andThen fromResult
-
-        scrollTopDecoder =
+        keydownDecoder =
             DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
                 |> DOM.parentElement
                 |> DOM.parentElement
                 |> DOM.parentElement
                 |> DOM.parentElement
                 |> DOM.target
+                |> Decode.andThen
+                    (\scrollTop ->
+                        keyDecoder
+                            |> onKey ArrowUp (SetKeyboardFocus Up scrollTop)
+                            |> onKey ArrowDown (SetKeyboardFocus Down scrollTop)
+                            |> onKey Enter SelectKeyboardFocus
+                            |> onKey Escape BlurTextfield
+                            |> (if query == "" then
+                                    \result ->
+                                        result
+                                            |> onKey BackSpace ClearPreviousSelection
+                                            |> onKey ArrowLeft MoveQueryLeft
+                                            |> onKey ArrowRight MoveQueryRight
+                                            |> doIt
+                                else
+                                    doIt
+                               )
+                    )
     in
     Html.div
         [ Attributes.style
@@ -808,7 +793,7 @@ textfield id query queryWidth =
                 ]
             ]
             [ Html.span
-                [ Attributes.class "selectize__multi-textfield-copy"
+                [ Attributes.class textfieldClass
                 , Attributes.style
                     [ "border" => "0"
                     , "padding" => "0"
@@ -820,126 +805,29 @@ textfield id query queryWidth =
             ]
         , Html.input
             [ Attributes.id (textfieldId id)
-            , Attributes.class "selectize__multi-textfield"
+            , Attributes.class textfieldClass
             , Attributes.style
                 [ "width" => (toString (queryWidth + 10) ++ "px") ]
             , Events.onInput SetQuery
-            , Events.on "keydown" decodeKey
-            , Events.on "keyup" (decodeQueryWidth SetQueryWidth)
+            , Events.on "keydown" keydownDecoder
+            , Events.on "keyup" (queryWidthDecoder SetQueryWidth)
             , Events.onBlur CloseMenu
             , Events.onFocus (PreventClosing False)
+            , Attributes.value query
             ]
             []
         ]
 
 
-buttons :
-    Maybe (Html Never)
-    -> Maybe (Bool -> Html Never)
-    -> Bool
-    -> Bool
-    -> Html (Msg a)
-buttons clearButton toggleButton sthSelected open =
-    Html.div
-        [ Attributes.style
-            [ "position" => "absolute"
-            , "right" => "0"
-            , "top" => "0"
-            , "display" => "flex"
-            ]
-        ]
-        [ case ( clearButton, sthSelected ) of
-            ( Just clear, True ) ->
-                Html.div
-                    [ Events.onClick ClearSelection ]
-                    [ clear |> mapToNoOp ]
-
-            _ ->
-                Html.text ""
-        , case toggleButton of
-            Just toggle ->
-                Html.div
-                    [ case open of
-                        True ->
-                            Events.onWithOptions "click"
-                                { stopPropagation = True
-                                , preventDefault = False
-                                }
-                                (Decode.succeed BlurTextfield)
-
-                        False ->
-                            Events.onWithOptions "click"
-                                { stopPropagation = True
-                                , preventDefault = False
-                                }
-                                (Decode.succeed FocusTextfield)
-                    ]
-                    [ toggle open |> mapToNoOp ]
-
-            Nothing ->
-                Html.div [] []
-        ]
-
-
-focusDecoder : Decoder (Msg a)
-focusDecoder =
+measurementsDecoder : ({ entries : List Float, menu : Float } -> Float -> msg) -> Decoder msg
+measurementsDecoder callback =
     Decode.map3
         (\entryHeights menuHeight scrollTop ->
-            OpenMenu { entries = entryHeights, menu = menuHeight } scrollTop
+            callback { entries = entryHeights, menu = menuHeight } scrollTop
         )
         entryHeightsDecoder
         menuHeightDecoder
         scrollTopDecoder
-
-
-keydownOptions : Events.Options
-keydownOptions =
-    { preventDefault = True
-    , stopPropagation = False
-    }
-
-
-keydownDecoder : Decoder (Msg a)
-keydownDecoder =
-    Decode.map2
-        (\code scrollTop ->
-            case code |> fromCode of
-                ArrowUp ->
-                    Ok (SetKeyboardFocus Up scrollTop)
-
-                ArrowDown ->
-                    Ok (SetKeyboardFocus Down scrollTop)
-
-                Enter ->
-                    Ok SelectKeyboardFocus
-
-                Escape ->
-                    Ok BlurTextfield
-
-                _ ->
-                    Err "not handling that key here"
-        )
-        Events.keyCode
-        scrollTopDecoder
-        |> Decode.andThen fromResult
-
-
-keyupDecoder : Decoder (Msg a)
-keyupDecoder =
-    Events.keyCode
-        |> Decode.map
-            (\code ->
-                case code |> fromCode of
-                    BackSpace ->
-                        Ok ClearSelection
-
-                    Delete ->
-                        Ok ClearSelection
-
-                    _ ->
-                        Err "not handling that key here"
-            )
-        |> Decode.andThen fromResult
 
 
 
@@ -1062,6 +950,75 @@ fromResult result =
             Decode.fail reason
 
 
+keyDecoder : Decoder (Result Key msg)
+keyDecoder =
+    Events.keyCode
+        |> Decode.map (fromCode >> Err)
+
+
+onKey : Key -> msg -> Decoder (Result Key msg) -> Decoder (Result Key msg)
+onKey code msg decoder =
+    decoder
+        |> Decode.andThen
+            (\result ->
+                case result of
+                    Ok msg ->
+                        Decode.succeed (Ok msg)
+
+                    Err actualCode ->
+                        if actualCode == code then
+                            Decode.succeed (Ok msg)
+                        else
+                            Decode.succeed (Err actualCode)
+            )
+
+
+doIt : Decoder (Result Key msg) -> Decoder msg
+doIt decoder =
+    decoder
+        |> Decode.andThen
+            (\result ->
+                case result of
+                    Ok msg ->
+                        Decode.succeed msg
+
+                    Err _ ->
+                        Decode.fail "not handling that key here"
+            )
+
+
+code : List ( Key, a ) -> Decoder a
+code msgs =
+    Events.keyCode
+        |> Decode.map fromCode
+        |> Decode.andThen
+            (\code ->
+                case
+                    msgs
+                        |> first (\( nextCode, msg ) -> nextCode == code)
+                        |> Maybe.map Tuple.second
+                of
+                    Just msg ->
+                        Decode.succeed msg
+
+                    Nothing ->
+                        Decode.fail "key not handled here"
+            )
+
+
+first : (a -> Bool) -> List a -> Maybe a
+first condition list =
+    case list of
+        [] ->
+            Nothing
+
+        element :: rest ->
+            if condition element then
+                Just element
+            else
+                first condition rest
+
+
 
 ---- ZIPLIST
 
@@ -1076,6 +1033,53 @@ type alias ZipList a =
 
 type alias EntryWithHeight a =
     ( Entry a, Float )
+
+
+removeCurrentEntry : ZipList a -> Maybe (ZipList a)
+removeCurrentEntry ({ front, current, back, currentTop } as zipList) =
+    if back |> containsActualEntries then
+        case back of
+            [] ->
+                Nothing
+
+            next :: rest ->
+                { zipList
+                    | current = next
+                    , back = rest
+                }
+                    |> zipFirst
+    else if front |> containsActualEntries then
+        case front of
+            [] ->
+                Nothing
+
+            previous :: rest ->
+                let
+                    ( _, height ) =
+                        previous
+                in
+                { zipList
+                    | front = rest
+                    , current = previous
+                    , currentTop = currentTop - height
+                }
+                    |> zipReverseFirst
+    else
+        Nothing
+
+
+containsActualEntries : List (EntryWithHeight a) -> Bool
+containsActualEntries entries =
+    let
+        isActualEntry entry =
+            case entry of
+                ( Entry _, _ ) ->
+                    True
+
+                _ ->
+                    False
+    in
+    entries |> List.any isActualEntry
 
 
 currentEntry : { r | current : EntryWithHeight a } -> a

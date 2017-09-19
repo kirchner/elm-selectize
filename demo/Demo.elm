@@ -141,6 +141,7 @@ update msg model =
                         { select = Select
                         , unselect = Unselect
                         , clearSelection = ClearSelection
+                        , keepQuery = False
                         }
                         model.selections
                         model.multiMenu
@@ -357,7 +358,11 @@ viewConfigMulti =
                         Html.div
                             [ Attributes.class "selectize__multi-entry" ]
                             [ Html.text license ]
-                , placeholder = Html.div [] [ Html.text "select licenses" ]
+                , placeholder =
+                    Html.div
+                        [ Attributes.class "selectize__multi-placeholder" ]
+                        [ Html.text "Invite the Muppets" ]
+                , textfieldClass = "selectize__multi-textfield"
                 }
         }
 

@@ -314,6 +314,7 @@ update :
     { select : Int -> a -> msg
     , unselect : Int -> msg
     , clearSelection : msg
+    , keepQuery : Bool
     }
     -> List a
     -> State a
@@ -347,6 +348,7 @@ simple :
     { attrs : Bool -> List (Html.Attribute Never)
     , selection : String -> Html Never
     , placeholder : Html Never
+    , textfieldClass : String
     }
     -> Input a
 simple config =
