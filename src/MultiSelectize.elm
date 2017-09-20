@@ -1,6 +1,7 @@
 module MultiSelectize
     exposing
-        ( Entry
+        ( Action
+        , Entry
         , HtmlDetails
         , Input
         , Msg
@@ -10,6 +11,7 @@ module MultiSelectize
         , divider
         , entry
         , simple
+        , unselectOn
         , update
         , view
         , viewConfig
@@ -315,6 +317,7 @@ update :
     , unselect : Int -> msg
     , clearSelection : msg
     , keepQuery : Bool
+    , textfieldMovable : Bool
     }
     -> List a
     -> State a
@@ -344,10 +347,21 @@ type alias Input a =
 
 
 {-| -}
+type alias Action =
+    Internal.Action
+
+
+{-| -}
+unselectOn : String -> Html.Attribute Action
+unselectOn =
+    Internal.unselectOn
+
+
+{-| -}
 simple :
     { attrs : Bool -> List (Html.Attribute Never)
-    , selection : String -> Html Never
-    , placeholder : Html Never
+    , selection : String -> Html Action
+    , placeholder : Bool -> Html Never
     , textfieldClass : String
     }
     -> Input a

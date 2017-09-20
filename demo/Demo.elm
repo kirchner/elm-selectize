@@ -9,6 +9,7 @@ module Demo
 
 import Html exposing (Html)
 import Html.Attributes as Attributes
+import Html.Events as Events
 import MultiSelectize
 import Selectize
 
@@ -34,6 +35,9 @@ type alias Model =
     , buttonMenu : Selectize.State String
     , multiMenu : MultiSelectize.State String
     , selections : List String
+    , showRemoveButtons : Bool
+    , keepQuery : Bool
+    , textfieldMovable : Bool
     }
 
 
@@ -57,6 +61,9 @@ init =
                 identity
                 muppets
       , selections = []
+      , showRemoveButtons = True
+      , keepQuery = False
+      , textfieldMovable = True
       }
     , Cmd.none
     )
@@ -76,6 +83,9 @@ type Msg
     | Select Int String
     | Unselect Int
     | ClearSelection
+    | ToggleShowRemoveButtons
+    | ToggleKeepQuery
+    | ToggleTextfieldMovable
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -141,7 +151,8 @@ update msg model =
                         { select = Select
                         , unselect = Unselect
                         , clearSelection = ClearSelection
-                        , keepQuery = False
+                        , keepQuery = model.keepQuery
+                        , textfieldMovable = model.textfieldMovable
                         }
                         model.selections
                         model.multiMenu
@@ -186,6 +197,21 @@ update msg model =
 
         ClearSelection ->
             ( { model | selections = [] }, Cmd.none )
+
+        ToggleShowRemoveButtons ->
+            ( { model | showRemoveButtons = not model.showRemoveButtons }
+            , Cmd.none
+            )
+
+        ToggleKeepQuery ->
+            ( { model | keepQuery = not model.keepQuery }
+            , Cmd.none
+            )
+
+        ToggleTextfieldMovable ->
+            ( { model | textfieldMovable = not model.textfieldMovable }
+            , Cmd.none
+            )
 
 
 andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
@@ -255,10 +281,47 @@ view model =
                 , Html.div
                     [ Attributes.style [ ( "width", "30rem" ) ] ]
                     [ MultiSelectize.view
-                        viewConfigMulti
+                        (viewConfigMulti model.showRemoveButtons)
                         model.selections
                         model.multiMenu
                         |> Html.map MultiMenuMsg
+                    ]
+                , Html.div
+                    [ Attributes.style
+                        [ ( "display", "flex" )
+                        , ( "flex-flow", "column" )
+                        ]
+                    ]
+                    [ Html.label
+                        [ Attributes.class "caption" ]
+                        [ Html.input
+                            [ Attributes.type_ "checkbox"
+                            , Attributes.checked model.showRemoveButtons
+                            , Events.onClick ToggleShowRemoveButtons
+                            ]
+                            []
+                        , Html.text "show remove buttons"
+                        ]
+                    , Html.label
+                        [ Attributes.class "caption" ]
+                        [ Html.input
+                            [ Attributes.type_ "checkbox"
+                            , Attributes.checked model.keepQuery
+                            , Events.onClick ToggleKeepQuery
+                            ]
+                            []
+                        , Html.text "keep query"
+                        ]
+                    , Html.label
+                        [ Attributes.class "caption" ]
+                        [ Html.input
+                            [ Attributes.type_ "checkbox"
+                            , Attributes.checked model.textfieldMovable
+                            , Events.onClick ToggleTextfieldMovable
+                            ]
+                            []
+                        , Html.text "textfield movable"
+                        ]
                     ]
                 ]
             ]
@@ -314,8 +377,8 @@ viewConfig selector =
         }
 
 
-viewConfigMulti : MultiSelectize.ViewConfig String
-viewConfigMulti =
+viewConfigMulti : Bool -> MultiSelectize.ViewConfig String
+viewConfigMulti showRemoveButtons =
     MultiSelectize.viewConfig
         { container = []
         , menu =
@@ -354,17 +417,43 @@ viewConfigMulti =
                             [ ( "selectize__multi-container--open", open ) ]
                         ]
                 , selection =
-                    \license ->
-                        Html.div
-                            [ Attributes.class "selectize__multi-entry" ]
-                            [ Html.text license ]
+                    if showRemoveButtons then
+                        selectionWithRemoveButton
+                    else
+                        simpleSelection
                 , placeholder =
-                    Html.div
-                        [ Attributes.class "selectize__multi-placeholder" ]
-                        [ Html.text "Invite the Muppets" ]
+                    \open ->
+                        Html.div
+                            [ Attributes.class "selectize__multi-placeholder"
+                            , Attributes.classList
+                                [ ( "selectize__multi-placeholder--menu-open", open ) ]
+                            ]
+                            [ Html.text "Invite the Muppets" ]
                 , textfieldClass = "selectize__multi-textfield"
                 }
         }
+
+
+simpleSelection : String -> Html MultiSelectize.Action
+simpleSelection license =
+    Html.div
+        [ Attributes.class "selectize__multi-entry" ]
+        [ Html.text license ]
+
+
+selectionWithRemoveButton : String -> Html MultiSelectize.Action
+selectionWithRemoveButton license =
+    Html.div
+        [ Attributes.class "selectize__multi-entry-container" ]
+        [ Html.div
+            [ Attributes.class "selectize__multi-entry-with-remove-button" ]
+            [ Html.text license ]
+        , Html.div
+            [ Attributes.class "selectize__multi-entry-remove-button"
+            , MultiSelectize.unselectOn "click"
+            ]
+            [ Html.text "×" ]
+        ]
 
 
 textfieldSelector : Selectize.Input String
