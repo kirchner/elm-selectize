@@ -29,10 +29,10 @@ main =
 
 
 type alias Model =
-    { textfieldSelection : Maybe String
-    , textfieldMenu : Selectize.State String
-    , buttonSelection : Maybe String
-    , buttonMenu : Selectize.State String
+    { selection : Maybe String
+    , menu : Selectize.State String
+    , autocompletion : Bool
+    , showClearButton : Bool
     , multiMenu : MultiSelectize.State String
     , selections : List String
     , showRemoveButtons : Bool
@@ -43,18 +43,14 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { textfieldSelection = Nothing
-      , textfieldMenu =
+    ( { selection = Nothing
+      , menu =
             Selectize.closed
                 "textfield-menu"
                 identity
                 licenses
-      , buttonSelection = Nothing
-      , buttonMenu =
-            Selectize.closed
-                "button-menu"
-                identity
-                licenses
+      , autocompletion = True
+      , showClearButton = True
       , multiMenu =
             MultiSelectize.closed
                 "multi-menu"
@@ -75,10 +71,10 @@ init =
 
 type Msg
     = NoOp
-    | TextfieldMenuMsg (Selectize.Msg String)
-    | SelectTextfieldLicense (Maybe String)
-    | ButtonMenuMsg (Selectize.Msg String)
-    | SelectButtonLicense (Maybe String)
+    | MenuMsg (Selectize.Msg String)
+    | SelectLicense (Maybe String)
+    | ToggleAutocompletion
+    | ToggleShowClearButton
     | MultiMenuMsg (MultiSelectize.Msg String)
     | Select Int String
     | Unselect Int
@@ -94,19 +90,19 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        TextfieldMenuMsg selectizeMsg ->
+        MenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectTextfieldLicense
-                        model.textfieldSelection
-                        model.textfieldMenu
+                    Selectize.update SelectLicense
+                        model.selection
+                        model.menu
                         selectizeMsg
 
                 newModel =
-                    { model | textfieldMenu = newMenu }
+                    { model | menu = newMenu }
 
                 cmd =
-                    menuCmd |> Cmd.map TextfieldMenuMsg
+                    menuCmd |> Cmd.map MenuMsg
             in
             case maybeMsg of
                 Just nextMsg ->
@@ -116,33 +112,18 @@ update msg model =
                 Nothing ->
                     ( newModel, cmd )
 
-        ButtonMenuMsg selectizeMsg ->
-            let
-                ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectButtonLicense
-                        model.buttonSelection
-                        model.buttonMenu
-                        selectizeMsg
+        SelectLicense newSelection ->
+            ( { model | selection = newSelection }, Cmd.none )
 
-                newModel =
-                    { model | buttonMenu = newMenu }
+        ToggleAutocompletion ->
+            ( { model | autocompletion = not model.autocompletion }
+            , Cmd.none
+            )
 
-                cmd =
-                    menuCmd |> Cmd.map ButtonMenuMsg
-            in
-            case maybeMsg of
-                Just nextMsg ->
-                    update nextMsg newModel
-                        |> andDo cmd
-
-                Nothing ->
-                    ( newModel, cmd )
-
-        SelectTextfieldLicense newSelection ->
-            ( { model | textfieldSelection = newSelection }, Cmd.none )
-
-        SelectButtonLicense newSelection ->
-            ( { model | buttonSelection = newSelection }, Cmd.none )
+        ToggleShowClearButton ->
+            ( { model | showClearButton = not model.showClearButton }
+            , Cmd.none
+            )
 
         MultiMenuMsg selectizeMsg ->
             let
@@ -249,35 +230,51 @@ view model =
                 [ Attributes.class "container" ]
                 [ Html.div
                     [ Attributes.class "caption" ]
-                    [ Html.text "with autocompletion: " ]
+                    [ Html.text "Selectize: " ]
                 , Html.div
                     [ Attributes.style [ ( "width", "30rem" ) ] ]
                     [ Selectize.view
-                        viewConfigTextfield
-                        model.textfieldSelection
-                        model.textfieldMenu
-                        |> Html.map TextfieldMenuMsg
+                        (viewConfigTextfield
+                            model.autocompletion
+                            model.showClearButton
+                        )
+                        model.selection
+                        model.menu
+                        |> Html.map MenuMsg
+                    ]
+                , Html.div
+                    [ Attributes.style
+                        [ ( "display", "flex" )
+                        , ( "flex-flow", "column" )
+                        ]
+                    ]
+                    [ Html.label
+                        [ Attributes.class "caption" ]
+                        [ Html.input
+                            [ Attributes.type_ "checkbox"
+                            , Attributes.checked model.autocompletion
+                            , Events.onClick ToggleAutocompletion
+                            ]
+                            []
+                        , Html.text "autocompletion"
+                        ]
+                    , Html.label
+                        [ Attributes.class "caption" ]
+                        [ Html.input
+                            [ Attributes.type_ "checkbox"
+                            , Attributes.checked model.showClearButton
+                            , Events.onClick ToggleShowClearButton
+                            ]
+                            []
+                        , Html.text "show clear button"
+                        ]
                     ]
                 ]
             , Html.div
                 [ Attributes.class "container" ]
                 [ Html.div
                     [ Attributes.class "caption" ]
-                    [ Html.text "without autocompletion: " ]
-                , Html.div
-                    [ Attributes.style [ ( "width", "30rem" ) ] ]
-                    [ Selectize.view
-                        viewConfigButton
-                        model.buttonSelection
-                        model.buttonMenu
-                        |> Html.map ButtonMenuMsg
-                    ]
-                ]
-            , Html.div
-                [ Attributes.class "container" ]
-                [ Html.div
-                    [ Attributes.class "caption" ]
-                    [ Html.text "multi-selection: " ]
+                    [ Html.text "MultiSelectize: " ]
                 , Html.div
                     [ Attributes.style [ ( "width", "30rem" ) ] ]
                     [ MultiSelectize.view
@@ -332,18 +329,8 @@ view model =
 ---- CONFIGURATION
 
 
-viewConfigTextfield : Selectize.ViewConfig String
-viewConfigTextfield =
-    viewConfig textfieldSelector
-
-
-viewConfigButton : Selectize.ViewConfig String
-viewConfigButton =
-    viewConfig buttonSelector
-
-
-viewConfig : Selectize.Input String -> Selectize.ViewConfig String
-viewConfig selector =
+viewConfigTextfield : Bool -> Bool -> Selectize.ViewConfig String
+viewConfigTextfield autocompletion showClearButton =
     Selectize.viewConfig
         { container = []
         , menu =
@@ -373,7 +360,11 @@ viewConfig selector =
                 , children =
                     [ Html.text title ]
                 }
-        , input = selector
+        , input =
+            if autocompletion then
+                textfieldSelector showClearButton
+            else
+                buttonSelector showClearButton
         }
 
 
@@ -456,8 +447,8 @@ selectionWithRemoveButton license =
         ]
 
 
-textfieldSelector : Selectize.Input String
-textfieldSelector =
+textfieldSelector : Bool -> Selectize.Input String
+textfieldSelector showClearButton =
     Selectize.autocomplete <|
         { attrs =
             \sthSelected open ->
@@ -469,13 +460,17 @@ textfieldSelector =
                     ]
                 ]
         , toggleButton = toggleButton
-        , clearButton = clearButton
+        , clearButton =
+            if showClearButton then
+                clearButton
+            else
+                Nothing
         , placeholder = "Select a License"
         }
 
 
-buttonSelector : Selectize.Input String
-buttonSelector =
+buttonSelector : Bool -> Selectize.Input String
+buttonSelector showClearButton =
     Selectize.simple
         { attrs =
             \sthSelected open ->
@@ -484,7 +479,11 @@ buttonSelector =
                     [ ( "selectize__button--light", open && not sthSelected ) ]
                 ]
         , toggleButton = toggleButton
-        , clearButton = clearButton
+        , clearButton =
+            if showClearButton then
+                clearButton
+            else
+                Nothing
         , placeholder = "Select a License"
         }
 
@@ -503,9 +502,9 @@ toggleButton =
                     , Attributes.class "selectize__icon"
                     ]
                     [ if open then
-                        Html.text "arrow_drop_up"
+                        Html.text "keyboard_arrow_up"
                       else
-                        Html.text "arrow_drop_down"
+                        Html.text "keyboard_arrow_down"
                     ]
                 ]
 
@@ -519,7 +518,7 @@ clearButton =
                 [ Attributes.class "material-icons"
                 , Attributes.class "selectize__icon"
                 ]
-                [ Html.text "clear" ]
+                [ Html.text "backspace" ]
             ]
 
 

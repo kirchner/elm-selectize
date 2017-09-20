@@ -165,12 +165,7 @@ and a selector given by, for example,
 
 # View
 
-@docs view, ViewConfig, viewConfig, HtmlDetails, Input, simple, autocomplete
-
-
-# Multi-Selectize
-
-@docs updateMulti, viewMulti, viewConfigMulti, simpleMulti, ViewConfigMulti
+@docs view, viewConfig, simple, ViewConfig, HtmlDetails, Input, unselectOn, Action
 
 -}
 

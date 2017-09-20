@@ -12,6 +12,7 @@ h3 {
   padding: 6px 8px;
   font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
   font-weight: normal;
+  min-width: 200px;
 }
 
 .selectize {
@@ -155,10 +156,6 @@ h3 {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-
-    &:hover {
-      color: #555555;
-    }
   }
 
   &__menu {
@@ -236,7 +233,11 @@ h3 {
     }
 
   &__icon {
-    color: #808080;
+    color: #a0a0a0;
+
+    &:hover {
+      color: #606060;
+    }
   }
 
   &__multi-container {

@@ -7,7 +7,8 @@
         "./src"
     ],
     "exposed-modules": [
-        "Selectize"
+        "Selectize",
+        "MultiSelectize"
     ],
     "dependencies": {
         "NoRedInk/elm-decode-pipeline": "3.0.0 <= v < 4.0.0",
