@@ -11117,7 +11117,14 @@ var _kirchner$elm_selectize$Selectize_MultiSelectize$update = F4(
 			case 'OpenMenu':
 				var _p89 = _p88._0;
 				if (state.open) {
-					return {ctor: '_Tuple3', _0: state, _1: _elm_lang$core$Platform_Cmd$none, _2: _elm_lang$core$Maybe$Nothing};
+					return {
+						ctor: '_Tuple3',
+						_0: _elm_lang$core$Native_Utils.update(
+							state,
+							{preventClose: false}),
+						_1: _elm_lang$core$Platform_Cmd$none,
+						_2: _elm_lang$core$Maybe$Nothing
+					};
 				} else {
 					var entries = A2(_kirchner$elm_selectize$Selectize_MultiSelectize$filterOut, selections, state.entries);
 					var newZipList = A2(_kirchner$elm_selectize$Selectize_MultiSelectize$fromList, entries, _p89.entries);
@@ -11215,7 +11222,8 @@ var _kirchner$elm_selectize$Selectize_MultiSelectize$update = F4(
 								_elm_lang$core$Basics$clamp,
 								0,
 								_elm_lang$core$List$length(selections),
-								state.queryPosition + 1)
+								state.queryPosition + 1),
+							preventClose: true
 						}),
 					_1: _kirchner$elm_selectize$Selectize_MultiSelectize$focus(state.id),
 					_2: _elm_lang$core$Maybe$Nothing
@@ -11513,7 +11521,7 @@ var _kirchner$elm_selectize$Selectize_MultiSelectize$textfield = F5(
 											_0: A3(
 												_elm_lang$html$Html_Events$onWithOptions,
 												'keydown',
-												{stopPropagation: false, preventDefault: true},
+												{stopPropagation: true, preventDefault: true},
 												keydownDecoder),
 											_1: {
 												ctor: '::',
