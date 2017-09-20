@@ -249,7 +249,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
 
         OpenMenu heights scrollTop ->
             if state.open then
-                ( state
+                ( { state | preventClose = False }
                 , Cmd.none
                 , Nothing
                 )
@@ -358,6 +358,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
                     | queryPosition =
                         (state.queryPosition + 1)
                             |> Basics.clamp 0 (List.length selections)
+                    , preventClose = True
                   }
                 , focus state.id
                 , Nothing
@@ -800,8 +801,7 @@ simple config id selections query queryWidth queryPosition open =
     in
     Html.div []
         [ Html.div
-            ([ -- Events.on "click" (measurementsDecoder OpenMenu)
-               Events.onClick FocusTextfield
+            ([ Events.onClick FocusTextfield
              , Events.onMouseDown (PreventClose True)
              , Events.onMouseUp (PreventClose False)
              , Attributes.style
@@ -879,7 +879,7 @@ textfield id textfieldClass query queryWidth placeholder =
                 [ "width" => (toString (queryWidth + 10) ++ "px") ]
             , Events.onInput SetQuery
             , Events.onWithOptions "keydown"
-                { stopPropagation = False
+                { stopPropagation = True
                 , preventDefault = True
                 }
                 keydownDecoder
