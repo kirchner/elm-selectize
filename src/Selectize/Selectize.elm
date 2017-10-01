@@ -454,11 +454,13 @@ view config selection state =
     case state.zipList of
         Nothing ->
             Html.div
-                [ Attributes.style
-                    [ "overflow" => "hidden"
-                    , "position" => "relative"
-                    ]
-                ]
+                ((config.container |> noOp)
+                    ++ [ Attributes.style
+                            [ "overflow" => "hidden"
+                            , "position" => "relative"
+                            ]
+                       ]
+                )
                 [ config.input
                     state.id
                     selectionText
