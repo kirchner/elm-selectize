@@ -1,4 +1,4 @@
-module Selectize.Selectize
+module Internal.Selectize
     exposing
         ( Entry
         , Heights

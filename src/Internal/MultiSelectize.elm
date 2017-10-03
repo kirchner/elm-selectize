@@ -1,30 +1,18 @@
-module Selectize.MultiSelectize
+module Internal.MultiSelectize
     exposing
         ( Action
-        , Entry
         , Heights
         , Input
-        , LEntry(..)
         , Movement(..)
         , Msg(..)
         , State
         , ViewConfig
-        , ZipList
         , closed
-        , contains
-        , currentEntry
-        , divider
-        , entry
-        , fromList
-        , moveForwardTo
         , simple
         , unselectOn
         , update
         , view
         , viewConfig
-        , zipCurrentHeight
-        , zipNext
-        , zipPrevious
         )
 
 import DOM
@@ -34,6 +22,8 @@ import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
 import Html.Lazy
+import Internal.Entry as Entry exposing (Entry(..))
+import Internal.ZipList as ZipList exposing (EntryWithHeight, ZipList)
 import Json.Decode as Decode exposing (Decoder)
 import Keyboard.Extra
     exposing
@@ -57,7 +47,7 @@ import Task
 
 type alias State a =
     { id : String
-    , entries : List (LEntry a)
+    , entries : List (Entry a)
     , query : String
     , queryWidth : Float
     , queryPosition : Int
@@ -74,61 +64,22 @@ type alias State a =
     }
 
 
+type alias SimpleState a =
+    { state : State a
+    , selections : List a
+    }
+
+
 type alias Heights =
     { entries : List Float
     , menu : Float
     }
 
 
-type LEntry a
-    = LEntry a String
-    | LDivider String
-
-
-removeLabel : LEntry a -> Entry a
-removeLabel labeledEntry =
-    case labeledEntry of
-        LEntry a _ ->
-            Entry a
-
-        LDivider text ->
-            Divider text
-
-
-selectFirst : List (LEntry a) -> a -> Maybe ( a, String )
-selectFirst entries a =
-    case entries of
-        [] ->
-            Nothing
-
-        first :: rest ->
-            case first of
-                LEntry value label ->
-                    if a == value then
-                        Just ( a, label )
-                    else
-                        selectFirst rest a
-
-                _ ->
-                    selectFirst rest a
-
-
-closed : String -> (a -> String) -> List (Entry a) -> State a
-closed id toLabel entries =
-    let
-        addLabel entry =
-            case entry of
-                Entry a ->
-                    LEntry a (toLabel a)
-
-                Divider text ->
-                    LDivider text
-
-        labeledEntries =
-            entries |> List.map addLabel
-    in
+closed : String -> List (Entry a) -> State a
+closed id entries =
     { id = id
-    , entries = labeledEntries
+    , entries = entries
     , query = ""
     , queryWidth = 0
     , queryPosition = 0
@@ -143,58 +94,16 @@ closed id toLabel entries =
     }
 
 
-
----- CONFIGURATION
-
-
-type alias ViewConfig a =
-    { container : List (Html.Attribute Never)
-    , menu : List (Html.Attribute Never)
-    , ul : List (Html.Attribute Never)
-    , entry : a -> Bool -> Bool -> HtmlDetails Never
-    , divider : String -> HtmlDetails Never
-    , input : Input a
+simpleClosed : String -> List (Entry a) -> SimpleState a
+simpleClosed id entries =
+    { state = closed id entries
+    , selections = []
     }
 
 
-type alias HtmlDetails msg =
-    { attributes : List (Html.Attribute msg)
-    , children : List (Html msg)
-    }
-
-
-type Entry a
-    = Entry a
-    | Divider String
-
-
-entry : a -> Entry a
-entry a =
-    Entry a
-
-
-divider : String -> Entry a
-divider title =
-    Divider title
-
-
-viewConfig :
-    { container : List (Html.Attribute Never)
-    , menu : List (Html.Attribute Never)
-    , ul : List (Html.Attribute Never)
-    , entry : a -> Bool -> Bool -> HtmlDetails Never
-    , divider : String -> HtmlDetails Never
-    , input : Input a
-    }
-    -> ViewConfig a
-viewConfig config =
-    { container = config.container
-    , menu = config.menu
-    , ul = config.ul
-    , entry = config.entry
-    , divider = config.divider
-    , input = config.input
-    }
+selections : SimpleState a -> List a
+selections simpleState =
+    simpleState.selections
 
 
 
@@ -231,18 +140,106 @@ type Movement
     | PageDown
 
 
+type TopMsg a
+    = TopSelect Int a
+    | TopUnselect Int
+    | TopClearSelection
+
+
+simplestUpdate :
+    { keepQuery : Bool
+    , textfieldMovable : Bool
+    }
+    -> SimpleState String
+    -> Msg String
+    -> ( SimpleState String, Cmd (Msg String) )
+simplestUpdate { keepQuery, textfieldMovable } simpleState msg =
+    let
+        contains query string =
+            string
+                |> String.toLower
+                |> String.contains
+                    (query |> String.toLower)
+    in
+    simpleUpdate
+        { keepQuery = keepQuery
+        , textfieldMovable = textfieldMovable
+        , matches = contains
+        }
+        simpleState
+        msg
+
+
+simpleUpdate :
+    { keepQuery : Bool
+    , textfieldMovable : Bool
+    , matches : String -> a -> Bool
+    }
+    -> SimpleState a
+    -> Msg a
+    -> ( SimpleState a, Cmd (Msg a) )
+simpleUpdate { keepQuery, textfieldMovable, matches } simpleState msg =
+    let
+        ( newState, cmd, maybeTopMsg ) =
+            update
+                { select = TopSelect
+                , unselect = TopUnselect
+                , clearSelection = TopClearSelection
+                , keepQuery = keepQuery
+                , textfieldMovable = textfieldMovable
+                , matches = matches
+                }
+                simpleState.selections
+                simpleState.state
+                msg
+
+        newSimpleState =
+            { simpleState | state = newState }
+    in
+    case maybeTopMsg of
+        Just (TopSelect position newSelection) ->
+            ( { newSimpleState
+                | selections =
+                    [ simpleState.selections |> List.take position
+                    , [ newSelection ]
+                    , simpleState.selections |> List.drop position
+                    ]
+                        |> List.concat
+              }
+            , cmd
+            )
+
+        Just (TopUnselect position) ->
+            ( { newSimpleState
+                | selections =
+                    [ simpleState.selections |> List.take position
+                    , simpleState.selections |> List.drop (position + 1)
+                    ]
+                        |> List.concat
+              }
+            , cmd
+            )
+
+        Just TopClearSelection ->
+            ( { newSimpleState | selections = [] }, cmd )
+
+        Nothing ->
+            ( newSimpleState, cmd )
+
+
 update :
     { select : Int -> a -> msg
     , unselect : Int -> msg
     , clearSelection : msg
     , keepQuery : Bool
     , textfieldMovable : Bool
+    , matches : String -> a -> Bool
     }
     -> List a
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update { select, unselect, clearSelection, keepQuery, textfieldMovable } selections state msg =
+update { select, unselect, clearSelection, keepQuery, textfieldMovable, matches } selections state msg =
     case msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
@@ -260,7 +257,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
                             |> filterOut selections
 
                     newZipList =
-                        fromList entries heights.entries
+                        ZipList.fromList entries heights.entries
 
                     top =
                         newZipList
@@ -269,7 +266,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
 
                     height =
                         newZipList
-                            |> Maybe.map zipCurrentHeight
+                            |> Maybe.map ZipList.currentHeight
                             |> Maybe.withDefault 0
                 in
                 ( { state
@@ -335,7 +332,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
                         |> filterOut selections
 
                 newZipList =
-                    fromListWithFilter newQuery entries state.entryHeights
+                    ZipList.fromListWithFilter matches newQuery entries state.entryHeights
             in
             ( { state
                 | query = newQuery
@@ -392,7 +389,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
                         |> filterOut (a :: selections)
 
                 newZipList =
-                    fromList entries state.entryHeights
+                    ZipList.fromList entries state.entryHeights
             in
             ( { state
                 | query = ""
@@ -403,12 +400,53 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
             )
 
         SetKeyboardFocus movement scrollTop ->
-            state
-                |> updateKeyboardFocus movement
-                |> scrollToKeyboardFocus state.id scrollTop
+            let
+                newZipList =
+                    case movement of
+                        Up ->
+                            state.zipList
+                                |> Maybe.map ZipList.previous
+
+                        Down ->
+                            state.zipList
+                                |> Maybe.map ZipList.next
+
+                        _ ->
+                            state.zipList
+
+                cmd =
+                    case newZipList of
+                        Just zipList ->
+                            let
+                                top =
+                                    zipList.currentTop
+
+                                height =
+                                    ZipList.currentHeight zipList
+
+                                y =
+                                    if top < scrollTop then
+                                        top
+                                    else if
+                                        (top + height)
+                                            > (scrollTop + state.menuHeight)
+                                    then
+                                        top + height - state.menuHeight
+                                    else
+                                        scrollTop
+                            in
+                            scroll state.id y
+
+                        Nothing ->
+                            Cmd.none
+            in
+            ( { state | zipList = newZipList }
+            , cmd
+            , Nothing
+            )
 
         SelectKeyboardFocus ->
-            case state.zipList |> Maybe.map currentEntry of
+            case state.zipList |> Maybe.map ZipList.currentEntry of
                 Just a ->
                     let
                         entries =
@@ -417,9 +455,9 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
 
                         newZipList =
                             if keepQuery || state.query == "" then
-                                state.zipList |> Maybe.andThen removeCurrentEntry
+                                state.zipList |> Maybe.andThen ZipList.removeCurrentEntry
                             else
-                                fromList entries state.entryHeights
+                                ZipList.fromList entries state.entryHeights
                     in
                     ( { state
                         | query =
@@ -470,7 +508,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
                         |> filterOut actualSelections
 
                 newZipList =
-                    fromList entries state.entryHeights
+                    ZipList.fromList entries state.entryHeights
             in
             ( { state
                 | zipList = newZipList
@@ -483,81 +521,82 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable } selecti
             )
 
 
-reset : State a -> State a
-reset state =
-    { state
-        | query = ""
-        , zipList = state.unfilteredZipList
-    }
-
-
-updateKeyboardFocus :
-    Movement
-    -> State a
-    -> ( State a, Cmd (Msg a), Maybe msg )
-updateKeyboardFocus movement state =
+filterOut : List a -> List (Entry a) -> List (Entry a)
+filterOut selections entries =
     let
-        newZipList =
-            case movement of
-                Up ->
-                    state.zipList
-                        |> Maybe.map zipPrevious
-
-                Down ->
-                    state.zipList
-                        |> Maybe.map zipNext
+        isNotSelected entry =
+            case entry of
+                Entry a ->
+                    selections
+                        |> List.any (\selection -> selection == a)
+                        |> not
 
                 _ ->
-                    state.zipList
+                    True
     in
-    ( { state
-        | zipList = newZipList
-      }
-    , Cmd.none
-    , Nothing
-    )
+    entries
+        |> List.filter isNotSelected
 
 
-scrollToKeyboardFocus :
-    String
-    -> Float
-    -> ( State a, Cmd (Msg a), Maybe msg )
-    -> ( State a, Cmd (Msg a), Maybe msg )
-scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
-    case state.zipList of
-        Just zipList ->
-            let
-                top =
-                    zipList.currentTop
 
-                height =
-                    zipCurrentHeight zipList
+---- CMDS
 
-                y =
-                    if top < scrollTop then
-                        top
-                    else if
-                        (top + height)
-                            > (scrollTop + state.menuHeight)
-                    then
-                        top + height - state.menuHeight
-                    else
-                        scrollTop
-            in
-            ( state
-            , Cmd.batch [ scroll id y, cmd ]
-            , maybeMsg
-            )
 
-        Nothing ->
-            ( state
-            , cmd
-            , maybeMsg
-            )
+scroll : String -> Float -> Cmd (Msg a)
+scroll id y =
+    Task.attempt (\_ -> NoOp) <|
+        Dom.Scroll.toY (menuId id) y
+
+
+focus : String -> Cmd (Msg a)
+focus id =
+    Task.attempt (\_ -> NoOp) <|
+        Dom.focus (textfieldId id)
+
+
+blur : String -> Cmd (Msg a)
+blur id =
+    Task.attempt (\_ -> NoOp) <|
+        Dom.blur (textfieldId id)
 
 
 
 ---- VIEW
+
+
+type alias ViewConfig a =
+    { container : List (Html.Attribute Never)
+    , menu : List (Html.Attribute Never)
+    , ul : List (Html.Attribute Never)
+    , entry : a -> Bool -> Bool -> HtmlDetails Never
+    , divider : String -> HtmlDetails Never
+    , input : Input a
+    }
+
+
+type alias HtmlDetails msg =
+    { attributes : List (Html.Attribute msg)
+    , children : List (Html msg)
+    }
+
+
+viewConfig :
+    { container : List (Html.Attribute Never)
+    , menu : List (Html.Attribute Never)
+    , ul : List (Html.Attribute Never)
+    , entry : a -> Bool -> Bool -> HtmlDetails Never
+    , divider : String -> HtmlDetails Never
+    , input : Input a
+    }
+    -> ViewConfig a
+viewConfig config =
+    { container = config.container
+    , menu = config.menu
+    , ul = config.ul
+    , entry = config.entry
+    , divider = config.divider
+    , input = config.input
+    }
 
 
 view : ViewConfig a -> List a -> State a -> Html (Msg a)
@@ -565,8 +604,7 @@ view config selections state =
     let
         selectionTexts =
             selections
-                |> List.filterMap (selectFirst state.entries)
-                |> List.map Tuple.second
+                |> List.filterMap (Entry.selectFirst state.entries)
 
         menuAttrs =
             [ Attributes.id (menuId state.id)
@@ -597,7 +635,7 @@ view config selections state =
                 , Html.div menuAttrs
                     [ state.entries
                         |> List.map
-                            (removeLabel >> viewUnfocusedEntry config Nothing)
+                            (viewUnfocusedEntry config Nothing)
                         |> Html.ul (noOp config.ul)
                     ]
                 ]
@@ -613,7 +651,8 @@ view config selections state =
                             |> viewEntries config state
                             |> List.reverse
                       , [ zipList.current
-                            |> viewCurrentEntry config state
+                            |> Tuple.first
+                            |> viewEntry config True state.mouseFocus
                         ]
                       , zipList.back
                             |> viewEntries config state
@@ -643,20 +682,6 @@ viewEntries config state front =
     front |> List.map viewEntry
 
 
-viewCurrentEntry :
-    { r
-        | entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-    }
-    -> State a
-    -> EntryWithHeight a
-    -> Html (Msg a)
-viewCurrentEntry config state current =
-    current
-        |> Tuple.first
-        |> viewFocusedEntry config state.mouseFocus
-
-
 viewUnfocusedEntry :
     { r
         | entry : a -> Bool -> Bool -> HtmlDetails Never
@@ -667,18 +692,6 @@ viewUnfocusedEntry :
     -> Html (Msg a)
 viewUnfocusedEntry config mouseFocus entry =
     viewEntry config False mouseFocus entry
-
-
-viewFocusedEntry :
-    { r
-        | entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-    }
-    -> Maybe a
-    -> Entry a
-    -> Html (Msg a)
-viewFocusedEntry config mouseFocus entry =
-    viewEntry config True mouseFocus entry
 
 
 viewEntry :
@@ -720,20 +733,13 @@ viewEntry config keyboardFocused mouseFocus entry =
         (children |> List.map mapToNoOp)
 
 
-mapActions : Int -> Int -> Html Action -> Html (Msg a)
-mapActions offset position node =
-    node
-        |> Html.map
-            (\action ->
-                case action of
-                    Unselect ->
-                        UnselectAt (position + offset)
-            )
+
+---- VIEW INPUT
 
 
 type alias Input a =
     String
-    -> List String
+    -> List a
     -> String
     -> Float
     -> Int
@@ -756,12 +762,12 @@ unselectOn event =
 
 simple :
     { attrs : Bool -> List (Html.Attribute Never)
-    , selection : String -> Html Action
+    , selection : a -> Html Action
     , placeholder : Bool -> Html Never
     , textfieldClass : String
     }
     -> String
-    -> List String
+    -> List a
     -> String
     -> Float
     -> Int
@@ -915,89 +921,6 @@ measurementsDecoder callback =
         scrollTopDecoder
 
 
-
----- HELPER
-
-
-filterOut : List a -> List (LEntry a) -> List (LEntry a)
-filterOut selections entries =
-    let
-        isNotSelected entry =
-            case entry of
-                LEntry a _ ->
-                    selections
-                        |> List.any (\selection -> selection == a)
-                        |> not
-
-                _ ->
-                    True
-    in
-    entries
-        |> List.filter isNotSelected
-
-
-contains : String -> String -> Bool
-contains query label =
-    label
-        |> String.toLower
-        |> String.contains (String.toLower query)
-
-
-(=>) : name -> value -> ( name, value )
-(=>) name value =
-    ( name, value )
-
-
-
----- VIEW HELPER
-
-
-menuId : String -> String
-menuId id =
-    id ++ "__menu"
-
-
-textfieldId : String -> String
-textfieldId id =
-    id ++ "__textfield"
-
-
-noOp : List (Html.Attribute Never) -> List (Html.Attribute (Msg a))
-noOp attrs =
-    List.map (Attributes.map (\_ -> NoOp)) attrs
-
-
-mapToNoOp : Html Never -> Html (Msg a)
-mapToNoOp =
-    Html.map (\_ -> NoOp)
-
-
-
----- CMDS
-
-
-scroll : String -> Float -> Cmd (Msg a)
-scroll id y =
-    Task.attempt (\_ -> NoOp) <|
-        Dom.Scroll.toY (menuId id) y
-
-
-focus : String -> Cmd (Msg a)
-focus id =
-    Task.attempt (\_ -> NoOp) <|
-        Dom.focus (textfieldId id)
-
-
-blur : String -> Cmd (Msg a)
-blur id =
-    Task.attempt (\_ -> NoOp) <|
-        Dom.blur (textfieldId id)
-
-
-
----- DECODER
-
-
 entryHeightsDecoder : Decoder (List Float)
 entryHeightsDecoder =
     Decode.field "offsetHeight" Decode.float
@@ -1031,14 +954,52 @@ scrollTopDecoder =
         |> DOM.target
 
 
-fromResult : Result String a -> Decoder a
-fromResult result =
-    case result of
-        Ok val ->
-            Decode.succeed val
 
-        Err reason ->
-            Decode.fail reason
+---- HELPER
+
+
+(=>) : name -> value -> ( name, value )
+(=>) name value =
+    ( name, value )
+
+
+
+---- VIEW HELPER
+
+
+menuId : String -> String
+menuId id =
+    id ++ "__menu"
+
+
+textfieldId : String -> String
+textfieldId id =
+    id ++ "__textfield"
+
+
+noOp : List (Html.Attribute Never) -> List (Html.Attribute (Msg a))
+noOp attrs =
+    List.map (Attributes.map (\_ -> NoOp)) attrs
+
+
+mapToNoOp : Html Never -> Html (Msg a)
+mapToNoOp =
+    Html.map (\_ -> NoOp)
+
+
+mapActions : Int -> Int -> Html Action -> Html (Msg a)
+mapActions offset position node =
+    node
+        |> Html.map
+            (\action ->
+                case action of
+                    Unselect ->
+                        UnselectAt (position + offset)
+            )
+
+
+
+---- DECODER
 
 
 keyDecoder : Decoder (Result Key msg)
@@ -1076,274 +1037,3 @@ doIt decoder =
                     Err _ ->
                         Decode.fail "not handling that key here"
             )
-
-
-code : List ( Key, a ) -> Decoder a
-code msgs =
-    Events.keyCode
-        |> Decode.map fromCode
-        |> Decode.andThen
-            (\code ->
-                case
-                    msgs
-                        |> first (\( nextCode, msg ) -> nextCode == code)
-                        |> Maybe.map Tuple.second
-                of
-                    Just msg ->
-                        Decode.succeed msg
-
-                    Nothing ->
-                        Decode.fail "key not handled here"
-            )
-
-
-first : (a -> Bool) -> List a -> Maybe a
-first condition list =
-    case list of
-        [] ->
-            Nothing
-
-        element :: rest ->
-            if condition element then
-                Just element
-            else
-                first condition rest
-
-
-
----- ZIPLIST
-
-
-type alias ZipList a =
-    { front : List (EntryWithHeight a)
-    , current : EntryWithHeight a
-    , back : List (EntryWithHeight a)
-    , currentTop : Float
-    }
-
-
-type alias EntryWithHeight a =
-    ( Entry a, Float )
-
-
-removeCurrentEntry : ZipList a -> Maybe (ZipList a)
-removeCurrentEntry ({ front, current, back, currentTop } as zipList) =
-    if back |> containsActualEntries then
-        case back of
-            [] ->
-                Nothing
-
-            next :: rest ->
-                { zipList
-                    | current = next
-                    , back = rest
-                }
-                    |> zipFirst
-    else if front |> containsActualEntries then
-        case front of
-            [] ->
-                Nothing
-
-            previous :: rest ->
-                let
-                    ( _, height ) =
-                        previous
-                in
-                { zipList
-                    | front = rest
-                    , current = previous
-                    , currentTop = currentTop - height
-                }
-                    |> zipReverseFirst
-    else
-        Nothing
-
-
-containsActualEntries : List (EntryWithHeight a) -> Bool
-containsActualEntries entries =
-    let
-        isActualEntry entry =
-            case entry of
-                ( Entry _, _ ) ->
-                    True
-
-                _ ->
-                    False
-    in
-    entries |> List.any isActualEntry
-
-
-currentEntry : { r | current : EntryWithHeight a } -> a
-currentEntry { current } =
-    case current of
-        ( Entry a, _ ) ->
-            a
-
-        _ ->
-            Debug.crash "this should be impossible"
-
-
-zipCurrentHeight : { r | current : EntryWithHeight a } -> Float
-zipCurrentHeight { current } =
-    current |> Tuple.second
-
-
-fromList : List (LEntry a) -> List Float -> Maybe (ZipList a)
-fromList entries entryHeights =
-    case ( entries |> List.map removeLabel, entryHeights ) of
-        ( firstEntry :: restEntries, firstHeight :: restHeights ) ->
-            { front = []
-            , current = ( firstEntry, firstHeight )
-            , back = zip restEntries restHeights
-            , currentTop = 0
-            }
-                |> zipFirst
-
-        _ ->
-            Nothing
-
-
-fromListWithFilter :
-    String
-    -> List (LEntry a)
-    -> List Float
-    -> Maybe (ZipList a)
-fromListWithFilter query entries entryHeights =
-    let
-        filtered =
-            zip entries entryHeights
-                |> List.filterMap
-                    (\( entry, height ) ->
-                        case entry of
-                            LEntry a label ->
-                                if label |> contains query then
-                                    Just ( Entry a, height )
-                                else
-                                    Nothing
-
-                            LDivider text ->
-                                Just ( Divider text, height )
-                    )
-    in
-    case filtered of
-        first :: rest ->
-            { front = []
-            , current = first
-            , back = rest
-            , currentTop = 0
-            }
-                |> zipFirst
-
-        _ ->
-            Nothing
-
-
-zipFirst : ZipList a -> Maybe (ZipList a)
-zipFirst ({ front, current, back, currentTop } as zipList) =
-    case current of
-        ( Divider _, _ ) ->
-            case back of
-                [] ->
-                    Nothing
-
-                next :: rest ->
-                    { front = current :: front
-                    , current = next
-                    , back = rest
-                    , currentTop = currentTop + Tuple.second current
-                    }
-                        |> zipFirst
-
-        _ ->
-            Just zipList
-
-
-zipReverseFirst : ZipList a -> Maybe (ZipList a)
-zipReverseFirst ({ front, current, back, currentTop } as zipList) =
-    case current of
-        ( Divider _, _ ) ->
-            case front of
-                [] ->
-                    Nothing
-
-                previous :: rest ->
-                    { front = rest
-                    , current = previous
-                    , back = current :: back
-                    , currentTop = currentTop - Tuple.second previous
-                    }
-                        |> zipReverseFirst
-
-        _ ->
-            Just zipList
-
-
-zipNext : ZipList a -> ZipList a
-zipNext ({ front, current, back, currentTop } as zipList) =
-    case back of
-        [] ->
-            zipList
-
-        next :: rest ->
-            { front = current :: front
-            , current = next
-            , back = rest
-            , currentTop = currentTop + Tuple.second current
-            }
-                |> zipFirst
-                |> Maybe.withDefault zipList
-
-
-zipPrevious : ZipList a -> ZipList a
-zipPrevious ({ front, current, back, currentTop } as zipList) =
-    case front of
-        [] ->
-            zipList
-
-        previous :: rest ->
-            { front = rest
-            , current = previous
-            , back = current :: back
-            , currentTop = currentTop - Tuple.second previous
-            }
-                |> zipReverseFirst
-                |> Maybe.withDefault zipList
-
-
-moveForwardTo : a -> ZipList a -> ZipList a
-moveForwardTo a zipList =
-    moveForwardToHelper a zipList
-        |> Maybe.withDefault zipList
-
-
-moveForwardToHelper :
-    a
-    -> ZipList a
-    -> Maybe (ZipList a)
-moveForwardToHelper a zipList =
-    if (zipList.current |> Tuple.first) == Entry a then
-        Just zipList
-    else
-        case zipList.back of
-            [] ->
-                Nothing
-
-            _ ->
-                zipList
-                    |> zipNext
-                    |> moveForwardToHelper a
-
-
-zip : List a -> List b -> List ( a, b )
-zip listA listB =
-    zipHelper listA listB [] |> List.reverse
-
-
-zipHelper : List a -> List b -> List ( a, b ) -> List ( a, b )
-zipHelper listA listB sum =
-    case ( listA, listB ) of
-        ( a :: restA, b :: restB ) ->
-            zipHelper restA restB (( a, b ) :: sum)
-
-        _ ->
-            sum

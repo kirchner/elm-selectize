@@ -171,7 +171,8 @@ and a selector given by, for example,
 
 import Html exposing (Html)
 import Html.Lazy as Lazy
-import Selectize.MultiSelectize as Internal
+import Internal.Entry as Internal
+import Internal.MultiSelectize as Internal
 
 
 {- model -}
@@ -197,11 +198,10 @@ your dropdown state with this function.
 -}
 closed :
     String
-    -> (a -> String)
     -> List (Entry a)
     -> State a
-closed id toLabel entries =
-    Internal.closed id toLabel entries
+closed id entries =
+    Internal.closed id entries
 
 
 {-| Each entry of the menu has to be wrapped in this type. We need this,
@@ -313,13 +313,14 @@ update :
     , clearSelection : msg
     , keepQuery : Bool
     , textfieldMovable : Bool
+    , matches : String -> a -> Bool
     }
     -> List a
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update callbacks selections state msg =
-    Internal.update callbacks selections state msg
+update config selections state msg =
+    Internal.update config selections state msg
 
 
 
@@ -355,7 +356,7 @@ unselectOn =
 {-| -}
 simple :
     { attrs : Bool -> List (Html.Attribute Never)
-    , selection : String -> Html Action
+    , selection : a -> Html Action
     , placeholder : Bool -> Html Never
     , textfieldClass : String
     }

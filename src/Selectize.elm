@@ -187,7 +187,7 @@ and an input given by, for example,
 
 import Html exposing (Html)
 import Html.Lazy as Lazy
-import Selectize.Selectize as Internal
+import Internal.Selectize as Internal
 
 
 {- model -}

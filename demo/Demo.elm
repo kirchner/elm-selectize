@@ -54,7 +54,6 @@ init =
       , multiMenu =
             MultiSelectize.closed
                 "multi-menu"
-                identity
                 muppets
       , selections = []
       , showRemoveButtons = True
@@ -134,6 +133,7 @@ update msg model =
                         , clearSelection = ClearSelection
                         , keepQuery = model.keepQuery
                         , textfieldMovable = model.textfieldMovable
+                        , matches = contains
                         }
                         model.selections
                         model.multiMenu
@@ -520,6 +520,17 @@ clearButton =
                 ]
                 [ Html.text "backspace" ]
             ]
+
+
+
+---- HELPER
+
+
+contains : String -> String -> Bool
+contains query label =
+    label
+        |> String.toLower
+        |> String.contains (String.toLower query)
 
 
 
