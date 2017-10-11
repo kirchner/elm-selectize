@@ -289,6 +289,8 @@ viewConfig :
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
+    , toggleButton : Maybe (Bool -> Html Never)
+    , clearButton : Maybe (Html Never)
     , input : Input a
     }
     -> ViewConfig a
@@ -298,6 +300,8 @@ viewConfig config =
     , ul = config.ul
     , entry = config.entry
     , divider = config.divider
+    , toggleButton = config.toggleButton
+    , clearButton = config.clearButton
     , input = config.input
     }
 
@@ -366,8 +370,6 @@ type alias Input a =
 -}
 simple :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
-    , toggleButton : Maybe (Bool -> Html Never)
-    , clearButton : Maybe (Html Never)
     , selection : a -> String
     , placeholder : String
     }
@@ -388,8 +390,6 @@ simple config =
 -}
 autocomplete :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
-    , toggleButton : Maybe (Bool -> Html Never)
-    , clearButton : Maybe (Html Never)
     , selection : a -> String
     , placeholder : String
     }

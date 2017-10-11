@@ -362,11 +362,17 @@ viewConfigTextfield autocompletion showClearButton =
                 , children =
                     [ Html.text title ]
                 }
+        , toggleButton = toggleButton
+        , clearButton =
+            if showClearButton then
+                clearButton
+            else
+                Nothing
         , input =
             if autocompletion then
-                textfieldSelector showClearButton
+                textfieldSelector
             else
-                buttonSelector showClearButton
+                buttonSelector
         }
 
 
@@ -449,8 +455,8 @@ selectionWithRemoveButton license =
         ]
 
 
-textfieldSelector : Bool -> Selectize.Input String
-textfieldSelector showClearButton =
+textfieldSelector : Selectize.Input String
+textfieldSelector =
     Selectize.autocomplete <|
         { attrs =
             \sthSelected open ->
@@ -461,19 +467,13 @@ textfieldSelector showClearButton =
                     , ( "selectize__textfield--menu-open", open )
                     ]
                 ]
-        , toggleButton = toggleButton
-        , clearButton =
-            if showClearButton then
-                clearButton
-            else
-                Nothing
         , selection = identity
         , placeholder = "Select a License"
         }
 
 
-buttonSelector : Bool -> Selectize.Input String
-buttonSelector showClearButton =
+buttonSelector : Selectize.Input String
+buttonSelector =
     Selectize.simple
         { attrs =
             \sthSelected open ->
@@ -481,12 +481,6 @@ buttonSelector showClearButton =
                 , Attributes.classList
                     [ ( "selectize__button--light", open && not sthSelected ) ]
                 ]
-        , toggleButton = toggleButton
-        , clearButton =
-            if showClearButton then
-                clearButton
-            else
-                Nothing
         , selection = identity
         , placeholder = "Select a License"
         }

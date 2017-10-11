@@ -323,6 +323,8 @@ type alias ViewConfig a =
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
+    , toggleButton : Maybe (Bool -> Html Never)
+    , clearButton : Maybe (Html Never)
     , input : Input a
     }
 
@@ -339,6 +341,8 @@ viewConfig :
     , ul : List (Html.Attribute Never)
     , entry : a -> Bool -> Bool -> HtmlDetails Never
     , divider : String -> HtmlDetails Never
+    , toggleButton : Maybe (Bool -> Html Never)
+    , clearButton : Maybe (Html Never)
     , input : Input a
     }
     -> ViewConfig a
@@ -348,6 +352,8 @@ viewConfig config =
     , ul = config.ul
     , entry = config.entry
     , divider = config.divider
+    , toggleButton = config.toggleButton
+    , clearButton = config.clearButton
     , input = config.input
     }
 
@@ -370,6 +376,14 @@ view config selection state =
             , Attributes.style [ "position" => "absolute" ]
             ]
                 ++ noOp config.menu
+
+        input =
+            config.input
+                (buttons config.clearButton config.toggleButton)
+                state.id
+                selection
+                state.query
+                state.open
     in
     case state.zipList of
         Nothing ->
@@ -379,11 +393,7 @@ view config selection state =
                     , "position" => "relative"
                     ]
                 ]
-                [ config.input
-                    state.id
-                    selection
-                    state.query
-                    state.open
+                [ input
                 , Html.div menuAttrs
                     [ state.entries
                         |> List.map (viewUnfocusedEntry config Nothing)
@@ -396,11 +406,7 @@ view config selection state =
                 [ Attributes.style
                     [ "position" => "relative" ]
                 ]
-                [ config.input
-                    state.id
-                    selection
-                    state.query
-                    state.open
+                [ input
                 , Html.div menuAttrs
                     [ [ zipList.front
                             |> viewEntries config state
@@ -512,7 +518,8 @@ viewEntry config keyboardFocused mouseFocus entry =
 
 
 type alias Input a =
-    String
+    (Bool -> Bool -> Html (Msg a))
+    -> String
     -> Maybe a
     -> String
     -> Bool
@@ -521,17 +528,16 @@ type alias Input a =
 
 simple :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
-    , toggleButton : Maybe (Bool -> Html Never)
-    , clearButton : Maybe (Html Never)
     , selection : a -> String
     , placeholder : String
     }
+    -> (Bool -> Bool -> Html (Msg a))
     -> String
     -> Maybe a
     -> String
     -> Bool
     -> Html (Msg a)
-simple config id selection _ open =
+simple config buttons id selection _ open =
     let
         buttonAttrs =
             [ [ Attributes.id (textfieldId id)
@@ -563,27 +569,22 @@ simple config id selection _ open =
     Html.div []
         [ Html.div buttonAttrs
             [ Html.text actualText ]
-        , buttons
-            config.clearButton
-            config.toggleButton
-            (selection /= Nothing)
-            open
+        , buttons (selection /= Nothing) open
         ]
 
 
 autocomplete :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
-    , toggleButton : Maybe (Bool -> Html Never)
-    , clearButton : Maybe (Html Never)
     , selection : a -> String
     , placeholder : String
     }
+    -> (Bool -> Bool -> Html (Msg a))
     -> String
     -> Maybe a
     -> String
     -> Bool
     -> Html (Msg a)
-autocomplete config id selection query open =
+autocomplete config buttons id selection query open =
     let
         inputAttrs =
             [ [ Attributes.value query
@@ -633,11 +634,7 @@ autocomplete config id selection query open =
                 |> Maybe.withDefault ""
                 |> Html.text
             ]
-        , buttons
-            config.clearButton
-            config.toggleButton
-            (selection /= Nothing)
-            open
+        , buttons (selection /= Nothing) open
         ]
 
 
