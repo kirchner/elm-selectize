@@ -13,6 +13,7 @@ module Internal.ZipList
         , fromList
         , fromListWithFilter
         , init
+        , keyboardFocus
         , moveForwardTo
         , next
         , onKeydown
@@ -84,6 +85,12 @@ filter matches state =
     )
 
 
+keyboardFocus : State a -> Maybe a
+keyboardFocus state =
+    state.zipList
+        |> Maybe.map currentEntry
+
+
 type alias Heights =
     { entries : List Float
     , menu : Float
@@ -96,9 +103,11 @@ type alias Heights =
 
 type Msg a
     = NoOp
-    | SetMeasurments Heights Float
+    | SetMeasurments Heights Float Bool
     | SetMouseFocus (Maybe a)
     | SetKeyboardFocus Movement Float
+    | PreventClosing Bool
+    | Select a
 
 
 type Movement
@@ -108,13 +117,21 @@ type Movement
     | PageDown
 
 
-update : Maybe a -> State a -> Msg a -> ( State a, Cmd (Msg a) )
-update selection state msg =
+update :
+    { select : a -> msg
+    , preventClosing : Bool -> msg
+    , openMenu : msg
+    }
+    -> Maybe a
+    -> State a
+    -> Msg a
+    -> ( State a, Cmd (Msg a), Maybe msg )
+update { select, preventClosing, openMenu } selection state msg =
     case msg of
         NoOp ->
-            ( state, Cmd.none )
+            ( state, Cmd.none, Nothing )
 
-        SetMeasurments heights scrollTop ->
+        SetMeasurments heights scrollTop openM ->
             let
                 newZipList =
                     fromList state.entries heights.entries
@@ -144,11 +161,16 @@ update selection state msg =
                 , scrollTop = scrollTop
               }
             , scroll state.id (top - (heights.menu - height) / 2)
+            , if openM then
+                Just openMenu
+              else
+                Nothing
             )
 
         SetMouseFocus focus ->
             ( { state | mouseFocus = focus }
             , Cmd.none
+            , Nothing
             )
 
         SetKeyboardFocus movement scrollTop ->
@@ -191,12 +213,26 @@ update selection state msg =
                     in
                     ( newState
                     , scroll state.id y
+                    , Nothing
                     )
 
                 Nothing ->
                     ( newState
                     , Cmd.none
+                    , Nothing
                     )
+
+        PreventClosing bool ->
+            ( state
+            , Cmd.none
+            , Just (preventClosing bool)
+            )
+
+        Select a ->
+            ( state
+            , Cmd.none
+            , Just (select a)
+            )
 
 
 
@@ -249,11 +285,11 @@ onKeydown path lift onKey =
             }
 
 
-decodeMeasurements : (Decoder (Msg a) -> Decoder (Msg a)) -> Decoder (Msg a)
-decodeMeasurements path =
+decodeMeasurements : (Decoder (Msg a) -> Decoder (Msg a)) -> Bool -> Decoder (Msg a)
+decodeMeasurements path openMenu =
     Decode.map3
         (\entryHeights menuHeight scrollTop ->
-            SetMeasurments { entries = entryHeights, menu = menuHeight } scrollTop
+            SetMeasurments { entries = entryHeights, menu = menuHeight } scrollTop openMenu
         )
         entryHeightsDecoder
         menuHeightDecoder
@@ -294,6 +330,15 @@ fromResult result =
 ---- VIEW
 
 
+type alias ViewConfig a =
+    { menu : List (Html.Attribute Never)
+    , ul : List (Html.Attribute Never)
+    , entry : a -> Bool -> Bool -> HtmlDetails Never
+    , divider : String -> HtmlDetails Never
+    , direction : Direction
+    }
+
+
 type alias HtmlDetails msg =
     { attributes : List (Html.Attribute msg)
     , children : List (Html msg)
@@ -306,26 +351,15 @@ type Direction
 
 
 view :
-    { r
-        | menu : List (Html.Attribute Never)
-        , ul : List (Html.Attribute Never)
-        , entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-        , direction : Direction
-    }
-    ->
-        { select : a -> msg
-        , preventClosing : Bool -> msg
-        , lift : Msg a -> msg
-        }
+    ViewConfig a
     -> State a
-    -> Html msg
-view config { select, preventClosing, lift } state =
+    -> Html (Msg a)
+view config state =
     let
         menuAttrs =
             [ Attributes.id state.id
-            , Events.onMouseDown (preventClosing True)
-            , Events.onMouseUp (preventClosing False)
+            , Events.onMouseDown (PreventClosing True)
+            , Events.onMouseUp (PreventClosing False)
             , Attributes.style [ "position" => "absolute" ]
             ]
                 ++ noOp config.menu
@@ -341,9 +375,9 @@ view config { select, preventClosing, lift } state =
                 ]
                 [ viewZipList
                     config
-                    { select = select
-                    , setMouseFocus = lift << SetMouseFocus
-                    , preventClosing = preventClosing
+                    { select = Select
+                    , setMouseFocus = SetMouseFocus
+                    , preventClosing = PreventClosing
                     }
                     state.id
                     zipList

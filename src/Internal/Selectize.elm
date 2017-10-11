@@ -77,7 +77,7 @@ type Msg a
     | SelectKeyboardFocusAndBlur
     | ClearSelection
       -- menu
-    | MenuMsg (Msg a) (ZipList.Msg a)
+    | MenuMsg (ZipList.Msg a)
 
 
 update :
@@ -141,7 +141,7 @@ update ({ select, matches } as tagger) selection state msg =
                 | query = newQuery
                 , menu = newMenu
               }
-            , cmd |> Cmd.map (MenuMsg NoOp)
+            , cmd |> Cmd.map MenuMsg
             , Just (select Nothing)
             )
 
@@ -160,7 +160,7 @@ update ({ select, matches } as tagger) selection state msg =
                 , query = ""
               }
             , blur state.id
-            , Just (select (state.menu.zipList |> Maybe.map ZipList.currentEntry))
+            , Just (select (state.menu |> ZipList.keyboardFocus))
             )
 
         ClearSelection ->
@@ -169,24 +169,45 @@ update ({ select, matches } as tagger) selection state msg =
             , Just (select Nothing)
             )
 
-        MenuMsg nextMsg menuMsg ->
+        MenuMsg menuMsg ->
             let
-                ( newMenu, menuCmd ) =
-                    ZipList.update selection state.menu menuMsg
-
-                ( newState, cmd, maybeMsg ) =
-                    update tagger
+                ( newMenu, menuCmd, maybeMsg ) =
+                    ZipList.update
+                        { select = Select
+                        , preventClosing = PreventClosing
+                        , openMenu = OpenMenu
+                        }
                         selection
-                        { state | menu = newMenu }
-                        nextMsg
+                        state.menu
+                        menuMsg
+
+                newState =
+                    { state | menu = newMenu }
+
+                cmd =
+                    menuCmd |> Cmd.map MenuMsg
             in
-            ( newState
-            , Cmd.batch
-                [ menuCmd |> Cmd.map (MenuMsg NoOp)
-                , cmd
-                ]
-            , maybeMsg
-            )
+            case maybeMsg of
+                Just nextMsg ->
+                    update tagger selection newState nextMsg
+                        |> andDo cmd
+
+                Nothing ->
+                    ( newState
+                    , cmd
+                    , Nothing
+                    )
+
+
+andDo : Cmd msg -> ( model, Cmd msg, maybeMsg ) -> ( model, Cmd msg, maybeMsg )
+andDo cmd ( model, cmds, maybeMsg ) =
+    ( model
+    , Cmd.batch
+        [ cmd
+        , cmds
+        ]
+    , maybeMsg
+    )
 
 
 
@@ -257,12 +278,15 @@ view config selection state =
             state.open
         , ZipList.viewList config state.menu |> mapToNoOp
         , if state.open then
-            ZipList.view config
-                { select = Select
-                , preventClosing = PreventClosing
-                , lift = MenuMsg NoOp
+            ZipList.view
+                { menu = config.menu
+                , ul = config.ul
+                , entry = config.entry
+                , divider = config.divider
+                , direction = config.direction
                 }
                 state.menu
+                |> Html.map MenuMsg
           else
             Html.text ""
         ]
@@ -316,7 +340,7 @@ simple config buttons id selection _ open =
                 [ Events.onBlur CloseMenu
                 , Events.on "keyup" keyupDecoder
                 , ZipList.onKeydown menuPath
-                    (MenuMsg NoOp)
+                    MenuMsg
                     (\code ->
                         case code |> fromCode of
                             Enter ->
@@ -331,8 +355,8 @@ simple config buttons id selection _ open =
                 ]
               else
                 [ Events.on "focus"
-                    (ZipList.decodeMeasurements path
-                        |> Decode.map (MenuMsg OpenMenu)
+                    (ZipList.decodeMeasurements path True
+                        |> Decode.map MenuMsg
                     )
                 ]
             , noOp (config.attrs (selection /= Nothing) open)
@@ -376,8 +400,8 @@ autocomplete config buttons id selection query open =
             [ [ Attributes.value query
               , Attributes.id (textfieldId id)
               , Events.on "focus"
-                    (ZipList.decodeMeasurements path
-                        |> Decode.map (MenuMsg OpenMenu)
+                    (ZipList.decodeMeasurements path True
+                        |> Decode.map MenuMsg
                     )
               ]
             , if selection == Nothing then
@@ -393,7 +417,7 @@ autocomplete config buttons id selection query open =
                 [ Events.onBlur CloseMenu
                 , Events.on "keyup" keyupDecoder
                 , ZipList.onKeydown menuPath
-                    (MenuMsg NoOp)
+                    MenuMsg
                     (\code ->
                         case code |> fromCode of
                             Enter ->
