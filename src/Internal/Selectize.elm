@@ -21,7 +21,6 @@ import Dom.Scroll
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
-import Html.Lazy
 import Internal.Entry as Entry exposing (Entry(..))
 import Internal.ZipList as ZipList exposing (EntryWithHeight, ZipList)
 import Json.Decode as Decode exposing (Decoder)
@@ -394,11 +393,15 @@ view config selection state =
                     ]
                 ]
                 [ input
-                , Html.div menuAttrs
-                    [ state.entries
-                        |> List.map (viewUnfocusedEntry config Nothing)
-                        |> Html.ul (noOp config.ul)
-                    ]
+                , ZipList.viewList
+                    config
+                    { select = Select
+                    , setMouseFocus = SetMouseFocus
+                    , preventClosing = PreventClosing
+                    }
+                    (menuId state.id)
+                    state.entries
+                    state.mouseFocus
                 ]
 
         Just zipList ->
@@ -407,110 +410,16 @@ view config selection state =
                     [ "position" => "relative" ]
                 ]
                 [ input
-                , Html.div menuAttrs
-                    [ [ zipList.front
-                            |> viewEntries config state
-                            |> List.reverse
-                      , [ zipList.current
-                            |> viewCurrentEntry config state
-                        ]
-                      , zipList.back
-                            |> viewEntries config state
-                      ]
-                        |> List.concat
-                        |> Html.ul (noOp config.ul)
-                    ]
+                , ZipList.view
+                    config
+                    { select = Select
+                    , setMouseFocus = SetMouseFocus
+                    , preventClosing = PreventClosing
+                    }
+                    (menuId state.id)
+                    zipList
+                    state.mouseFocus
                 ]
-
-
-viewEntries :
-    ViewConfig a
-    -> State a
-    -> List (EntryWithHeight a)
-    -> List (Html (Msg a))
-viewEntries config state front =
-    let
-        viewEntry ( entry, _ ) =
-            Html.Lazy.lazy3 viewUnfocusedEntry
-                config
-                state.mouseFocus
-                entry
-    in
-    front |> List.map viewEntry
-
-
-viewCurrentEntry :
-    ViewConfig a
-    -> State a
-    -> EntryWithHeight a
-    -> Html (Msg a)
-viewCurrentEntry config state current =
-    current
-        |> Tuple.first
-        |> viewFocusedEntry config state.mouseFocus
-
-
-viewUnfocusedEntry :
-    { r
-        | entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-    }
-    -> Maybe a
-    -> Entry a
-    -> Html (Msg a)
-viewUnfocusedEntry config mouseFocus entry =
-    viewEntry config False mouseFocus entry
-
-
-viewFocusedEntry :
-    { r
-        | entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-    }
-    -> Maybe a
-    -> Entry a
-    -> Html (Msg a)
-viewFocusedEntry config mouseFocus entry =
-    viewEntry config True mouseFocus entry
-
-
-viewEntry :
-    { r
-        | entry : a -> Bool -> Bool -> HtmlDetails Never
-        , divider : String -> HtmlDetails Never
-    }
-    -> Bool
-    -> Maybe a
-    -> Entry a
-    -> Html (Msg a)
-viewEntry config keyboardFocused mouseFocus entry =
-    let
-        { attributes, children } =
-            case entry of
-                Entry entry ->
-                    config.entry entry
-                        (mouseFocus == Just entry)
-                        keyboardFocused
-
-                Divider title ->
-                    config.divider title
-
-        liAttrs attrs =
-            attrs ++ noOp attributes
-    in
-    Html.li
-        (liAttrs <|
-            case entry of
-                Entry entry ->
-                    [ Events.onClick (Select entry)
-                    , Events.onMouseEnter (SetMouseFocus (Just entry))
-                    , Events.onMouseLeave (SetMouseFocus Nothing)
-                    ]
-
-                _ ->
-                    []
-        )
-        (children |> List.map mapToNoOp)
 
 
 

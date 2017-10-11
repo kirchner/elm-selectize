@@ -11,8 +11,13 @@ module Internal.ZipList
         , next
         , previous
         , removeCurrentEntry
+        , view
+        , viewList
         )
 
+import Html exposing (Html)
+import Html.Attributes as Attributes
+import Html.Events as Events
 import Internal.Entry exposing (..)
 
 
@@ -235,6 +240,183 @@ moveForwardToHelper a zipList =
                 zipList
                     |> next
                     |> moveForwardToHelper a
+
+
+
+---- VIEW
+
+
+type alias HtmlDetails msg =
+    { attributes : List (Html.Attribute msg)
+    , children : List (Html msg)
+    }
+
+
+viewList :
+    { r
+        | menu : List (Html.Attribute Never)
+        , ul : List (Html.Attribute Never)
+        , entry : a -> Bool -> Bool -> HtmlDetails Never
+        , divider : String -> HtmlDetails Never
+    }
+    ->
+        { select : a -> msg
+        , setMouseFocus : Maybe a -> msg
+        , preventClosing : Bool -> msg
+        }
+    -> String
+    -> List (Entry a)
+    -> Maybe a
+    -> Html msg
+viewList config { select, setMouseFocus, preventClosing } id entries mouseFocus =
+    let
+        menuAttrs =
+            [ Attributes.id id
+            , Events.onMouseDown (preventClosing True)
+            , Events.onMouseUp (preventClosing False)
+            , Attributes.style [ "position" => "absolute" ]
+            ]
+                ++ noOp config.menu
+    in
+    Html.div menuAttrs
+        [ entries
+            |> List.map
+                (viewEntry
+                    False
+                    config
+                    select
+                    setMouseFocus
+                    mouseFocus
+                )
+            |> Html.ul (noOp config.ul)
+        ]
+
+
+view :
+    { r
+        | menu : List (Html.Attribute Never)
+        , ul : List (Html.Attribute Never)
+        , entry : a -> Bool -> Bool -> HtmlDetails Never
+        , divider : String -> HtmlDetails Never
+    }
+    ->
+        { select : a -> msg
+        , setMouseFocus : Maybe a -> msg
+        , preventClosing : Bool -> msg
+        }
+    -> String
+    -> ZipList a
+    -> Maybe a
+    -> Html msg
+view config { select, setMouseFocus, preventClosing } id zipList mouseFocus =
+    let
+        menuAttrs =
+            [ Attributes.id id
+            , Events.onMouseDown (preventClosing True)
+            , Events.onMouseUp (preventClosing False)
+            , Attributes.style [ "position" => "absolute" ]
+            ]
+                ++ noOp config.menu
+    in
+    Html.div menuAttrs
+        [ [ zipList.front
+                |> viewUnfocusedEntriesWithHeight config select setMouseFocus mouseFocus
+                |> List.reverse
+          , [ zipList.current
+                |> Tuple.first
+                |> viewEntry True config select setMouseFocus mouseFocus
+            ]
+          , zipList.back
+                |> viewUnfocusedEntriesWithHeight config select setMouseFocus mouseFocus
+          ]
+            |> List.concat
+            |> Html.ul (noOp config.ul)
+        ]
+
+
+viewUnfocusedEntriesWithHeight :
+    { r
+        | entry : a -> Bool -> Bool -> HtmlDetails Never
+        , divider : String -> HtmlDetails Never
+    }
+    -> (a -> msg)
+    -> (Maybe a -> msg)
+    -> Maybe a
+    -> List (EntryWithHeight a)
+    -> List (Html msg)
+viewUnfocusedEntriesWithHeight config select setMouseFocus mouseFocus front =
+    let
+        viewEntryWithHeight ( entry, _ ) =
+            viewEntry
+                False
+                config
+                select
+                setMouseFocus
+                mouseFocus
+                entry
+    in
+    front |> List.map viewEntryWithHeight
+
+
+viewEntry :
+    Bool
+    ->
+        { r
+            | entry : a -> Bool -> Bool -> HtmlDetails Never
+            , divider : String -> HtmlDetails Never
+        }
+    -> (a -> msg)
+    -> (Maybe a -> msg)
+    -> Maybe a
+    -> Entry a
+    -> Html msg
+viewEntry keyboardFocused config select setMouseFocus mouseFocus entry =
+    let
+        { attributes, children } =
+            case entry of
+                Entry entry ->
+                    config.entry entry
+                        (mouseFocus == Just entry)
+                        keyboardFocused
+
+                Divider title ->
+                    config.divider title
+
+        liAttrs attrs =
+            attrs ++ noOp attributes
+    in
+    Html.li
+        (liAttrs <|
+            case entry of
+                Entry entry ->
+                    [ Events.onClick (select entry)
+                    , Events.onMouseEnter (setMouseFocus (Just entry))
+                    , Events.onMouseLeave (setMouseFocus Nothing)
+                    ]
+
+                _ ->
+                    []
+        )
+        (children |> List.map mapToNoOp)
+
+
+
+---- HELPER
+
+
+(=>) : name -> value -> ( name, value )
+(=>) name value =
+    ( name, value )
+
+
+noOp : List (Html.Attribute Never) -> List (Html.Attribute msg)
+noOp attrs =
+    List.map (Attributes.map never) attrs
+
+
+mapToNoOp : Html Never -> Html msg
+mapToNoOp =
+    Html.map never
 
 
 zip : List a -> List b -> List ( a, b )
