@@ -1,8 +1,6 @@
 module Internal.Selectize
     exposing
-        ( Heights
-        , Input
-        , Movement(..)
+        ( Input
         , Msg(..)
         , State
         , ViewConfig
@@ -17,7 +15,6 @@ module Internal.Selectize
 
 import DOM
 import Dom
-import Dom.Scroll
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
@@ -44,38 +41,20 @@ import Task
 
 type alias State a =
     { id : String
-    , entries : List (Entry a)
     , query : String
-    , zipList : Maybe (ZipList a)
-    , open : Bool
-    , mouseFocus : Maybe a
     , preventBlur : Bool
-
-    -- dom measurements
-    , entryHeights : List Float
-    , menuHeight : Float
-    , scrollTop : Float
-    }
-
-
-type alias Heights =
-    { entries : List Float
-    , menu : Float
+    , menu : ZipList.State a
+    , open : Bool
     }
 
 
 closed : String -> List (Entry a) -> State a
 closed id entries =
     { id = id
-    , entries = entries
     , query = ""
-    , zipList = Nothing
-    , open = False
-    , mouseFocus = Nothing
     , preventBlur = False
-    , entryHeights = []
-    , menuHeight = 0
-    , scrollTop = 0
+    , menu = ZipList.init (menuId id) entries
+    , open = False
     }
 
 
@@ -86,7 +65,7 @@ closed id entries =
 type Msg a
     = NoOp
       -- open/close menu
-    | OpenMenu Heights Float
+    | OpenMenu
     | CloseMenu
     | FocusTextfield
     | BlurTextfield
@@ -94,18 +73,11 @@ type Msg a
       -- query
     | SetQuery String
       -- handle focus and selection
-    | SetMouseFocus (Maybe a)
     | Select a
-    | SetKeyboardFocus Movement Float
     | SelectKeyboardFocusAndBlur
     | ClearSelection
-
-
-type Movement
-    = Up
-    | Down
-    | PageUp
-    | PageDown
+      -- menu
+    | MenuMsg (Msg a) (ZipList.Msg a)
 
 
 update :
@@ -116,44 +88,17 @@ update :
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update { select, matches } selection state msg =
+update ({ select, matches } as tagger) selection state msg =
     case msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
 
-        OpenMenu heights scrollTop ->
-            let
-                newZipList =
-                    ZipList.fromList state.entries heights.entries
-                        |> Maybe.map
-                            (case selection of
-                                Just a ->
-                                    ZipList.moveForwardTo a
-
-                                Nothing ->
-                                    identity
-                            )
-
-                top =
-                    newZipList
-                        |> Maybe.map .currentTop
-                        |> Maybe.withDefault 0
-
-                height =
-                    newZipList
-                        |> Maybe.map ZipList.currentHeight
-                        |> Maybe.withDefault 0
-            in
+        OpenMenu ->
             ( { state
-                | zipList = newZipList
-                , open = True
-                , mouseFocus = Nothing
+                | open = True
                 , query = ""
-                , entryHeights = heights.entries
-                , menuHeight = heights.menu
-                , scrollTop = scrollTop
               }
-            , scroll state.id (top - (heights.menu - height) / 2)
+            , Cmd.none
             , Nothing
             )
 
@@ -161,7 +106,10 @@ update { select, matches } selection state msg =
             if state.preventBlur then
                 ( state, Cmd.none, Nothing )
             else
-                ( state |> reset
+                ( { state
+                    | open = False
+                    , query = ""
+                  }
                 , Cmd.none
                 , Nothing
                 )
@@ -186,43 +134,33 @@ update { select, matches } selection state msg =
 
         SetQuery newQuery ->
             let
-                newZipList =
-                    ZipList.fromListWithFilter matches newQuery state.entries state.entryHeights
+                ( newMenu, cmd ) =
+                    ZipList.filter (matches newQuery) state.menu
             in
             ( { state
                 | query = newQuery
-                , zipList = newZipList
-                , mouseFocus = Nothing
+                , menu = newMenu
               }
-            , scroll state.id 0
+            , cmd |> Cmd.map (MenuMsg NoOp)
             , Just (select Nothing)
             )
 
-        SetMouseFocus focus ->
-            ( { state | mouseFocus = focus }
-            , Cmd.none
-            , Nothing
-            )
-
         Select a ->
-            ( state |> reset
+            ( { state
+                | open = False
+                , query = ""
+              }
             , Cmd.none
             , Just (select (Just a))
             )
 
-        SetKeyboardFocus movement scrollTop ->
-            state
-                |> updateKeyboardFocus select movement
-                |> scrollToKeyboardFocus state.id scrollTop
-
         SelectKeyboardFocusAndBlur ->
-            let
-                maybeA =
-                    state.zipList |> Maybe.map ZipList.currentEntry
-            in
-            ( state |> reset
+            ( { state
+                | open = False
+                , query = ""
+              }
             , blur state.id
-            , Just (select (state.zipList |> Maybe.map ZipList.currentEntry))
+            , Just (select (state.menu.zipList |> Maybe.map ZipList.currentEntry))
             )
 
         ClearSelection ->
@@ -231,83 +169,22 @@ update { select, matches } selection state msg =
             , Just (select Nothing)
             )
 
-
-type alias WithKeyboardFocus a r =
-    { r | keyboardFocus : Maybe a }
-
-
-reset : State a -> State a
-reset state =
-    { state
-        | query = ""
-        , zipList = Nothing
-        , open = False
-        , mouseFocus = Nothing
-    }
-
-
-updateKeyboardFocus :
-    (Maybe a -> msg)
-    -> Movement
-    -> State a
-    -> ( State a, Cmd (Msg a), Maybe msg )
-updateKeyboardFocus select movement state =
-    let
-        newZipList =
-            case movement of
-                Up ->
-                    state.zipList
-                        |> Maybe.map ZipList.previous
-
-                Down ->
-                    state.zipList
-                        |> Maybe.map ZipList.next
-
-                _ ->
-                    state.zipList
-    in
-    ( { state
-        | zipList = newZipList
-      }
-    , Cmd.none
-    , Just (select Nothing)
-    )
-
-
-scrollToKeyboardFocus :
-    String
-    -> Float
-    -> ( State a, Cmd (Msg a), Maybe msg )
-    -> ( State a, Cmd (Msg a), Maybe msg )
-scrollToKeyboardFocus id scrollTop ( state, cmd, maybeMsg ) =
-    case state.zipList of
-        Just zipList ->
+        MenuMsg nextMsg menuMsg ->
             let
-                top =
-                    zipList.currentTop
+                ( newMenu, menuCmd ) =
+                    ZipList.update selection state.menu menuMsg
 
-                height =
-                    ZipList.currentHeight zipList
-
-                y =
-                    if top < scrollTop then
-                        top
-                    else if
-                        (top + height)
-                            > (scrollTop + state.menuHeight)
-                    then
-                        top + height - state.menuHeight
-                    else
-                        scrollTop
+                ( newState, cmd, maybeMsg ) =
+                    update tagger
+                        selection
+                        { state | menu = newMenu }
+                        nextMsg
             in
-            ( state
-            , Cmd.batch [ scroll id y, cmd ]
-            , maybeMsg
-            )
-
-        Nothing ->
-            ( state
-            , cmd
+            ( newState
+            , Cmd.batch
+                [ menuCmd |> Cmd.map (MenuMsg NoOp)
+                , cmd
+                ]
             , maybeMsg
             )
 
@@ -370,59 +247,32 @@ view :
     -> State a
     -> Html (Msg a)
 view config selection state =
-    let
-        menuAttrs =
-            [ Attributes.id (menuId state.id)
-            , Events.onMouseDown (PreventClosing True)
-            , Events.onMouseUp (PreventClosing False)
-            , Attributes.style [ "position" => "absolute" ]
-            ]
-                ++ noOp config.menu
+    Html.div
+        []
+        [ config.input
+            (buttons config.clearButton config.toggleButton)
+            state.id
+            selection
+            state.query
+            state.open
+        , ZipList.viewList config state.menu |> mapToNoOp
+        , if state.open then
+            ZipList.view config
+                { select = Select
+                , preventClosing = PreventClosing
+                , lift = MenuMsg NoOp
+                }
+                state.menu
+          else
+            Html.text ""
+        ]
 
-        input =
-            config.input
-                (buttons config.clearButton config.toggleButton)
-                state.id
-                selection
-                state.query
-                state.open
-    in
-    case state.zipList of
-        Nothing ->
-            Html.div
-                [ Attributes.style
-                    [ "overflow" => "hidden"
-                    , "position" => "relative"
-                    ]
-                ]
-                [ input
-                , ZipList.viewList
-                    config
-                    { select = Select
-                    , setMouseFocus = SetMouseFocus
-                    , preventClosing = PreventClosing
-                    }
-                    (menuId state.id)
-                    state.entries
-                    state.mouseFocus
-                ]
 
-        Just zipList ->
-            Html.div
-                [ Attributes.style
-                    [ "position" => "relative" ]
-                ]
-                [ input
-                , ZipList.view
-                    config
-                    { select = Select
-                    , setMouseFocus = SetMouseFocus
-                    , preventClosing = PreventClosing
-                    }
-                    (menuId state.id)
-                    zipList
-                    state.mouseFocus
-                ]
+path : Decoder a -> Decoder a
+path =
+    DOM.parentElement
+        << DOM.parentElement
+        << DOM.childNode 1
 
 
 
@@ -465,20 +315,44 @@ simple config buttons id selection _ open =
             , if open then
                 [ Events.onBlur CloseMenu
                 , Events.on "keyup" keyupDecoder
-                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                , ZipList.onKeydown menuPath
+                    (MenuMsg NoOp)
+                    (\code ->
+                        case code |> fromCode of
+                            Enter ->
+                                Just SelectKeyboardFocusAndBlur
+
+                            Escape ->
+                                Just BlurTextfield
+
+                            _ ->
+                                Nothing
+                    )
                 ]
               else
-                [ Events.on "focus" focusDecoder ]
+                [ Events.on "focus"
+                    (ZipList.decodeMeasurements path
+                        |> Decode.map (MenuMsg OpenMenu)
+                    )
+                ]
             , noOp (config.attrs (selection /= Nothing) open)
             ]
                 |> List.concat
+
+        menuPath =
+            DOM.parentElement
+                << DOM.parentElement
+                << DOM.childNode 2
 
         actualText =
             selection
                 |> Maybe.map config.selection
                 |> Maybe.withDefault config.placeholder
     in
-    Html.div []
+    Html.div
+        [ Attributes.style
+            [ "position" => "relative" ]
+        ]
         [ Html.div buttonAttrs
             [ Html.text actualText ]
         , buttons (selection /= Nothing) open
@@ -501,7 +375,10 @@ autocomplete config buttons id selection query open =
         inputAttrs =
             [ [ Attributes.value query
               , Attributes.id (textfieldId id)
-              , Events.on "focus" focusDecoder
+              , Events.on "focus"
+                    (ZipList.decodeMeasurements path
+                        |> Decode.map (MenuMsg OpenMenu)
+                    )
               ]
             , if selection == Nothing then
                 if open then
@@ -515,7 +392,19 @@ autocomplete config buttons id selection query open =
             , if open then
                 [ Events.onBlur CloseMenu
                 , Events.on "keyup" keyupDecoder
-                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                , ZipList.onKeydown menuPath
+                    (MenuMsg NoOp)
+                    (\code ->
+                        case code |> fromCode of
+                            Enter ->
+                                Just SelectKeyboardFocusAndBlur
+
+                            Escape ->
+                                Just BlurTextfield
+
+                            _ ->
+                                Nothing
+                    )
                 , Events.onInput SetQuery
                 ]
               else
@@ -523,8 +412,16 @@ autocomplete config buttons id selection query open =
             , noOp (config.attrs (selection /= Nothing) open)
             ]
                 |> List.concat
+
+        menuPath =
+            DOM.parentElement
+                << DOM.parentElement
+                << DOM.childNode 2
     in
-    Html.div []
+    Html.div
+        [ Attributes.style
+            [ "position" => "relative" ]
+        ]
         [ Html.input inputAttrs []
         , Html.div
             ([ Attributes.style
@@ -598,49 +495,6 @@ buttons clearButton toggleButton sthSelected open =
         ]
 
 
-focusDecoder : Decoder (Msg a)
-focusDecoder =
-    Decode.map3
-        (\entryHeights menuHeight scrollTop ->
-            OpenMenu { entries = entryHeights, menu = menuHeight } scrollTop
-        )
-        entryHeightsDecoder
-        menuHeightDecoder
-        scrollTopDecoder
-
-
-keydownOptions : Events.Options
-keydownOptions =
-    { preventDefault = True
-    , stopPropagation = False
-    }
-
-
-keydownDecoder : Decoder (Msg a)
-keydownDecoder =
-    Decode.map2
-        (\code scrollTop ->
-            case code |> fromCode of
-                ArrowUp ->
-                    Ok (SetKeyboardFocus Up scrollTop)
-
-                ArrowDown ->
-                    Ok (SetKeyboardFocus Down scrollTop)
-
-                Enter ->
-                    Ok SelectKeyboardFocusAndBlur
-
-                Escape ->
-                    Ok BlurTextfield
-
-                _ ->
-                    Err "not handling that key here"
-        )
-        Events.keyCode
-        scrollTopDecoder
-        |> Decode.andThen fromResult
-
-
 keyupDecoder : Decoder (Msg a)
 keyupDecoder =
     Events.keyCode
@@ -703,12 +557,6 @@ mapToNoOp =
 ---- CMDS
 
 
-scroll : String -> Float -> Cmd (Msg a)
-scroll id y =
-    Task.attempt (\_ -> NoOp) <|
-        Dom.Scroll.toY (menuId id) y
-
-
 focus : String -> Cmd (Msg a)
 focus id =
     Task.attempt (\_ -> NoOp) <|
@@ -723,33 +571,6 @@ blur id =
 
 
 ---- DECODER
-
-
-entryHeightsDecoder : Decoder (List Float)
-entryHeightsDecoder =
-    Decode.field "offsetHeight" Decode.float
-        |> DOM.childNodes
-        |> DOM.childNode 0
-        |> DOM.childNode 1
-        |> DOM.parentElement
-        |> DOM.parentElement
-        |> DOM.target
-
-
-menuHeightDecoder : Decoder Float
-menuHeightDecoder =
-    DOM.childNode 1 (Decode.field "clientHeight" Decode.float)
-        |> DOM.parentElement
-        |> DOM.parentElement
-        |> DOM.target
-
-
-scrollTopDecoder : Decoder Float
-scrollTopDecoder =
-    DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
-        |> DOM.parentElement
-        |> DOM.parentElement
-        |> DOM.target
 
 
 fromResult : Result String a -> Decoder a

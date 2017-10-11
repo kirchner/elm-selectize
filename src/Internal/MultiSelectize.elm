@@ -332,7 +332,7 @@ update { select, unselect, clearSelection, keepQuery, textfieldMovable, matches 
                         |> filterOut selections
 
                 newZipList =
-                    ZipList.fromListWithFilter matches newQuery entries state.entryHeights
+                    ZipList.fromListWithFilter (matches newQuery) entries state.entryHeights
             in
             ( { state
                 | query = newQuery
