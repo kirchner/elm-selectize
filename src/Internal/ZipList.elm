@@ -1,6 +1,7 @@
 module Internal.ZipList
     exposing
-        ( EntryWithHeight
+        ( Direction(..)
+        , EntryWithHeight
         , ZipList
         , currentEntry
         , currentHeight
@@ -252,6 +253,11 @@ type alias HtmlDetails msg =
     }
 
 
+type Direction
+    = Upward
+    | Downward
+
+
 viewList :
     { r
         | menu : List (Html.Attribute Never)
@@ -298,6 +304,7 @@ view :
         , ul : List (Html.Attribute Never)
         , entry : a -> Bool -> Bool -> HtmlDetails Never
         , divider : String -> HtmlDetails Never
+        , direction : Direction
     }
     ->
         { select : a -> msg
@@ -314,7 +321,16 @@ view config { select, setMouseFocus, preventClosing } id zipList mouseFocus =
             [ Attributes.id id
             , Events.onMouseDown (preventClosing True)
             , Events.onMouseUp (preventClosing False)
-            , Attributes.style [ "position" => "absolute" ]
+            , case config.direction of
+                Downward ->
+                    Attributes.style
+                        [ "position" => "absolute" ]
+
+                Upward ->
+                    Attributes.style
+                        [ "position" => "absolute"
+                        , "bottom" => "100%"
+                        ]
             ]
                 ++ noOp config.menu
     in

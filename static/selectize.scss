@@ -161,13 +161,15 @@ h3 {
   &__menu {
     z-index: 2000;
     width: 100%; 
-    margin-top: 5px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 0;
+    margin-right: 0;
     background: white;
     color: black;
     max-height: 20rem;
     overflow: scroll;
     padding: 0;
-    margin: 2px 0 0 0;
     color: #000;
     background: #fff;
 

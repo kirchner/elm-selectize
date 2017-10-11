@@ -1,6 +1,7 @@
 module Selectize
     exposing
-        ( Entry
+        ( Direction
+        , Entry
         , HtmlDetails
         , Input
         , Msg
@@ -9,8 +10,10 @@ module Selectize
         , autocomplete
         , closed
         , divider
+        , downward
         , entry
         , simple
+        , upward
         , update
         , view
         , viewConfig
@@ -181,7 +184,7 @@ and an input given by, for example,
 
 # View
 
-@docs view, ViewConfig, viewConfig, HtmlDetails, Input, simple, autocomplete
+@docs view, ViewConfig, viewConfig, HtmlDetails, Direction, upward, downward, Input, simple, autocomplete
 
 -}
 
@@ -190,6 +193,7 @@ import Html.Lazy as Lazy
 import Internal.Entry as Internal
 import Internal.Selectize as Internal
 import Internal.SimpleSelectize
+import Internal.ZipList as ZipList
 
 
 {- model -}
@@ -291,6 +295,7 @@ viewConfig :
     , divider : String -> HtmlDetails Never
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
+    , direction : Direction
     , input : Input a
     }
     -> ViewConfig a
@@ -302,6 +307,7 @@ viewConfig config =
     , divider = config.divider
     , toggleButton = config.toggleButton
     , clearButton = config.clearButton
+    , direction = config.direction
     , input = config.input
     }
 
@@ -312,6 +318,26 @@ type alias HtmlDetails msg =
     { attributes : List (Html.Attribute msg)
     , children : List (Html msg)
     }
+
+
+{-| In which direction should the menu open?
+-}
+type alias Direction =
+    ZipList.Direction
+
+
+{-| The menu opens upward.
+-}
+upward : Direction
+upward =
+    ZipList.Upward
+
+
+{-| The menu opens downward.
+-}
+downward : Direction
+downward =
+    ZipList.Downward
 
 
 

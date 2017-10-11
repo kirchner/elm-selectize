@@ -22,7 +22,7 @@ import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
 import Internal.Entry as Entry exposing (Entry(..))
-import Internal.ZipList as ZipList exposing (EntryWithHeight, ZipList)
+import Internal.ZipList as ZipList exposing (Direction, EntryWithHeight, ZipList)
 import Json.Decode as Decode exposing (Decoder)
 import Keyboard.Extra
     exposing
@@ -324,6 +324,7 @@ type alias ViewConfig a =
     , divider : String -> HtmlDetails Never
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
+    , direction : Direction
     , input : Input a
     }
 
@@ -342,6 +343,7 @@ viewConfig :
     , divider : String -> HtmlDetails Never
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
+    , direction : Direction
     , input : Input a
     }
     -> ViewConfig a
@@ -353,6 +355,7 @@ viewConfig config =
     , divider = config.divider
     , toggleButton = config.toggleButton
     , clearButton = config.clearButton
+    , direction = config.direction
     , input = config.input
     }
 

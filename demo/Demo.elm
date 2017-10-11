@@ -368,6 +368,8 @@ viewConfigTextfield autocompletion showClearButton =
                 clearButton
             else
                 Nothing
+        , direction =
+            Selectize.downward
         , input =
             if autocompletion then
                 textfieldSelector
