@@ -187,7 +187,9 @@ and an input given by, for example,
 
 import Html exposing (Html)
 import Html.Lazy as Lazy
+import Internal.Entry as Internal
 import Internal.Selectize as Internal
+import Internal.SimpleSelectize
 
 
 {- model -}
@@ -213,11 +215,10 @@ your dropdown state with this function.
 -}
 closed :
     String
-    -> (a -> String)
     -> List (Entry a)
     -> State a
-closed id toLabel entries =
-    Internal.closed id toLabel entries
+closed id entries =
+    Internal.closed id entries
 
 
 {-| Each entry of the menu has to be wrapped in this type. We need this,
@@ -324,13 +325,15 @@ module documentation to see what boilerplate is needed in your main
 update.
 -}
 update :
-    (Maybe a -> msg)
+    { select : Maybe a -> msg
+    , matches : String -> a -> Bool
+    }
     -> Maybe a
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update select selection state msg =
-    Internal.update select selection state msg
+update config selection state msg =
+    Internal.update config selection state msg
 
 
 
@@ -365,6 +368,7 @@ simple :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
+    , selection : a -> String
     , placeholder : String
     }
     -> Input a
@@ -386,6 +390,7 @@ autocomplete :
     { attrs : Bool -> Bool -> List (Html.Attribute Never)
     , toggleButton : Maybe (Bool -> Html Never)
     , clearButton : Maybe (Html Never)
+    , selection : a -> String
     , placeholder : String
     }
     -> Input a

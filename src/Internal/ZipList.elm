@@ -7,6 +7,7 @@ module Internal.ZipList
         , first
         , fromList
         , fromListWithFilter
+        , moveForwardTo
         , next
         , previous
         , removeCurrentEntry
@@ -249,14 +250,3 @@ zipHelper listA listB sum =
 
         _ ->
             sum
-
-
-
----- HELPER
-
-
-contains : String -> String -> Bool
-contains query label =
-    label
-        |> String.toLower
-        |> String.contains (String.toLower query)

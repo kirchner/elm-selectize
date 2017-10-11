@@ -47,7 +47,6 @@ init =
       , menu =
             Selectize.closed
                 "textfield-menu"
-                identity
                 licenses
       , autocompletion = True
       , showClearButton = True
@@ -92,7 +91,10 @@ update msg model =
         MenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectLicense
+                    Selectize.update
+                        { select = SelectLicense
+                        , matches = contains
+                        }
                         model.selection
                         model.menu
                         selectizeMsg
@@ -465,6 +467,7 @@ textfieldSelector showClearButton =
                 clearButton
             else
                 Nothing
+        , selection = identity
         , placeholder = "Select a License"
         }
 
@@ -484,6 +487,7 @@ buttonSelector showClearButton =
                 clearButton
             else
                 Nothing
+        , selection = identity
         , placeholder = "Select a License"
         }
 
