@@ -7,18 +7,19 @@ module Demo
         , update
         )
 
+import Browser exposing (Document)
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Selectize
 
 
-main : Program Never Model Msg
+main : Program {} Model Msg
 main =
-    Html.program
+    Browser.document
         { init = init
+        , view = view
         , update = update
         , subscriptions = subscriptions
-        , view = view
         }
 
 
@@ -34,8 +35,8 @@ type alias Model =
     }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : {} -> ( Model, Cmd Msg )
+init _ =
     ( { textfieldSelection = Nothing
       , textfieldMenu =
             Selectize.closed
@@ -138,16 +139,15 @@ subscriptions model =
 ---- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
-    Html.div []
+    { title = "elm-selectize demo"
+    , body =
         [ Html.h3 []
             [ Html.text "Dropdown Menus" ]
         , Html.div
-            [ Attributes.style
-                [ ( "display", "flex" )
-                , ( "flex-flow", "column" )
-                ]
+            [ Attributes.style "display" "flex"
+            , Attributes.style "flex-flow" "column"
             ]
             [ Html.div
                 [ Attributes.class "container" ]
@@ -155,7 +155,7 @@ view model =
                     [ Attributes.class "caption" ]
                     [ Html.text "with autocompletion: " ]
                 , Html.div
-                    [ Attributes.style [ ( "width", "30rem" ) ] ]
+                    [ Attributes.style "width" "30rem" ]
                     [ Selectize.view
                         viewConfigTextfield
                         model.textfieldSelection
@@ -169,7 +169,7 @@ view model =
                     [ Attributes.class "caption" ]
                     [ Html.text "without autocompletion: " ]
                 , Html.div
-                    [ Attributes.style [ ( "width", "30rem" ) ] ]
+                    [ Attributes.style "width" "30rem" ]
                     [ Selectize.view
                         viewConfigButton
                         model.buttonSelection
@@ -179,6 +179,7 @@ view model =
                 ]
             ]
         ]
+    }
 
 
 

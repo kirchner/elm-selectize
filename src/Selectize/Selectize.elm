@@ -26,26 +26,18 @@ module Selectize.Selectize
         , zipPrevious
         )
 
-import DOM
-import Dom
-import Dom.Scroll
+--import Keyboard.Extra
+--    exposing
+--        ( Key(..)
+--        , fromCode
+--        )
+
+import Browser.Dom as Dom
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
 import Html.Lazy
 import Json.Decode as Decode exposing (Decoder)
-import Keyboard.Extra
-    exposing
-        ( Key
-            ( ArrowDown
-            , ArrowUp
-            , BackSpace
-            , Delete
-            , Enter
-            , Escape
-            )
-        , fromCode
-        )
 import Task
 
 
@@ -110,8 +102,8 @@ selectFirst entries a =
 closed : String -> (a -> String) -> List (Entry a) -> State a
 closed id toLabel entries =
     let
-        addLabel entry =
-            case entry of
+        addLabel e =
+            case e of
                 Entry a ->
                     LEntry a (toLabel a)
 
@@ -223,7 +215,7 @@ update :
     -> State a
     -> Msg a
     -> ( State a, Cmd (Msg a), Maybe msg )
-update select selection state msg =
+update select maybeSelection state msg =
     case msg of
         NoOp ->
             ( state, Cmd.none, Nothing )
@@ -233,7 +225,7 @@ update select selection state msg =
                 newZipList =
                     fromList state.entries heights.entries
                         |> Maybe.map
-                            (case selection of
+                            (case maybeSelection of
                                 Just a ->
                                     moveForwardTo a
 
@@ -305,8 +297,8 @@ update select selection state msg =
             , Just (select Nothing)
             )
 
-        SetMouseFocus focus ->
-            ( { state | mouseFocus = focus }
+        SetMouseFocus newFocus ->
+            ( { state | mouseFocus = newFocus }
             , Cmd.none
             , Nothing
             )
@@ -328,16 +320,14 @@ update select selection state msg =
 
         SelectKeyboardFocusAndBlur ->
             let
-                maybeA =
-                    state.zipList |> Maybe.map currentEntry
-
                 selection =
-                    maybeA
+                    state.zipList
+                        |> Maybe.andThen currentEntry
                         |> Maybe.andThen (selectFirst state.entries)
             in
             ( state |> reset
             , blur state.id
-            , Just (select (state.zipList |> Maybe.map currentEntry))
+            , Just (select (state.zipList |> Maybe.andThen currentEntry))
             )
 
         ClearSelection ->
@@ -447,7 +437,7 @@ view config selection state =
             [ Attributes.id (menuId state.id)
             , Events.onMouseDown (PreventClosing True)
             , Events.onMouseUp (PreventClosing False)
-            , Attributes.style [ "position" => "absolute" ]
+            , Attributes.style "position" "absolute"
             ]
                 ++ noOp config.menu
     in
@@ -455,10 +445,8 @@ view config selection state =
         Nothing ->
             Html.div
                 ((config.container |> noOp)
-                    ++ [ Attributes.style
-                            [ "overflow" => "hidden"
-                            , "position" => "relative"
-                            ]
+                    ++ [ Attributes.style "overflow" "hidden"
+                       , Attributes.style "position" "relative"
                        ]
                 )
                 [ config.input
@@ -476,8 +464,7 @@ view config selection state =
 
         Just zipList ->
             Html.div
-                [ Attributes.style
-                    [ "position" => "relative" ]
+                [ Attributes.style "position" "relative"
                 ]
                 [ config.input
                     state.id
@@ -506,14 +493,13 @@ viewEntries :
     -> List (EntryWithHeight a)
     -> List (Html (Msg a))
 viewEntries config state front =
-    let
-        viewEntry ( entry, _ ) =
-            Html.Lazy.lazy3 viewUnfocusedEntry
+    List.map
+        (Tuple.first
+            >> Html.Lazy.lazy3 viewUnfocusedEntry
                 config
                 state.mouseFocus
-                entry
-    in
-    front |> List.map viewEntry
+        )
+        front
 
 
 viewCurrentEntry :
@@ -535,8 +521,8 @@ viewUnfocusedEntry :
     -> Maybe a
     -> Entry a
     -> Html (Msg a)
-viewUnfocusedEntry config mouseFocus entry =
-    viewEntry config False mouseFocus entry
+viewUnfocusedEntry config =
+    viewEntry config False
 
 
 viewFocusedEntry :
@@ -547,8 +533,8 @@ viewFocusedEntry :
     -> Maybe a
     -> Entry a
     -> Html (Msg a)
-viewFocusedEntry config mouseFocus entry =
-    viewEntry config True mouseFocus entry
+viewFocusedEntry config =
+    viewEntry config True
 
 
 viewEntry :
@@ -560,13 +546,13 @@ viewEntry :
     -> Maybe a
     -> Entry a
     -> Html (Msg a)
-viewEntry config keyboardFocused mouseFocus entry =
+viewEntry config keyboardFocused mouseFocus e =
     let
         { attributes, children } =
-            case entry of
-                Entry entry ->
-                    config.entry entry
-                        (mouseFocus == Just entry)
+            case e of
+                Entry actualEntry ->
+                    config.entry actualEntry
+                        (mouseFocus == Just actualEntry)
                         keyboardFocused
 
                 Divider title ->
@@ -577,10 +563,10 @@ viewEntry config keyboardFocused mouseFocus entry =
     in
     Html.li
         (liAttrs <|
-            case entry of
-                Entry entry ->
-                    [ Events.onClick (Select entry)
-                    , Events.onMouseEnter (SetMouseFocus (Just entry))
+            case e of
+                Entry actualEntry ->
+                    [ Events.onClick (Select actualEntry)
+                    , Events.onMouseEnter (SetMouseFocus (Just actualEntry))
                     , Events.onMouseLeave (SetMouseFocus Nothing)
                     ]
 
@@ -614,18 +600,16 @@ simple config id selection _ open =
         buttonAttrs =
             [ [ Attributes.id (textfieldId id)
               , Attributes.tabindex 0
-              , Attributes.style
-                    [ "-webkit-touch-callout" => "none"
-                    , "-webkit-user-select" => "none"
-                    , "-moz-user-select" => "none"
-                    , "-ms-user-select" => "none"
-                    , "user-select" => "none"
-                    ]
+              , Attributes.style "-webkit-touch-callout" "none"
+              , Attributes.style "-webkit-user-select" "none"
+              , Attributes.style "-moz-user-select" "none"
+              , Attributes.style "-ms-user-select" "none"
+              , Attributes.style "user-select" "none"
               ]
             , if open then
                 [ Events.onBlur CloseMenu
                 , Events.on "keyup" keyupDecoder
-                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                , Events.preventDefaultOn "keydown" keydownDecoder
                 ]
               else
                 [ Events.on "focus" focusDecoder ]
@@ -672,13 +656,11 @@ autocomplete config id selection query open =
                 else
                     [ Attributes.value config.placeholder ]
               else
-                [ Attributes.style
-                    [ "color" => "transparent" ]
-                ]
+                [ Attributes.style "color" "transparent" ]
             , if open then
                 [ Events.onBlur CloseMenu
                 , Events.on "keyup" keyupDecoder
-                , Events.onWithOptions "keydown" keydownOptions keydownDecoder
+                , Events.preventDefaultOn "keydown" keydownDecoder
                 , Events.onInput SetQuery
                 ]
               else
@@ -690,17 +672,15 @@ autocomplete config id selection query open =
     Html.div []
         [ Html.input inputAttrs []
         , Html.div
-            ([ Attributes.style
-                [ "position" => "absolute"
-                , "width" => "100%"
-                , "height" => "100%"
-                , "left" => "0"
-                , "top" => "0"
-                , "pointer-events" => "none"
-                , "border-color" => "transparent"
-                , "background-color" => "transparent"
-                , "box-shadow" => "none"
-                ]
+            ([ Attributes.style "position" "absolute"
+             , Attributes.style "width" "100%"
+             , Attributes.style "height" "100%"
+             , Attributes.style "left" "0"
+             , Attributes.style "top" "0"
+             , Attributes.style "pointer-events" "none"
+             , Attributes.style "border-color" "transparent"
+             , Attributes.style "background-color" "transparent"
+             , Attributes.style "box-shadow" "none"
              ]
                 ++ noOp (config.attrs (selection /= Nothing) open)
             )
@@ -721,12 +701,10 @@ buttons :
     -> Html (Msg a)
 buttons clearButton toggleButton sthSelected open =
     Html.div
-        [ Attributes.style
-            [ "position" => "absolute"
-            , "right" => "0"
-            , "top" => "0"
-            , "display" => "flex"
-            ]
+        [ Attributes.style "position" "absolute"
+        , Attributes.style "right" "0"
+        , Attributes.style "top" "0"
+        , Attributes.style "display" "flex"
         ]
         [ case ( clearButton, sthSelected ) of
             ( Just clear, True ) ->
@@ -741,18 +719,12 @@ buttons clearButton toggleButton sthSelected open =
                 Html.div
                     [ case open of
                         True ->
-                            Events.onWithOptions "click"
-                                { stopPropagation = True
-                                , preventDefault = False
-                                }
-                                (Decode.succeed BlurTextfield)
+                            Events.preventDefaultOn "click"
+                                (Decode.succeed ( BlurTextfield, True ))
 
                         False ->
-                            Events.onWithOptions "click"
-                                { stopPropagation = True
-                                , preventDefault = False
-                                }
-                                (Decode.succeed FocusTextfield)
+                            Events.preventDefaultOn "click"
+                                (Decode.succeed ( FocusTextfield, True ))
                     ]
                     [ toggle open |> mapToNoOp ]
 
@@ -772,29 +744,22 @@ focusDecoder =
         scrollTopDecoder
 
 
-keydownOptions : Events.Options
-keydownOptions =
-    { preventDefault = True
-    , stopPropagation = False
-    }
-
-
-keydownDecoder : Decoder (Msg a)
+keydownDecoder : Decoder ( Msg a, Bool )
 keydownDecoder =
     Decode.map2
         (\code scrollTop ->
-            case code |> fromCode of
-                ArrowUp ->
-                    Ok (SetKeyboardFocus Up scrollTop)
+            case code of
+                38 ->
+                    Ok ( SetKeyboardFocus Up scrollTop, True )
 
-                ArrowDown ->
-                    Ok (SetKeyboardFocus Down scrollTop)
+                40 ->
+                    Ok ( SetKeyboardFocus Down scrollTop, True )
 
-                Enter ->
-                    Ok SelectKeyboardFocusAndBlur
+                13 ->
+                    Ok ( SelectKeyboardFocusAndBlur, True )
 
-                Escape ->
-                    Ok BlurTextfield
+                27 ->
+                    Ok ( BlurTextfield, True )
 
                 _ ->
                     Err "not handling that key here"
@@ -809,11 +774,11 @@ keyupDecoder =
     Events.keyCode
         |> Decode.map
             (\code ->
-                case code |> fromCode of
-                    BackSpace ->
+                case code of
+                    8 ->
                         Ok ClearSelection
 
-                    Delete ->
+                    46 ->
                         Ok ClearSelection
 
                     _ ->
@@ -831,11 +796,6 @@ contains query label =
     label
         |> String.toLower
         |> String.contains (String.toLower query)
-
-
-(=>) : name -> value -> ( name, value )
-(=>) name value =
-    ( name, value )
 
 
 
@@ -869,7 +829,12 @@ mapToNoOp =
 scroll : String -> Float -> Cmd (Msg a)
 scroll id y =
     Task.attempt (\_ -> NoOp) <|
-        Dom.Scroll.toY (menuId id) y
+        (Dom.getViewportOf (menuId id)
+            |> Task.andThen
+                (\{ viewport } ->
+                    Dom.setViewportOf (menuId id) viewport.x y
+                )
+        )
 
 
 focus : String -> Cmd (Msg a)
@@ -890,29 +855,58 @@ blur id =
 
 entryHeightsDecoder : Decoder (List Float)
 entryHeightsDecoder =
-    Decode.field "offsetHeight" Decode.float
-        |> DOM.childNodes
-        |> DOM.childNode 0
-        |> DOM.childNode 1
-        |> DOM.parentElement
-        |> DOM.parentElement
-        |> DOM.target
+    let
+        loop idx xs =
+            Decode.maybe
+                (Decode.at
+                    [ String.fromInt idx
+                    , "offsetHeight"
+                    ]
+                    Decode.float
+                )
+                |> Decode.andThen
+                    (Maybe.map (\x -> loop (idx + 1) (x :: xs))
+                        >> Maybe.withDefault (Decode.succeed xs)
+                    )
+    in
+    Decode.map List.reverse <|
+        Decode.at
+            [ "target"
+            , "parentElement"
+            , "parentElement"
+            , "childNodes"
+            , "1"
+            , "childNodes"
+            , "0"
+            , "childNodes"
+            ]
+            (loop 0 [])
 
 
 menuHeightDecoder : Decoder Float
 menuHeightDecoder =
-    DOM.childNode 1 (Decode.field "clientHeight" Decode.float)
-        |> DOM.parentElement
-        |> DOM.parentElement
-        |> DOM.target
+    Decode.at
+        [ "target"
+        , "parentElement"
+        , "parentElement"
+        , "childNodes"
+        , "1"
+        , "clientHeight"
+        ]
+        Decode.float
 
 
 scrollTopDecoder : Decoder Float
 scrollTopDecoder =
-    DOM.childNode 1 (Decode.field "scrollTop" Decode.float)
-        |> DOM.parentElement
-        |> DOM.parentElement
-        |> DOM.target
+    Decode.at
+        [ "target"
+        , "parentElement"
+        , "parentElement"
+        , "childNodes"
+        , "1"
+        , "scrollTop"
+        ]
+        Decode.float
 
 
 fromResult : Result String a -> Decoder a
@@ -941,14 +935,14 @@ type alias EntryWithHeight a =
     ( Entry a, Float )
 
 
-currentEntry : { r | current : EntryWithHeight a } -> a
+currentEntry : { r | current : EntryWithHeight a } -> Maybe a
 currentEntry { current } =
     case current of
         ( Entry a, _ ) ->
-            a
+            Just a
 
         _ ->
-            Debug.crash "this should be impossible"
+            Nothing
 
 
 zipCurrentHeight : { r | current : EntryWithHeight a } -> Float
@@ -981,8 +975,8 @@ fromListWithFilter query entries entryHeights =
         filtered =
             zip entries entryHeights
                 |> List.filterMap
-                    (\( entry, height ) ->
-                        case entry of
+                    (\( e, height ) ->
+                        case e of
                             LEntry a label ->
                                 if label |> contains query then
                                     Just ( Entry a, height )

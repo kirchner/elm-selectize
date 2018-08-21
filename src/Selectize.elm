@@ -341,8 +341,8 @@ update select selection state msg =
 selection (along with the configuration and the its actual state).
 -}
 view : ViewConfig a -> Maybe a -> State a -> Html (Msg a)
-view viewConfig selection state =
-    Lazy.lazy3 Internal.view viewConfig selection state
+view =
+    Lazy.lazy3 Internal.view
 
 
 {-| You have to choose an `Input` in your view configuration. This
