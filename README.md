@@ -9,20 +9,5 @@ This is a customizable dropdown menu with the following features:
 * you can insert non-selectable dividers between entries
 * the styling and rendering of the entries can be fully customized
 
-Check out the [demo](https://kirchner.github.io/elm-selectize) or run it
-locally by executing `./elm-live.sh`
-
-
-## Nix Support
-
-If you are using [NixOS](https://nixos.org/) you run the demo locally via
-
-```
-$ nix-shell
-```
-
-You can run the test suite with
-
-```
-$ nix-shell test.nix
-```
+If you like you can check out the
+[demo](https://kirchner.github.io/elm-selectize).
